@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using StockProject.Components.Account;
+using StockProject.Components.Pages.Account;
 using StockProject.Data;
+using StockProject.Data.Entities;
 
 namespace StockProject.Extention;
 
@@ -8,7 +9,7 @@ namespace StockProject.Extention;
     {
         public static IServiceCollection ConfigureAppIdentity(this IServiceCollection services, IConfiguration config)
         {
-            services.AddIdentityCore<ApplicationUser>(options =>
+            services.AddIdentityCore<UserEntity>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = false;
                 options.Password.RequireDigit = false;
@@ -28,7 +29,7 @@ namespace StockProject.Extention;
                 options.DefaultScheme = IdentityConstants.ApplicationScheme;
                 options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
             }).AddIdentityCookies();
-            services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+            //services.AddSingleton<IEmailSender<UserEntity>, IdentityNoOpEmailSender>();
             return services;
         }
 

@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
-using StockProject.Components.Account;
+using StockProject.Components.Pages.Account;
 
 namespace StockProject.Extention;
     public static class ServiceExtensions
@@ -7,7 +7,7 @@ namespace StockProject.Extention;
         public static IServiceCollection AddAppServices(this IServiceCollection services)
         {
           
-            //services.AddScoped<ApplicationUserService>();
+            //services.AddScoped<UserEntityService>();
             //services.AddScoped<BoardService>();
             //services.AddScoped<CommentService>();
             //services.AddScoped<PostService>();

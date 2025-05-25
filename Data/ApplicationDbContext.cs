@@ -1,11 +1,27 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using StockProject.Data.Entities;
 
 namespace StockProject.Data
 {
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<UserEntity>(options)
     {
+        public DbSet<StockEntity> Stocks { get; set; }
+        public DbSet<StockCategory> StockCategories { get; set; }
+        public DbSet<TransactionEntity> Transactions { get; set; }
+        public DbSet<Board> Boards { get; set; }
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+            
+            builder.Entity<StockEntity>().ToTable("Stocks");
+            builder.Entity<StockCategory>().ToTable("StockCategories");
+            builder.Entity<TransactionEntity>().ToTable("Transactions");
+            builder.Entity<Board>().ToTable("Boards");
 
 
+
+        }
+        
     }
 }

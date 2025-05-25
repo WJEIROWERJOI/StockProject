@@ -1,4 +1,5 @@
 ﻿using StockProject.Components;
+using StockProject.Components.Pages.Account;
 
 namespace StockProject.Extention;
 
