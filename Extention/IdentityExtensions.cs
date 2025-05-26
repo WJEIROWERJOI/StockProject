@@ -29,8 +29,8 @@ namespace StockProject.Extention;
                 options.DefaultScheme = IdentityConstants.ApplicationScheme;
                 options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
             }).AddIdentityCookies();
-            //services.AddSingleton<IEmailSender<UserEntity>, IdentityNoOpEmailSender>();
-            return services;
+            services.AddSingleton<IEmailSender<UserEntity>, IdentityNoOpEmailSender>();
+        return services;
         }
 
 

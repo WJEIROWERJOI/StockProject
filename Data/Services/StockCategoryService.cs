@@ -1,24 +1,41 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using StockProject.Data.Entities;
+﻿using StockProject.Data.Dtos;
+using static StockProject.Data.Mapper;
+using StockProject.Data.Repositories;
 
-namespace StockProject.Data.Repositories
+namespace StockProject.Data.Services
 {
-    public class UserRepository
+    public class StockCategoryService
     {
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<UserEntity> _userManager;
-        public UserRepository(ApplicationDbContext context,UserManager<UserEntity> userManager)
+
+
+
+        private readonly StockCategoryRepository _repository;
+        public StockCategoryService(StockCategoryRepository repository)
         {
-            _context = context;
-            _userManager = userManager;
+            _repository = repository;
         }
 
 
+        //public required string Name { get; init; }
+        //public string Description { get; init; } = string.Empty;
+
+        //c
+        public async Task<int> CreateCategory(StockCategoryDto dto)
+        {
+
+            return await _repository.CreateStockCategoryByEntity(StockCategoryDtoToEntity(dto));
+        }
+
+
+        public async Task<int> CreateCategoryByName(StockCategoryDto dto)
+        {
+            return await _repository.CreateStockCategoryByName(dto.Name, dto.Description);
+        }
 
         //r
-        
-        
+
+
+
         //public async Task<bool> NameExistAsync(string str)
         //{
         //    return await _context.StockCategories.AnyAsync(p => p.Name.Equals(str, StringComparison.OrdinalIgnoreCase));
@@ -72,8 +89,6 @@ namespace StockProject.Data.Repositories
         //    return await _context.SaveChangesAsync();
         //}
 
-
-
-
     }
 }
+
