@@ -24,7 +24,28 @@ namespace StockProject.Data.Services
         }
 
         //c
+        public async Task CreateStockAsync(StockDto dto)
+        {
+            var category = await _stockCategoryRepository.GetStockCategoryByName(dto.Category)
+                ?? throw new KeyNotFoundException($"Category '{dto.Category}' not found");
 
+            try
+            {
+                StockEntity entity = StockDtoToEntity(dto, category);
+                entity.CreatedAt = DateTime.UtcNow;
+                entity.LastUpdatedAt = DateTime.UtcNow;
+
+                await _stockRepository.CreateStockAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogAsync(
+                    "StockCreationError",
+                    $"Exception Type: {ex.GetType().Name}, Message: {ex.Message}, StackTrace: {ex.StackTrace}"
+                );
+                throw;
+            }
+        }
 
 
 
@@ -39,40 +60,79 @@ namespace StockProject.Data.Services
 
 
         //u
-
-
-
         public async Task ChangeAmountAsync(StockDto dto, int amount)
         {
-            var entity = await _stockRepository.GetStockByNameAsync(dto.ProductName)
+            var entity = await _stockRepository.GetStockByIdAsync(dto.Id)
                 ?? throw new KeyNotFoundException($"Stock '{dto.ProductName}' not found");
-
-
             try
             {
-                await CreateStockTransactionAsync(entity, amount, "Amount changed");
-
+                var transaction = await CreateStockTransactionAsync(entity, amount, "Amount changed");
+                entity.Transactions.Add(transaction);
                 entity.Quantity += amount;
+                entity.LastUpdatedAt = DateTime.UtcNow;
+                await _stockRepository.UpdateStockAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                // await _logService.LogAsync(ex.GetType().Name, $"{ex.StackTrace} + {ex.Message}");
+                await _logService.LogAsync(
+                    "StockChangeAmountError",
+                    $"Exception Type: {ex.GetType().Name}, Message: {ex.Message}, StackTrace: {ex.StackTrace}"
+                );
+                throw;
+            }
+        }
+        public async Task ChangeStock(StockDto dto)
+        {
+            var entity = await _stockRepository.GetStockByIdAsync(dto.Id)
+                ?? throw new KeyNotFoundException($"Stock '{dto.ProductName}' not found");
+            try
+            {
+                var transaction = await CreateStockTransactionAsync(entity, 0, "Stock changed");
+                entity.Transactions.Add(transaction);
+                entity.ProductName = dto.ProductName;
+                entity.Description = dto.Description;
+                entity.Category = await _stockCategoryRepository.GetStockCategoryByName(dto.Category)
+                    ?? throw new KeyNotFoundException($"Category '{dto.Category}' not found");
+                entity.Quantity = dto.Quantity;
                 entity.LastUpdatedAt = DateTime.UtcNow;
 
                 await _stockRepository.UpdateStockAsync(entity);
-
             }
             catch (Exception ex)
             {
                 await _logService.LogAsync(
-     "StockTransactionError",
-     $"Exception Type: {ex.GetType().Name}, Message: {ex.Message}, StackTrace: {ex.StackTrace}"
- );
+                    "StockChangeError",
+                    $"Exception Type: {ex.GetType().Name}, Message: {ex.Message}, StackTrace: {ex.StackTrace}"
+                );
+                throw;
+            }
+
+        }
+
+
+        //d
+        public async Task DeleteStockAsync(string id)
+        {
+            var stock = await _stockRepository.GetStockByIdAsync(id)
+                ?? throw new KeyNotFoundException($"Stock with ID '{id}' not found");
+            try
+            {
+                await _stockRepository.DeleteStockAsync(id);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogAsync(
+                    "StockDeletionError",
+                    $"Exception Type: {ex.GetType().Name}, Message: {ex.Message}, StackTrace: {ex.StackTrace}"
+                );
                 throw;
             }
         }
 
 
 
-        //d
-
-        public async Task CreateStockTransactionAsync(StockEntity stock, int amount, string remark)
+        public async Task<StockTransaction> CreateStockTransactionAsync(StockEntity stock, int amount, string remark)
         {
             try
             {
@@ -87,14 +147,15 @@ namespace StockProject.Data.Services
                     TransactionDate = DateTime.UtcNow
                 };
                 await _stockTransactionRepository.CreateStockTransactionAsync(transaction);
-                return;
+
+                return transaction;
             }
             catch (Exception ex)
             {
                 await _logService.LogAsync(
-    "StockTransactionError",
-    $"Exception Type: {ex.GetType().Name}, Message: {ex.Message}, StackTrace: {ex.StackTrace}"
-);
+                    "TransactionCreationError",
+                    $"Exception Type: {ex.GetType().Name}, Message: {ex.Message}, StackTrace: {ex.StackTrace}"
+                );
                 throw;
             }
         }

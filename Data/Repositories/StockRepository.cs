@@ -16,9 +16,12 @@ namespace StockProject.Data.Repositories
 
 
         //c
-
-
-
+        public async Task<StockEntity> CreateStockAsync(StockEntity stock)
+        {
+            _context.Stocks.Add(stock);
+            await _context.SaveChangesAsync();
+            return stock;
+        }
         //r
         public async Task<List<StockEntity>> GetAllStockAsync()
         {
@@ -27,37 +30,36 @@ namespace StockProject.Data.Repositories
                 .ToListAsync();
         }
 
-        public async Task<StockEntity> GetStockByIdAsync(string id)
+        public async Task<StockEntity?> GetStockByIdAsync(string id)
         {
-            return await _context.Stocks.FirstOrDefaultAsync(s => s.Id == id)
-                   ?? throw new KeyNotFoundException("Stock not found");
+            return await _context.Stocks.FirstOrDefaultAsync(s => s.Id == id);
         }
 
-        public async Task<StockEntity> GetStockByNameAsync(string name)
+        public async Task<StockEntity?> GetStockByNameAsync(string name)
         {
-            return await _context.Stocks.FirstOrDefaultAsync(s => s.ProductName == name)
-                   ?? throw new KeyNotFoundException("Stock not found");
+            return await _context.Stocks.FirstOrDefaultAsync(s => s.ProductName == name);
         }
         //u
 
-        public async Task<bool> UpdateStockAsync(StockEntity stock)
+        public async Task UpdateStockAsync(StockEntity stock)
         {
-            try
-            {
-                _context.Stocks.Update(stock);  // 엔티티 변경 추적
-                await _context.SaveChangesAsync();  // 변경 사항 DB에 반영
-            }
-            catch (Exception ex)
-            {
-                // 예외 처리 (로그 기록 등)
-                Console.WriteLine($"업데이트 중 오류 발생: {ex.Message}");
-                return false;
-            }
-            return true;
+            _context.Stocks.Update(stock);
+            await _context.SaveChangesAsync();
         }
 
-        //d
 
+        //d
+        public async Task DeleteStockAsync(string id)
+        {
+            var stock = await _context.Stocks
+                .Include(s => s.Transactions)
+                .FirstOrDefaultAsync(s => s.Id == id);
+            if (stock != null)
+            {
+                _context.Stocks.Remove(stock);
+                await _context.SaveChangesAsync();
+            }
+        }
 
     }
 }

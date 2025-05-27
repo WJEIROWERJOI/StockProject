@@ -13,10 +13,8 @@ namespace StockProject.Data.Repositories
         }
 
         //c
-
         public async Task<int> CreateStockCategoryByEntity(StockCategory stockCategory)
         {
-            if (await NameExistAsync(stockCategory.Name)) { return 0; }
             _context.StockCategories.Add(stockCategory);
             return await _context.SaveChangesAsync();
         }
@@ -24,45 +22,25 @@ namespace StockProject.Data.Repositories
 
         public async Task<int> CreateStockCategoryByName(string name, string? description)
         {
-            if (await NameExistAsync(name)) { return 0; }
-
-            StockCategory stockCategoryEntity = new StockCategory()
+            StockCategory stockCategory = new StockCategory()
             {
                 Name = name,
                 Description = description ?? string.Empty
             };
-
-            _context.StockCategories.Add(stockCategoryEntity);
+            _context.StockCategories.Add(stockCategory);
             return await _context.SaveChangesAsync();
         }
-
-
-
 
         //r
         public async Task<bool> NameExistAsync(string str)
         {
             return await _context.StockCategories.AnyAsync(p => p.Name.Equals(str, StringComparison.OrdinalIgnoreCase));
-
-
         }
-        //MapperClass
-        //public StockCategory EntityToDto(StockCategorydto dto)
-        //{
-        //    return new StockCategory()
-        //    {
-        //        Name = dto.Name,
-        //        Description = dto.Description ?? string.Empty
-        //    };
-        //}
-
-
-
+        
         public async Task<List<StockCategory>> GetStockCategories()
         {
             return await _context.StockCategories.ToListAsync();
         }
-
 
         public async Task<StockCategory?> GetStockCategoryById(int id)
         {
@@ -76,30 +54,38 @@ namespace StockProject.Data.Repositories
                 .FirstOrDefaultAsync();
         }
 
-
         // u
         public async Task<int> UpdateStockCategory(StockCategory stockCategory)
         {
-            if (await NameExistAsync(stockCategory.Name)) { return 0; }
             _context.StockCategories.Update(stockCategory);
             return await _context.SaveChangesAsync();
         }
 
-
         //d
         public async Task<int> DeleteStockCategory(StockCategory stockCategory)
         {
-            _context.StockCategories.Remove(stockCategory);
+            var stockCategory1 = await _context.StockCategories.FindAsync(stockCategory.CategoryId);
+            if (stockCategory1 == null) return 0;
+            _context.StockCategories.Remove(stockCategory1);
             return await _context.SaveChangesAsync();
         }
         public async Task<int> DeleteStockCategoryById(int id)
         {
-            var stockCategory = await GetStockCategoryById(id);
+            var stockCategory = await _context.StockCategories.FindAsync(id);
+            if (stockCategory == null) return 0;
+            _context.StockCategories.Remove(stockCategory);
+            return await _context.SaveChangesAsync();
+        }
+        public async Task<int> DeleteStockCategoryByName(string name)
+        {
+            var stockCategory = await _context.StockCategories
+                .Where(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                .FirstOrDefaultAsync();
             if (stockCategory == null) return 0;
             _context.StockCategories.Remove(stockCategory);
             return await _context.SaveChangesAsync();
         }
 
-
+        
     }
 }

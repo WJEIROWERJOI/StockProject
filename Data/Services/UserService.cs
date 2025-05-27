@@ -25,7 +25,7 @@ namespace StockProject.Data.Services
          var result = await _userManager.CreateAsync(user, dto.Password);
             if(result == IdentityResult.Success)
             {
-                await _logService.LogAsync("CreateUser", user.UserName);
+                await _logService.LogAsync("CreateUser", user.UserName ?? "Unknown");
             }
          var result1 = await _userManager.AddToRoleAsync(user, dto.Role.ToString());
             if (result1 == IdentityResult.Success)

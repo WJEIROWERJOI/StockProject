@@ -39,7 +39,8 @@
 
 				<td>
 
-					<button class="btn btn-primary btn-sm" @onclick="() => ChangeAmount(dto, 1)">+</button>
+					<button class="btn btn-primary btn-sm" @onclick="() => ChangeAmount(dto, 1)">+</button>					
+					<button class="btn btn-primary btn-sm" @onclick="() => ChangeAmount(dto, -1)">-</button>
 
 					@* <button class="btn btn-primary btn-sm" @onclick="() => BeginEdit(usr, true)">수정</button>
 								<button class="btn btn-primary btn-sm" @onclick="() => BeginEdit(usr, false)">비번</button>
@@ -83,12 +84,18 @@
 	<p style="color: green;">@message</p>
 } *@
 
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+	<div class="alert alert-danger">@ErrorMessage</div>
+}
 
 
 
 
 @code {
 	private List<StockDto> dtos = new();
+	private string ErrorMessage = "";
+
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -101,7 +108,20 @@
 
 	protected async Task ChangeAmount(StockDto dto, int amount)
 	{
-		await stockService.ChangeAmountAsync(dto, amount);
+		try
+		{
+			await stockService.ChangeAmountAsync(dto, amount);
+		}
+		catch (KeyNotFoundException ex)
+		{
+			ErrorMessage = $"데이터를 찾을 수 없습니다: {ex.Message}";
+		}
+		catch (Exception ex)
+		{
+			ErrorMessage = $"오류 발생: {ex.Message}";
+		}
 		StateHasChanged();
 	}
+
 }
+

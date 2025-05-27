@@ -5,6 +5,7 @@ namespace StockProject.Data.Dtos
 {
     public record StockDto
     {
+        public required string Id { get; init; } = Guid.NewGuid().ToString();
         public required string Category { get; init; }
         public required string ProductName { get; init; }
         public string Description { get; init; } = string.Empty;

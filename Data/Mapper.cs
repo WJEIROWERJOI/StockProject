@@ -22,6 +22,7 @@ namespace StockProject.Data
         {
             return new StockDto()
             {
+                Id = entity.Id,
                 Category = entity.Category?.Name ?? string.Empty,
                 ProductName = entity.ProductName,
                 Description = entity.Description ?? string.Empty,
@@ -30,11 +31,12 @@ namespace StockProject.Data
                 LastUpdatedAt = entity.LastUpdatedAt
             };
         }
-        public static StockEntity StockDtoToEntity(StockDto dto)
+        public static StockEntity StockDtoToEntity(StockDto dto,StockCategory category)
         {
             return new StockEntity()
             {
-                Category = null, // Assuming category is set separately
+                Id = dto.Id,
+                Category = category,
                 ProductName = dto.ProductName,
                 Description = dto.Description,
                 Quantity = dto.Quantity,
