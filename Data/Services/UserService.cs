@@ -28,14 +28,14 @@ namespace StockProject.Data.Services
 
 
 
-            public class IdentityResult
-        {
-            public bool Succeeded { get; }
-            public IEnumerable<IdentityError> Errors { get; }
+            //public class IdentityResult
+            //public bool Succeeded { get; }
+            //public IEnumerable<IdentityError> Errors { get; }
 
-            public static IdentityResult Success { get; }
-            public static IdentityResult Failed(params IdentityError[] errors);
-        }
+            //public static IdentityResult Success { get; }
+            //public static IdentityResult Failed(params IdentityError[] errors);
+        
+
     }
 
 

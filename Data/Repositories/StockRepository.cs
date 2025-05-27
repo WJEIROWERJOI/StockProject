@@ -1,4 +1,7 @@
-﻿namespace StockProject.Data.Repositories
+﻿using Microsoft.EntityFrameworkCore;
+using StockProject.Data.Entities;
+
+namespace StockProject.Data.Repositories
 {
     public class StockRepository
     {
@@ -8,6 +11,24 @@
             _context = context;
         }
 
+
+
+
+        //c
+
+
+
+        //r
+        public async Task<List<StockEntity>> GetAllStockAsync()
+        {
+            return await _context.Stocks.Include(s=>s.Category)
+                .ToListAsync();
+        }
+
+
+        //u
+
+        //d
 
 
     }

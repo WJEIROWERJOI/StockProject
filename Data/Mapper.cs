@@ -29,12 +29,24 @@ namespace StockProject.Data
             {
                 UserName = dto.UserName,
                 Email = dto.Email,
-                LastLoginAt = DateTime.UtcNow,
+                LastLoginAt = null,
                 CreatedAt = DateTime.UtcNow,
                 LastUpdatedAt = DateTime.UtcNow
             };
         }
 
+        public static StockDto StockEntityToDto(StockEntity entity)
+        {
+            return new StockDto()
+            {
+                Category = entity.Category?.Name ?? string.Empty,
+                ProductName = entity.ProductName,
+                Description = entity.Description ?? string.Empty,
+                Quantity = entity.Quantity,
+                CreatedAt = entity.CreatedAt,
+                LastUpdatedAt = entity.LastUpdatedAt
+            };
+        }
 
     }
 }

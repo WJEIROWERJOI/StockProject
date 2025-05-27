@@ -1,68 +1,168 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using StockProject.Data.Entities;
 
-namespace StockProject.Data.Services
+namespace StockProject.Data.Services;
+public static class Seeding
 {
-    public static class Seeding
+    public static async Task SeedingBoard(ApplicationDbContext context, RoleManager<IdentityRole> roleManager, UserManager<UserEntity> userManager)
     {
-        public static async Task SeedingBoard(ApplicationDbContext context, RoleManager<IdentityRole> roleManager, UserManager<UserEntity> userManager)
+        var logService = new LogService();
+
+        //if (!context.Boards.Any())
+        //{
+        //    List<Board> brds = new List<Board> {
+        //    new Board { Title = "User List", Url = "/list", Img = "bi bi-person-fill-nav-menu" },
+        //    new Board { Title = "User Register", Url = "/register", Img = "bi bi-lock-nav-menu" },
+        //    new Board { Title = "Post", Url = "/posts/lists", Img = "bi bi-list-nested-nav-menu" }
+        //};
+        //    context.Boards.AddRange(brds);
+        //}
+
+
+        if (!context.StockCategories.Any())
         {
-            //if (!context.Boards.Any())
-            //{
-            //    List<Board> brds = new List<Board> {
-            //    new Board { Title = "User List", Url = "/list", Img = "bi bi-person-fill-nav-menu" },
-            //    new Board { Title = "User Register", Url = "/register", Img = "bi bi-lock-nav-menu" },
-            //    new Board { Title = "Post", Url = "/posts/lists", Img = "bi bi-list-nested-nav-menu" }
-            //};
-            //    context.Boards.AddRange(brds);
-            //}
-
-
-
-            if (!await roleManager.RoleExistsAsync("SuperAdmin"))
+            List<StockCategory> cas = new()
+                {
+                    new StockCategory
+                    {
+                        Name = "Electronics",
+                        Description ="전자 제품"
+                    },
+                    new StockCategory
+                    {
+                        Name = "Furniture",
+                        Description ="가구"
+                    },
+                    new StockCategory
+                    {
+                        Name = "Food",
+                        Description ="음식"
+                    }
+                };
+            context.StockCategories.AddRange(cas);
+            var result = await context.SaveChangesAsync();
+            if (result != 0)
             {
-                await roleManager.CreateAsync(new IdentityRole("SuperAdmin"));
-            }
-            if (!await roleManager.RoleExistsAsync("Admin"))
-            {
-                await roleManager.CreateAsync(new IdentityRole("Admin"));
-            }
-            if (!await roleManager.RoleExistsAsync("User"))
-            {
-                await roleManager.CreateAsync(new IdentityRole("User"));
+                foreach (var c in cas)
+                {
+                    await logService.LogAsync("CreateStockCategory", c.Name);
+                }
             }
 
-            //if (!context.ApplicationUsers.Any())
-            //{
-            //    List<ApplicationUser> usrs = new List<ApplicationUser>
-            //{
-            //    new ApplicationUser
-            //    {
-            //        UserName = "admin",
-            //        Email = "admin@admin.com",
-            //        PasswordHash = string.Empty,
-            //        Role = UserRole.Admin
-            //    },
-            //    new ApplicationUser
-            //    {
-            //        UserName = "test1",
-            //        Email = "test1@test1.com",
-            //        PasswordHash = string.Empty,
-            //        Role = UserRole.Admin
-            //    }
-            //};
-            //    context.ApplicationUsers.AddRange(usrs);
-            //    await context.SaveChangesAsync();
-            //}
+        }
 
-            //var users = context.ApplicationUsers.ToList();
-            //foreach (var usr in users)
-            //{
-            //    var identityUser = await userManager.FindByIdAsync(usr.Id);
-            //    if (identityUser != null && !await userManager.IsInRoleAsync(identityUser, "Admin"))
-            //    {
-            //        await userManager.AddToRoleAsync(identityUser, "Admin");
-            //    }
+        if (!context.Stocks.Any())
+        {
+
+            List<StockEntity> cas = new List<StockEntity>
+                {
+                    new() {
+                        Category=context.StockCategories.Single(p=>p.Name.Equals("Electronics")),
+                        ProductName="Iphone",
+                        Description="아이폰",
+                        Quantity =1,
+                        CreatedAt = DateTime.UtcNow,
+                        LastUpdatedAt = DateTime.UtcNow
+                    },
+                    new() {
+                        Category=context.StockCategories.Single(p=>p.Name.Equals("Furniture")),
+                        ProductName="Sidiz",
+                        Description="시디즈책상",
+                        Quantity =3,
+                        CreatedAt = DateTime.UtcNow,
+                        LastUpdatedAt = DateTime.UtcNow
+                    },
+                    new() {
+                        Category=context.StockCategories.Single(p=>p.Name.Equals("Food")),
+                        ProductName="McDonald",
+                        Description="햄벅어",
+                        Quantity =5,
+                        CreatedAt = DateTime.UtcNow,
+                        LastUpdatedAt = DateTime.UtcNow
+                    },
+
+                };
+
+            context.Stocks.AddRange(cas);
+
+
+            var result = await context.SaveChangesAsync();
+            if (result != 0)
+            {
+                foreach (var c in cas)
+                {
+                    await logService.LogAsync("CreateStock", c.ProductName);
+                }
+            }
+        }
+
+
+        if (!await roleManager.RoleExistsAsync("SuperAdmin"))
+        {
+            await roleManager.CreateAsync(new IdentityRole("SuperAdmin"));
+            await logService.LogAsync("CreateRole", "Create SuperAdmin");
+        }
+        if (!await roleManager.RoleExistsAsync("Admin"))
+        {
+            await roleManager.CreateAsync(new IdentityRole("Admin"));
+            await logService.LogAsync("CreateRole", "Create Admin");
+        }
+        if (!await roleManager.RoleExistsAsync("Staff"))
+        {
+            await roleManager.CreateAsync(new IdentityRole("Staff"));
+            await logService.LogAsync("CreateRole", "Create Staff");
+        }
+
+        if (!context.Users.Any())
+        {
+
+            List<UserEntity> usrs = new()
+                {
+                    new UserEntity
+                    {
+                         UserName = "superadmin",
+                    Email = "suadmin@suadmin.com"
+                    },
+                    new UserEntity
+                    {
+                        UserName = "admin",
+                    Email = "admin@admin.com"
+                    },
+                    new UserEntity
+                    {
+                        UserName = "test1",
+                    Email = "test1@test1.com"
+                    }
+                };
+
+            foreach (var usr in usrs)
+            {
+                var result = await userManager.CreateAsync(usr, usr.UserName ?? string.Empty);
+                if (result == IdentityResult.Success)
+                {
+                    await logService.LogAsync("CreateUser", usr.UserName ?? string.Empty);
+
+                }
+                switch (usr.UserName)
+                {
+                    case "superadmin":
+                        await userManager.AddToRolesAsync(usr, new List<string> { "SuperAdmin", "Admin" });
+                        await logService.LogAsync("AddRole", $"{usr.UserName} to SuperAdmin and Admin");
+                        break;
+                    case "admin":
+                        await userManager.AddToRoleAsync(usr, "Admin");
+                        await logService.LogAsync("AddRole", $"{usr.UserName} to Admin");
+                        break;
+                    case "test1":
+                        await userManager.AddToRoleAsync(usr, "Staff");
+                        await logService.LogAsync("AddRole", $"{usr.UserName} to Staff");
+                        break;
+                }
+
+            }
+
+
         }
     }
+
 }

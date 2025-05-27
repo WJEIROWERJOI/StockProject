@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using StockProject.Components.Pages.Account;
+using StockProject.Data.Repositories;
 using StockProject.Data.Services;
 
 namespace StockProject.Extention;
@@ -13,6 +14,9 @@ public static class ServiceExtensions
         //services.AddScoped<CommentService>();
         //services.AddScoped<PostService>();
 
+        services.AddScoped<StockRepository>();
+        services.AddScoped<StockService>();
+        services.AddScoped<LogService>();
         services.AddScoped<UserService>();
         services.AddScoped<IdentityUserAccessor>();
         services.AddScoped<IdentityRedirectManager>();
