@@ -21,12 +21,18 @@ namespace StockProject.Data.Repositories
         //r
         public async Task<List<StockEntity>> GetAllStockAsync()
         {
-            return await _context.Stocks.Include(s=>s.Category)
+            return await _context.Stocks
+                .Include(s=>s.Category)
                 .ToListAsync();
         }
 
 
         //u
+        public async Task UpdateStockAsync(StockEntity entity)
+        {
+            var stock = _context.Stocks.Find(entity.Id);
+            
+        }
 
         //d
 

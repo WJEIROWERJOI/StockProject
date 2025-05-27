@@ -14,9 +14,11 @@ namespace StockProject.Data.Services
             _stockRepository = stockRepository;
         }
 
-
-
         //c
+
+
+
+
 
         //r
         public async Task<List<StockDto>> FindAllStockAsync()
@@ -26,9 +28,19 @@ namespace StockProject.Data.Services
             return dtos;
         }
 
+
         //u
 
+
+
+
+
+
+
         //d
+
+
+
 
 
     }

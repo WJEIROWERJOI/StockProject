@@ -9,12 +9,13 @@ namespace StockProject.Data.Services
         private readonly ApplicationDbContext _context;
         private readonly UserManager<UserEntity> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-
-        public UserService(ApplicationDbContext context, UserManager<UserEntity> userManager, RoleManager<IdentityRole> roleManager)
+        private readonly LogService _logService;
+        public UserService(ApplicationDbContext context, UserManager<UserEntity> userManager, RoleManager<IdentityRole> roleManager,LogService logService)
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
+            _logService = logService;
         }
         
         //c
@@ -22,21 +23,22 @@ namespace StockProject.Data.Services
         {
             UserEntity user = UserRegisterDtoToEntity(dto);
          var result = await _userManager.CreateAsync(user, dto.Password);
+            if(result == IdentityResult.Success)
+            {
+                await _logService.LogAsync("CreateUser", user.UserName);
+            }
          var result1 = await _userManager.AddToRoleAsync(user, dto.Role.ToString());
+            if (result1 == IdentityResult.Success)
+            {
+                await _logService.LogAsync("AddRole", $"{user.UserName} to {dto.Role.ToString()}");
+            }
 
 
 
 
 
-            //public class IdentityResult
-            //public bool Succeeded { get; }
-            //public IEnumerable<IdentityError> Errors { get; }
 
-            //public static IdentityResult Success { get; }
-            //public static IdentityResult Failed(params IdentityError[] errors);
-        
-
-    }
+        }
 
 
 

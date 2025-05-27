@@ -12,6 +12,6 @@ public class StockEntity
     public int Quantity { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime LastUpdatedAt { get; set; } = DateTime.UtcNow;
-    public List<TransactionEntity> Transactions { get; set; } = new();
+    public List<StockTransaction> Transactions { get; set; } = new();
 }
 

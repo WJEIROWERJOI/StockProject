@@ -11,7 +11,7 @@ using StockProject.Data;
 namespace StockProject.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250527071920_InitialStart")]
+    [Migration("20250527074722_InitialStart")]
     partial class InitialStart
     {
         /// <inheritdoc />
@@ -222,7 +222,7 @@ namespace StockProject.Migrations
                     b.ToTable("Stocks", (string)null);
                 });
 
-            modelBuilder.Entity("StockProject.Data.Entities.TransactionEntity", b =>
+            modelBuilder.Entity("StockProject.Data.Entities.StockTransaction", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -397,7 +397,7 @@ namespace StockProject.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("StockProject.Data.Entities.TransactionEntity", b =>
+            modelBuilder.Entity("StockProject.Data.Entities.StockTransaction", b =>
                 {
                     b.HasOne("StockProject.Data.Entities.StockEntity", null)
                         .WithMany("Transactions")

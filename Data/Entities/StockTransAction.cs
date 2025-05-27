@@ -1,6 +1,6 @@
 ﻿
 namespace StockProject.Data.Entities;
-public class TransactionEntity
+public class StockTransaction
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public required string StockId { get; set; }//물건 ID

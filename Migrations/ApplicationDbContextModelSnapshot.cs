@@ -219,7 +219,7 @@ namespace StockProject.Migrations
                     b.ToTable("Stocks", (string)null);
                 });
 
-            modelBuilder.Entity("StockProject.Data.Entities.TransactionEntity", b =>
+            modelBuilder.Entity("StockProject.Data.Entities.StockTransaction", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -394,7 +394,7 @@ namespace StockProject.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("StockProject.Data.Entities.TransactionEntity", b =>
+            modelBuilder.Entity("StockProject.Data.Entities.StockTransaction", b =>
                 {
                     b.HasOne("StockProject.Data.Entities.StockEntity", null)
                         .WithMany("Transactions")
