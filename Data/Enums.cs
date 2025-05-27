@@ -1,7 +1,7 @@
 ﻿namespace StockProject.Data;
 public enum TransactionType
 {
-    In = 0, Out = 1
+    In = 0, Out = 1,Change=2
 }
 
 public enum UserRole

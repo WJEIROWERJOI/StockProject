@@ -5,24 +5,7 @@ namespace StockProject.Data
 {
     public static class Mapper
     {
-        public static StockCategory StockCategoryDtoToEntity(StockCategoryDto dto)
-        {
-            return new StockCategory()
-            {
-                Name = dto.Name,
-                Description = dto.Description ?? string.Empty
-            };
-        }
-        public static StockCategoryDto StockCategoryEntityToDto(StockCategory Entity)
-        {
-            return new StockCategoryDto()
-            {
-                Name = Entity.Name,
-                Description = Entity.Description ?? string.Empty
-            };
-        }
-
-
+        
         public static UserEntity UserRegisterDtoToEntity(UserRegisterDto dto)
         {
             return new UserEntity()
@@ -45,6 +28,18 @@ namespace StockProject.Data
                 Quantity = entity.Quantity,
                 CreatedAt = entity.CreatedAt,
                 LastUpdatedAt = entity.LastUpdatedAt
+            };
+        }
+        public static StockEntity StockDtoToEntity(StockDto dto)
+        {
+            return new StockEntity()
+            {
+                Category = null, // Assuming category is set separately
+                ProductName = dto.ProductName,
+                Description = dto.Description,
+                Quantity = dto.Quantity,
+                CreatedAt = dto.CreatedAt,
+                LastUpdatedAt = dto.LastUpdatedAt
             };
         }
 

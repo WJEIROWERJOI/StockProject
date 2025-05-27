@@ -1,8 +1,11 @@
 ﻿@page "/Stock/List"
+@using Microsoft.AspNetCore.Authorization
 @using StockProject.Data.Dtos
 @using StockProject.Data.Services
 
 @inject StockService stockService
+
+@* @attribute [Authorize] *@
 
 <PageTitle>StockList</PageTitle>
 <h3>StockList</h3>
@@ -24,18 +27,21 @@
 		</tr>
 	</thead>
 	<tbody>
-		@foreach (var stk in dtos)
+		@foreach (var dto in dtos)
 		{
-				<tr>
-					<td>@stk.Category</td>
-					<td>@stk.ProductName</td>
-					<td>@stk.Description</td>
-					<td>@stk.Quantity</td>
-				<td>@stk.CreatedAt.AddHours(9).ToString("yyyy-MM-dd HH:mm")</td>
-				<td>@stk.LastUpdatedAt.AddHours(9).ToString("yyyy-MM-dd HH:mm")</td>
+			<tr>
+				<td>@dto.Category</td>
+				<td>@dto.ProductName</td>
+				<td>@dto.Description</td>
+				<td>@dto.Quantity</td>
+				<td>@dto.CreatedAt.AddHours(9).ToString("yy-MM-dd HH:mm")</td>
+				<td>@dto.LastUpdatedAt.AddHours(9).ToString("yy-MM-dd HH:mm")</td>
 
-					@* <td>
-								<button class="btn btn-primary btn-sm" @onclick="() => BeginEdit(usr, true)">수정</button>
+				<td>
+
+					<button class="btn btn-primary btn-sm" @onclick="() => ChangeAmount(dto, 1)">+</button>
+
+					@* <button class="btn btn-primary btn-sm" @onclick="() => BeginEdit(usr, true)">수정</button>
 								<button class="btn btn-primary btn-sm" @onclick="() => BeginEdit(usr, false)">비번</button>
 								<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
 										data-bs-target="#abc">
@@ -64,10 +70,10 @@
 											</div>
 										</div>
 									</div>
-								</div>
-					</td> *@
-				</tr>
-			
+								</div> *@
+				</td>
+			</tr>
+
 		}
 	</tbody>
 </table>
@@ -86,11 +92,16 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		
+
 		dtos = await stockService.FindAllStockAsync();
-		
+
 		await base.OnInitializedAsync();
-	
+
 	}
 
+	protected async Task ChangeAmount(StockDto dto, int amount)
+	{
+		await stockService.ChangeAmountAsync(dto, amount);
+		StateHasChanged();
+	}
 }

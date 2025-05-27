@@ -15,7 +15,7 @@ namespace StockProject.Data.Dtos
         [Required, DataType(DataType.EmailAddress)]
         public string Email { get; set; } = string.Empty;
         [Required]
-        public UserRole Role { get; set; }
+        public UserRole Role { get; set; }//SuperAdmin=0,Admin=1,Staff=2
 
     }
 }

@@ -42,7 +42,7 @@ namespace StockProject.Data.Repositories
         //r
         public async Task<bool> NameExistAsync(string str)
         {
-           return await _context.StockCategories.AnyAsync(p => p.Name.Equals(str, StringComparison.OrdinalIgnoreCase));
+            return await _context.StockCategories.AnyAsync(p => p.Name.Equals(str, StringComparison.OrdinalIgnoreCase));
 
 
         }
@@ -63,20 +63,20 @@ namespace StockProject.Data.Repositories
             return await _context.StockCategories.ToListAsync();
         }
 
-        
+
         public async Task<StockCategory?> GetStockCategoryById(int id)
         {
             return await _context.StockCategories.FindAsync(id);
         }
-        
+
         public async Task<StockCategory?> GetStockCategoryByName(string name)
         {
             return await _context.StockCategories
                 .Where(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                 .FirstOrDefaultAsync();
         }
-        
-        
+
+
         // u
         public async Task<int> UpdateStockCategory(StockCategory stockCategory)
         {
@@ -92,6 +92,14 @@ namespace StockProject.Data.Repositories
             _context.StockCategories.Remove(stockCategory);
             return await _context.SaveChangesAsync();
         }
+        public async Task<int> DeleteStockCategoryById(int id)
+        {
+            var stockCategory = await GetStockCategoryById(id);
+            if (stockCategory == null) return 0;
+            _context.StockCategories.Remove(stockCategory);
+            return await _context.SaveChangesAsync();
+        }
+
 
     }
 }
