@@ -100,17 +100,17 @@ public static class Seeding
         if (!await roleManager.RoleExistsAsync("SuperAdmin"))
         {
             await roleManager.CreateAsync(new IdentityRole("SuperAdmin"));
-            await logService.LogAsync("CreateRole", "Create SuperAdmin");
+            await logService.LogAsync("CreateRole", "SuperAdmin");
         }
         if (!await roleManager.RoleExistsAsync("Admin"))
         {
             await roleManager.CreateAsync(new IdentityRole("Admin"));
-            await logService.LogAsync("CreateRole", "Create Admin");
+            await logService.LogAsync("CreateRole", "Admin");
         }
         if (!await roleManager.RoleExistsAsync("Staff"))
         {
             await roleManager.CreateAsync(new IdentityRole("Staff"));
-            await logService.LogAsync("CreateRole", "Create Staff");
+            await logService.LogAsync("CreateRole", "Staff");
         }
 
         if (!context.Users.Any())
