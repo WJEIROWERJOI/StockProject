@@ -119,13 +119,14 @@ namespace StockProject.Data.Services
 
 
         //d
-        public async Task DeleteStockAsync(string id)
+        public async Task DeleteStockAsync(StockDto dto)
         {
-            var stock = await _stockRepository.GetStockByIdAsync(id)
-                ?? throw new KeyNotFoundException($"Stock with ID '{id}' not found");
+            var stock = await _stockRepository.GetStockByIdAsync(dto.Id)
+                ?? throw new KeyNotFoundException($"Stock with ID '{dto.ProductName}' not found");
             try
             {
-                await _stockRepository.DeleteStockAsync(id);
+                await CreateStockTransactionAsync(stock, 0, "Stock deleted", dto.UserId ?? string.Empty);
+                await _stockRepository.DeleteStockAsync(stock.Id);
             }
             catch (Exception ex)
             {

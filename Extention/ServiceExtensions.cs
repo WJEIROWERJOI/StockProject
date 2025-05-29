@@ -4,6 +4,7 @@ using StockProject.Data.Repositories;
 using StockProject.Data.Services;
 
 namespace StockProject.Extention;
+
 public static class ServiceExtensions
 {
     public static IServiceCollection AddAppServices(this IServiceCollection services)
@@ -14,8 +15,10 @@ public static class ServiceExtensions
         //services.AddScoped<CommentService>();
         //services.AddScoped<PostService>();
 
+
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+
         services.AddScoped<StockTransactionRepository>();
         services.AddScoped<StockCategoryRepository>();
         services.AddScoped<StockRepository>();

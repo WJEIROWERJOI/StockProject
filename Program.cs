@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.ConfigureAppIdentity(builder.Configuration);
 builder.Services.ConfigureDatabase(builder.Configuration);
 builder.Services.AddAppServices();
-
+        
 var app = builder.Build();
 
 app.ConfigureExceptionHandler();
@@ -30,9 +30,8 @@ using (var scope = app.Services.CreateScope())
         await Seeding.SeedingBoard(context, roleManager, userManager);
     }
     catch (Exception ex)
-    {
-        // ÇÊ¿ä ½Ã ·Î±×
-        Console.WriteLine($"½Ãµù Áß ¿À·ù ¹ß»ı: {ex.Message}");
+    {   //ì‹œë”©ì´ ì˜ëª»ëœ ê²½ìš°ìš°
+        Console.WriteLine($"ì‹œë”© ì¤‘ ì—ëŸ¬ ë°œìƒ: {ex.Message}");
     }
 }
 
