@@ -2,126 +2,151 @@
 @using Microsoft.AspNetCore.Authorization
 @using StockProject.Data.Dtos
 @using StockProject.Data.Services
-
+@using System.Security.Claims
+@rendermode InteractiveServer
 @inject StockService stockService
-
+@inject AuthenticationStateProvider auth
+@inject ICurrentUserService currentUserService
 @* @attribute [Authorize] *@
 
 <PageTitle>StockList</PageTitle>
 <h3>StockList</h3>
 <hr />
 
-
-
-@* 표 *@
 <table class="table">
-	<thead>
-		<tr>
-			<th scope="col">Category</th>
-			<th scope="col">ProductName</th>
-			<th scope="col">Description</th>
-			<th scope="col">Quantity</th>
-			<th scope="col">CreatedAt</th>
-			<th scope="col">LastUpdatedAt</th>
-			<th scope="col">Options</th>
-		</tr>
-	</thead>
-	<tbody>
-		@foreach (var dto in dtos)
-		{
-			<tr>
-				<td>@dto.Category</td>
-				<td>@dto.ProductName</td>
-				<td>@dto.Description</td>
-				<td>@dto.Quantity</td>
-				<td>@dto.CreatedAt.AddHours(9).ToString("yy-MM-dd HH:mm")</td>
-				<td>@dto.LastUpdatedAt.AddHours(9).ToString("yy-MM-dd HH:mm")</td>
-
-				<td>
-
-					<button class="btn btn-primary btn-sm" @onclick="() => ChangeAmount(dto, 1)">+</button>					
-					<button class="btn btn-primary btn-sm" @onclick="() => ChangeAmount(dto, -1)">-</button>
-
-					@* <button class="btn btn-primary btn-sm" @onclick="() => BeginEdit(usr, true)">수정</button>
-								<button class="btn btn-primary btn-sm" @onclick="() => BeginEdit(usr, false)">비번</button>
-								<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
-										data-bs-target="#abc">
-									삭제
-								</button>
-								<div class="modal fade" id="abc" data-bs-keyboard="false" tabindex="-1">
-									<div class="modal-dialog modal-dialog-centered">
-										<div class="modal-content">
-											<div class="modal-header">
-												<h1 class="modal-title fs-3" id="abc">확인</h1>
-												<button type="button" class="btn-close" data-bs-dismiss="modal"
-														aria-label="Close"></button>
-											</div>
-											<div class="modal-body">
-												@usr.UserName 을 삭제 하시겠습니까?
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-primary"
-														@onclick="() => deleteUser(usr.UserName)">
-													네
-												</button>
-												<button type="button" class="btn btn-secondary"
-														data-bs-dismiss="modal">
-													아니요
-												</button>
-											</div>
-										</div>
-									</div>
-								</div> *@
-				</td>
-			</tr>
-
-		}
-	</tbody>
+    <thead>
+        <tr>
+            <th scope="col">Category</th>
+            <th scope="col">ProductName</th>
+            <th scope="col">Description</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">CreatedAt</th>
+            <th scope="col">LastUpdatedAt</th>
+            <th scope="col">Options</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var dto in dtos)
+        {
+            <tr>
+                @if (!dto.IsEditing)
+                {
+                    <td>@dto.Category</td>
+                    <td>@dto.ProductName</td>
+                    <td>@dto.Description</td>
+                    <td>@dto.Quantity</td>
+                    <td>@dto.CreatedAt.AddHours(9).ToString("yy-MM-dd HH:mm")</td>
+                    <td>@dto.LastUpdatedAt.AddHours(9).ToString("yy-MM-dd HH:mm")</td>
+                    <td>
+                        <div class="input-group input-group-sm">
+                            <input class="form-control text-center" style="max-width: 50px;" type="number" @bind="dto.Amount" />
+                            <button class="btn btn-primary btn-sm" type="submit" @onclick="() => ChangeAmount(dto, dto.Amount)">+</button>
+                            <button class="btn btn-primary btn-sm" type="submit" @onclick="() => ChangeAmount(dto, -dto.Amount)">-</button>
+                        </div>
+                        <button class="btn btn-primary btn-sm" type="button" @onclick="() => EnterEditMode(dto)">수정</button>
+                    </td>
+                }
+                else
+                {
+                    <td>@dto.Category</td>
+                    <td>
+                        <EditForm Model="@dto" OnValidSubmit="() => ChangeStock(dto)">
+                            <InputText @bind-Value="dto.ProductName" class="form-control" />
+                        </EditForm>
+                    </td>
+                    <td>
+                        <EditForm Model="@dto">
+                            <InputText @bind-Value="dto.Description" class="form-control" />
+                        </EditForm>
+                    </td>
+                    <td>
+                        <EditForm Model="@dto">
+                            <InputNumber @bind-Value="dto.Quantity" class="form-control" />
+                        </EditForm>
+                    </td>
+                    <td>@dto.CreatedAt.AddHours(9).ToString("yy-MM-dd HH:mm")</td>
+                    <td>@dto.LastUpdatedAt.AddHours(9).ToString("yy-MM-dd HH:mm")</td>
+                    <td>
+                        <EditForm Model="@dto" OnValidSubmit="() => ChangeStock(dto)">
+                            <button class="btn btn-success btn-sm" type="submit">저장</button>
+                            <button class="btn btn-info btn-sm" type="button" @onclick="() => CancelEdit(dto)">취소</button>
+                        </EditForm>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
 </table>
-@* 
-@if (!string.IsNullOrEmpty(message))
-{
-	<p style="color: green;">@message</p>
-} *@
 
 @if (!string.IsNullOrEmpty(ErrorMessage))
 {
-	<div class="alert alert-danger">@ErrorMessage</div>
+    <div class="alert alert-danger">@ErrorMessage</div>
 }
-
-
-
 
 @code {
-	private List<StockDto> dtos = new();
-	private string ErrorMessage = "";
+    private List<StockDto> dtos = new();
+    private string ErrorMessage = "";
 
 
-	protected override async Task OnInitializedAsync()
-	{
+    protected override async Task OnInitializedAsync()
+    {
 
-		dtos = await stockService.FindAllStockAsync();
 
-		await base.OnInitializedAsync();
+        await InitialDataBring();
+    }
 
-	}
+    private async Task ChangeAmount(StockDto dto, int amount)
+    {
+        try
+        {
+            dto.UserId = currentUserService.UserId;
+            await stockService.ChangeAmountAsync(dto, amount);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            ErrorMessage = $"데이터를 찾을 수 없습니다: {ex.Message}";
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"오류 발생: {ex.Message}";
+        }
+        await InitialDataBring();
+        StateHasChanged();
+    }
 
-	protected async Task ChangeAmount(StockDto dto, int amount)
-	{
-		try
-		{
-			await stockService.ChangeAmountAsync(dto, amount);
-		}
-		catch (KeyNotFoundException ex)
-		{
-			ErrorMessage = $"데이터를 찾을 수 없습니다: {ex.Message}";
-		}
-		catch (Exception ex)
-		{
-			ErrorMessage = $"오류 발생: {ex.Message}";
-		}
-		StateHasChanged();
-	}
+    private async Task ChangeStock(StockDto dto)
+    {
+        try
+        {
+            dto.UserId = currentUserService.UserId;
+            await stockService.ChangeStock(dto);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            ErrorMessage = $"데이터를 찾을 수 없습니다: {ex.Message}";
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"오류 발생: {ex.Message}";
+        }
+        await InitialDataBring();
+        StateHasChanged();
+    }
 
+    private void EnterEditMode(StockDto dto)
+    {
+        dto.IsEditing = true;
+        StateHasChanged();
+    }
+
+    private void CancelEdit(StockDto dto)
+    {
+        dto.IsEditing = false;
+        StateHasChanged();
+    }
+
+    private async Task InitialDataBring()
+    {
+        dtos = await stockService.FindAllStockAsync();
+    }
 }
-

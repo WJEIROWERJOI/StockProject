@@ -62,11 +62,17 @@ namespace StockProject.Data.Services
         //u
         public async Task ChangeAmountAsync(StockDto dto, int amount)
         {
+            if(amount == 0)
+            {
+                return;
+            }
+
+
             var entity = await _stockRepository.GetStockByIdAsync(dto.Id)
                 ?? throw new KeyNotFoundException($"Stock '{dto.ProductName}' not found");
             try
             {
-                var transaction = await CreateStockTransactionAsync(entity, amount, "Amount changed");
+                var transaction = await CreateStockTransactionAsync(entity, amount, "Amount changed", dto.UserId ?? string.Empty);
                 entity.Transactions.Add(transaction);
                 entity.Quantity += amount;
                 entity.LastUpdatedAt = DateTime.UtcNow;
@@ -82,13 +88,14 @@ namespace StockProject.Data.Services
                 throw;
             }
         }
+
         public async Task ChangeStock(StockDto dto)
         {
             var entity = await _stockRepository.GetStockByIdAsync(dto.Id)
                 ?? throw new KeyNotFoundException($"Stock '{dto.ProductName}' not found");
             try
             {
-                var transaction = await CreateStockTransactionAsync(entity, 0, "Stock changed");
+                var transaction = await CreateStockTransactionAsync(entity, 0, "Stock changed", dto.UserId ?? string.Empty);
                 entity.Transactions.Add(transaction);
                 entity.ProductName = dto.ProductName;
                 entity.Description = dto.Description;
@@ -132,17 +139,18 @@ namespace StockProject.Data.Services
 
 
 
-        public async Task<StockTransaction> CreateStockTransactionAsync(StockEntity stock, int amount, string remark)
+        public async Task<StockTransaction> CreateStockTransactionAsync(StockEntity stock, int amount, string remark,string userId)
         {
             try
             {
                 StockTransaction transaction = new StockTransaction
                 {
+                    UserId = userId,
                     StockId = stock.Id,
                     Quantity = amount,
                     PreviousQuantity = stock.Quantity,
                     AfterQuantity = stock.Quantity + amount,
-                    Type = amount > 0 ? TransactionType.In : TransactionType.Out,
+                    Type = amount > 0 ? TransactionType.In : (amount < 0 ? TransactionType.Out : TransactionType.Change),
                     Remark = remark,
                     TransactionDate = DateTime.UtcNow
                 };
@@ -159,8 +167,6 @@ namespace StockProject.Data.Services
                 throw;
             }
         }
-
-
 
     }
 }

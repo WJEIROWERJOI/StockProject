@@ -14,10 +14,15 @@ public static class ServiceExtensions
         //services.AddScoped<CommentService>();
         //services.AddScoped<PostService>();
 
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<StockTransactionRepository>();
+        services.AddScoped<StockCategoryRepository>();
         services.AddScoped<StockRepository>();
         services.AddScoped<StockService>();
         services.AddScoped<LogService>();
         services.AddScoped<UserService>();
+        services.AddScoped<UserRepository>();
         services.AddScoped<IdentityUserAccessor>();
         services.AddScoped<IdentityRedirectManager>();
         services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();

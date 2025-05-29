@@ -34,9 +34,9 @@ namespace StockProject.Data.Repositories
         //r
         public async Task<bool> NameExistAsync(string str)
         {
-            return await _context.StockCategories.AnyAsync(p => p.Name.Equals(str, StringComparison.OrdinalIgnoreCase));
+            return await _context.StockCategories.AnyAsync(p => p.Name.ToLower() == str.ToLower());
         }
-        
+
         public async Task<List<StockCategory>> GetStockCategories()
         {
             return await _context.StockCategories.ToListAsync();
@@ -50,8 +50,8 @@ namespace StockProject.Data.Repositories
         public async Task<StockCategory?> GetStockCategoryByName(string name)
         {
             return await _context.StockCategories
-                .Where(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-                .FirstOrDefaultAsync();
+                .Where(s => s.Name.ToLower() == name.ToLower())
+    .FirstOrDefaultAsync();
         }
 
         // u
@@ -86,6 +86,6 @@ namespace StockProject.Data.Repositories
             return await _context.SaveChangesAsync();
         }
 
-        
+
     }
 }
