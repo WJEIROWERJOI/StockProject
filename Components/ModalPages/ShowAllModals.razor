@@ -1,0 +1,674 @@
+﻿@page "/showallmodals"
+
+<h1>Animating the modal</h1>
+
+<hr class="mb-5" />
+
+<p>
+    By default, the modal is shown with a subtle fade in out animation. However, this can be disabled so the modal shows and hides immediately.
+</p>
+
+<div class="card mb-4">
+    <h5 class="card-header">Setting on a per modal basis</h5>
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("var options = new ModalOptions() { AnimationType = ModalAnimation.None };")
+                <br />
+                @("Modal.Show<Confirm>(\"Animation Type: None\", options);")
+            </code>
+        </p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h5 class="card-header">Setting globally for all modals</h5>
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("<BlazoredModal AnimationType=\"@ModalAnimationType.None\"/> ")
+            </code>
+        </p>
+    </div>
+</div>
+
+<button @onclick="AnimationDefault" class="btn btn-primary">Fade-in Fade-Out (Default)</button>
+<button @onclick="AnimationPopInOut" class="btn btn-primary">Pop-in Pop-Out</button>
+<button @onclick="AnimationPopIn" class="btn btn-primary">Pop-in</button>
+<button @onclick="NoAnimation" class="btn btn-secondary">None</button>
+
+<p>
+    It is also possible to have multiple modals (like in the Multiple Modals example) with different animations. With the below modal, the first modal will appear without an animation. The second modal will fade-in and fade-out.
+</p>
+
+<button @onclick="@MultipleModals" class="btn btn-primary">Multiple Modals</button>
+
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+
+    void AnimationDefault()
+    {
+        Modal.Show<Confirm>("Default Animation");
+    }
+
+    void AnimationPopInOut()
+    {
+        var options = new ModalOptions { AnimationType = ModalAnimationType.PopInOut };
+
+        Modal.Show<Confirm>("Animation Type: PopInOut", options);
+    }
+
+    void AnimationPopIn()
+    {
+        var options = new ModalOptions { AnimationType = ModalAnimationType.PopIn };
+
+        Modal.Show<Confirm>("Animation Type: PopIn", options);
+    }
+
+    void NoAnimation()
+    {
+        var options = new ModalOptions { AnimationType = ModalAnimationType.None };
+
+        Modal.Show<Confirm>("Animation Type: None", options);
+    }
+
+    void MultipleModals()
+    {
+        var options = new ModalOptions
+        {
+            AnimationType = ModalAnimationType.None
+        };
+
+        Modal.Show<YesNoPromptAnimation>("Multiple Modals", options);
+    }
+}
+<h1>Background Click</h1>
+
+<hr class="mb-5" />
+
+<p>
+    By default, a modal is cancelled if the user clicks anywhere outside the modal. This behavior can
+    be disabled by setting <code>DisableBackgroundCancel</code> to <code>true</code>.
+</p>
+
+<div class="card mb-4">
+    <h5 class="card-header">Setting on a per modal basis</h5>
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("var options = new ModalOptions() { DisableBackgroundCancel = true };")
+                <br />
+                @("Modal.Show<Confirm>(\"Background Cancel Disabled\", options);")
+            </code>
+        </p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h5 class="card-header">Setting globally for all modals</h5>
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("<BlazoredModal DisableBackgroundCancel=\"true\" />")
+            </code>
+        </p>
+    </div>
+</div>
+
+<button @onclick="BackgroundCancelEnabled" class="btn btn-primary">Cancellation enabled</button>
+<button @onclick="BackgroundCancelDisabled" class="btn btn-secondary">Cancellation disabled</button>
+
+@code {
+
+    
+    void BackgroundCancelEnabled()
+    {
+        Modal.Show<Confirm>("Background Cancel Enabled (Default)");
+    }
+
+    void BackgroundCancelDisabled()
+    {
+        var options = new ModalOptions { DisableBackgroundCancel = true };
+
+        Modal.Show<Confirm>("Background Cancel Disabled", options);
+    }
+}
+
+
+
+<h1>Custom Layout</h1>
+
+<hr class="mb-5" />
+
+<p>
+    Custom layout can be set globally or on a per modal basis to change the look of modals.
+</p>
+
+<div class="card mb-4">
+    <h5 class="card-header">Setting on a per modal basis</h5>
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("var options = new ModalOptions() { UseCustomLayout = true };")
+            </code>
+        </p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h5 class="card-header">Setting globally for all modals</h5>
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("<BlazoredModal UseCustomLayout=\"true\"/> ")
+            </code>
+        </p>
+    </div>
+</div>
+
+<button @onclick="ShowModalCustomLayout" class="btn btn-primary">Show Modal</button>
+
+@code {
+
+    
+    void ShowModalCustomLayout()
+    {
+        var options = new ModalOptions { UseCustomLayout = true };
+        var parameters = new ModalParameters { { nameof(CustomBootstrapModal.Message), "Hello custom modal!!" } };
+        Modal.Show<CustomBootstrapModal>("Custom Layout", parameters, options);
+    }
+
+}
+
+
+<h1>Custom Overlay</h1>
+
+<hr class="mb-5" />
+
+<p>
+    The overlay can be customised by providing one or more custom classes to augment or overwrite the default styles.
+</p>
+
+<div class="card mb-4">
+    <h5 class="card-header">Setting on a per modal basis</h5>
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("var options = new ModalOptions() { OverlayCustomClass = \"my-custom-class\" };")
+                <br />
+                @("Modal.Show<Confirm>(\"Custom Overlay\", options);")
+            </code>
+        </p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h5 class="card-header">Setting globally for all modals</h5>
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("<BlazoredModal OverlayCustomClass=\"my-custom-class\" />")
+            </code>
+        </p>
+    </div>
+</div>
+
+<button @onclick="ShowModalCustomOverlay" class="btn btn-primary">Show Modal</button>
+
+@code {
+
+   
+    void ShowModalCustomOverlay()
+    {
+        var options = new ModalOptions { OverlayCustomClass = "custom-modal-overlay" };
+        Modal.Show<Confirm>("Custom Overlay", options);
+    }
+
+}
+
+<h1>Custom Styling</h1>
+
+<hr class="mb-5" />
+
+<p>
+    Custom CSS classes can be set globally or on a per modal basis to change the look of modals by overriding the default CSS class .blazored-modal.
+</p>
+
+<div class="card mb-4">
+    <h5 class="card-header">Setting on a per modal basis</h5>
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("var options = new ModalOptions() { Class = \"my-custom-modal-class\" };")
+                <br />
+                @("Modal.Show<Confirm>(\"Custom Styling\", options);")
+            </code>
+        </p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h5 class="card-header">Setting globally for all modals</h5>
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("<BlazoredModal Class=\"my-custom-modal-class\" />")
+            </code>
+        </p>
+    </div>
+</div>
+
+<button @onclick="ShowModalCustomStyle" class="btn btn-primary">Show Custom Modal</button>
+<br />
+<br />
+<button @onclick="ShowDefaultModal" class="btn btn-secondary">Show Default Modal</button>
+
+@code {
+
+
+    void ShowModalCustomStyle()
+    {
+        var options = new ModalOptions { Class = "my-custom-modal-class" };
+        Modal.Show<Confirm>("Custom Style", options);
+    }
+
+    void ShowDefaultModal()
+    {
+        Modal.Show<Confirm>("Default Style");
+    }
+}
+
+<h1>Hiding the modal close button</h1>
+
+<hr class="mb-5" />
+
+<p>
+    By default, a close button is shown in the modal. If you prefer, the button can be hidden and you can handle closing the modal yourself.
+</p>
+
+<div class="card mb-4">
+    <h5 class="card-header">Setting on a per modal basis</h5>
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("var options = new ModalOptions() { HideCloseButton = true };")
+                <br />
+                @("Modal.Show<Confirm>(\"Hiding Close Button\", options);")
+            </code>
+        </p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h5 class="card-header">Setting globally for all modals</h5>
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("<BlazoredModal HideCloseButton=\"true\" />")
+            </code>
+        </p>
+    </div>
+</div>
+
+<button @onclick="CloseButtonShown" class="btn btn-primary">Show the close button</button>
+<button @onclick="CloseButtonHidden" class="btn btn-secondary">Hide the close button</button>
+
+@code {
+
+   
+    void CloseButtonShown()
+    {
+        Modal.Show<Confirm>("Showing Close Button (default)");
+    }
+
+    void CloseButtonHidden()
+    {
+        var options = new ModalOptions { HideCloseButton = true };
+        Modal.Show<Confirm>("Hiding Close Button", options);
+    }
+}
+
+<h1>Closing Modal after long-running task</h1>
+
+<hr class="mb-5" />
+
+<p>
+    A long-running task can be executed and a modal can be closed programatically after it.
+</p>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("var loading = Modal.Show<Loading>();")<br />
+                @("await Task.Delay(5000);")<br />
+                <br />
+                @("loading.Close();")<br />
+            </code>
+        </p>
+    </div>
+</div>
+
+<p>Result: @_result;</p>
+
+<button @onclick="ShowModal" class="btn btn-primary">Long-running task default ModalResult</button>
+<button @onclick="ShowOkResultModal" class="btn btn-primary">Long-running task OK result</button>
+<button @onclick="ShowCancelModal" class="btn btn-primary">Long-running task with cancelled result</button>
+
+
+@code {
+
+   
+    string? _result;
+
+    async Task ShowModal()
+    {
+        var options = new ModalOptions
+        {
+            HideCloseButton = false,
+            DisableBackgroundCancel = true,
+            HideHeader = true
+        };
+        var loading = Modal.Show<Loading>(string.Empty, options);
+
+        await Task.Delay(5000);
+
+        loading.Close();
+        var result = await loading.Result;
+        if (result.DataType == typeof(object))
+            _result = "Modal returned with default ModalResult";
+
+        StateHasChanged();
+    }
+
+    async Task ShowOkResultModal()
+    {
+        var options = new ModalOptions
+        {
+            HideCloseButton = false,
+            DisableBackgroundCancel = true,
+            HideHeader = true
+        };
+        var loading = Modal.Show<Loading>(string.Empty, options);
+
+        await Task.Delay(5000);
+
+        loading.Close(ModalResult.Ok("Closed with OK result"));
+        var result = await loading.Result;
+        if (result.Data is not null && result.DataType == typeof(string))
+            _result = result.Data.ToString()!;
+
+        StateHasChanged();
+    }
+
+    async Task ShowCancelModal()
+    {
+        var options = new ModalOptions
+        {
+            HideCloseButton = false,
+            DisableBackgroundCancel = true,
+            HideHeader = true
+        };
+        var loading = Modal.Show<Loading>(string.Empty, options);
+
+        await Task.Delay(5000);
+
+        loading.Close(ModalResult.Cancel());
+        var result = await loading.Result;
+        if (result.Cancelled)
+            _result = "Closed with Cancelled result";
+
+        StateHasChanged();
+    }
+
+}
+
+<h1>Multiple Modals</h1>
+
+<hr class="mb-5" />
+
+<p>
+    It is possible to show multiple modals at the same time. Each new modal needs to be shown from the currently active modal.
+    In this example an initial confirmation modal is shown, if you select <em>Yes</em> then a second confirmation modal is shown.
+    When you <em>Close</em> the second modal both modals will be closed. If you <em>Cancel</em> the second modal, only the second
+    modal will be closed.
+</p>
+
+<button @onclick="ShowModal1" class="btn btn-primary">Show Modal</button>
+
+@code {
+
+    
+    void ShowModal1() => Modal.Show<YesNoPrompt>("First Modal");
+
+}
+<h1>Passing Data to a Modal</h1>
+
+<hr class="mb-5" />
+
+<p>
+    Data can be passed to a modal by using the <code>ModalParameters</code> object. The items you add to this collection must match the parameters
+    defined on the component being displayed in the modal. In the example below, you can type a message and see it displayed in the modal.
+</p>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("var parameters = new ModalParameters")<br />
+                @("{")<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;@("{ nameof(DisplayMessage.Message), _message }")<br />
+                @("};")<br />
+                <br />
+                @("Modal.Show<DisplayMessage>(\"Passing Data\", parameters);")<br />
+            </code>
+        </p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label>Enter a message</label>
+    <input class="form-control" type="text" @bind="_message" />
+</div>
+
+<button @onclick="ShowModal2" class="btn btn-primary">Show Modal</button>
+
+@code {
+
+    
+    string _message = "";
+
+    void ShowModal2()
+    {
+        var parameters = new ModalParameters
+        {
+            { nameof(DisplayMessage.Message), _message },
+        };
+
+        Modal.Show<DisplayMessage>("Passing Data", parameters);
+        _message = "";
+    }
+
+}
+
+
+<h1>Positioning the modal</h1>
+
+<hr class="mb-5" />
+
+<p>
+    By default, the modal is shown in the center of the viewport. The modal can be shown
+    in a number of different positions by setting the <code>Position</code> option.
+</p>
+
+<div class="card mb-4">
+    <h5 class="card-header">Setting on a per modal basis</h5>
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("var options = new ModalOptions() { Position = ModalPosition.TopLeft };")
+                <br />
+                @("Modal.Show<Confirm>(\"Position: TopLeft\", options);")
+            </code>
+        </p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h5 class="card-header">Setting globally for all modals</h5>
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("<BlazoredModal Position=\"ModalPosition.TopLeft\" />")
+            </code>
+        </p>
+    </div>
+</div>
+
+<button @onclick="@(() => PositionCustom(ModalPosition.TopLeft))" class="btn btn-secondary">Top left</button>
+<button @onclick="@(() => PositionCustom(ModalPosition.TopRight))" class="btn btn-secondary">Top right</button>
+<button @onclick="PositionCenter" class="btn btn-primary">Top Center (Default)</button>
+<button @onclick="@(() => PositionCustom(ModalPosition.Middle))" class="btn btn-secondary">Middle</button>
+<button @onclick="@(() => PositionCustom(ModalPosition.BottomLeft))" class="btn btn-secondary">Bottom left</button>
+<button @onclick="@(() => PositionCustom(ModalPosition.BottomRight))" class="btn btn-secondary">Bottom right</button>
+<button @onclick="@(() => PositionCustom(ModalPosition.Custom))" class="btn btn-secondary">Custom</button>
+
+@code {
+
+    
+    void PositionCenter()
+    {
+        Modal.Show<Confirm>("Top Center Modal (Default)");
+    }
+
+    void PositionCustom(ModalPosition position)
+    {
+        var options = new ModalOptions { Position = position };
+
+        if (position == ModalPosition.Custom)
+            options.PositionCustomClass = "my-custom-position";
+
+        Modal.Show<Confirm>($"Position: {position}", options);
+    }
+}
+<h1>Returning Data From a Modal</h1>
+
+<hr class="mb-5" />
+
+<p>
+    Data can be returned from a modal by using the <code>ModalResult.Data</code> property. You can return simple strings as well as complex objects.
+    In the example below, you can add a message in the modal that will be show here when you close the modal.
+</p>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("var messageForm = Modal.Show<MessageForm>();")<br />
+                @("var result = await messageForm.Result;")<br />
+                <br />
+                @("if (!result.Cancelled)")<br />
+                @("    _message = result.Data.ToString();")
+            </code>
+        </p>
+    </div>
+</div>
+
+<button @onclick="ShowModal3" class="btn btn-primary">Show Modal</button>
+
+@if (!string.IsNullOrWhiteSpace(_message))
+{
+    <hr />
+    <p><strong>Your message was:</strong></p>
+    <p>@_message</p>
+}
+
+@code {
+
+    
+    // string? _message;
+
+    async Task ShowModal3()
+    {
+        var parameters = new ModalParameters
+        {
+            { nameof(MessageForm.TestClass), new TestClass() }
+        };
+
+        var messageForm = Modal.Show<MessageForm>(parameters);
+        var result = await messageForm.Result;
+
+        if (!result.Cancelled)
+            _message = result.Data?.ToString() ?? string.Empty;
+    }
+
+}
+
+
+<h1>Sizing the modal</h1>
+
+<hr class="mb-5" />
+
+<p>
+    The modal has a default width. However, this can be changed by setting the <code>Size</code> option.
+</p>
+<p>
+    There are 5 different sizes available:
+    <ul>
+        <li>Small - 300px</li>
+        <li>Medium - 500px (default)</li>
+        <li>Large - 800px</li>
+        <li>Extra Large - 1140px</li>
+        <li>Custom - Provide your own class, via the <code>SizeCustomClass</code> parameter, which sets the width</li>
+    </ul>
+</p>
+
+<div class="card mb-4">
+    <h5 class="card-header">Setting on a per modal basis</h5>
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("var options = new ModalOptions() { Size = ModalSize.Large };")
+                <br />
+                @("Modal.Show<Confirm>(\"Size: Large\", options);")
+            </code>
+        </p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <h5 class="card-header">Setting globally for all modals</h5>
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("<CascadingBlazoredModal Size=\"ModalSize.Large\" />")
+            </code>
+        </p>
+    </div>
+</div>
+
+<button @onclick="@(() => SetSize(ModalSize.Automatic))" class="btn btn-secondary">Automatic</button>
+<button @onclick="@(() => SetSize(ModalSize.Small))" class="btn btn-secondary">Small</button>
+<button @onclick="DefaultSize" class="btn btn-primary">Medium (default)</button>
+<button @onclick="@(() => SetSize(ModalSize.Large))" class="btn btn-secondary">Large</button>
+<button @onclick="@(() => SetSize(ModalSize.ExtraLarge))" class="btn btn-secondary">Extra Large</button>
+<button @onclick="@(() => SetSize(ModalSize.Custom))" class="btn btn-secondary">Custom</button>
+
+@code {
+
+   
+    void DefaultSize()
+    {
+        Modal.Show<Confirm>("Size: Medium (Default)");
+    }
+
+    void SetSize(ModalSize size)
+    {
+        var options = new ModalOptions { Size = size };
+
+        if (size == ModalSize.Custom)
+            options.SizeCustomClass = "my-custom-size";
+
+        Modal.Show<Confirm>($"Size: {size}", options);
+    }
+}
