@@ -1,0 +1,33 @@
+﻿@using StockProject.Data.Services
+@inject StockCategoryService stockCategoryService
+<div>
+    <EditForm Model="@category" OnValidSubmit="() => Close(category)">
+        <div class="form-floating mb-3">
+            <InputText @bind-Value="category.Name" class="form-control" />
+            <label>Category Name</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <InputText @bind-Value="category.Description" class="form-control" />
+            <label>Description</label>
+        </div>
+
+
+        <button class="btn btn-success" type="submit">저장</button>
+        <button class="btn btn-info" type="button" @onclick="Cancel">취소</button>
+    </EditForm>
+</div>
+
+@code {
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    StockCategory category = new();
+
+
+    async Task Close(StockCategory stockCategory)
+    {
+        await stockCategoryService.CreateStockCategory(stockCategory);
+        await BlazoredModal.CloseAsync(ModalResult.Ok(true));
+    }
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+
+}

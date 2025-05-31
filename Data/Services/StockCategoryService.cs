@@ -16,6 +16,13 @@ namespace StockProject.Data.Services
 
 
         //c
+        public async Task CreateStockCategory(StockCategory stockCategory)
+        {
+            await _stockCategoryRespotiry.CreateStockCategoryByEntity(stockCategory);
+        }
+
+
+
 
         //r
         public async Task<List<StockCategory>> FindAllStockCategories()

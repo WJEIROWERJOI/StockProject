@@ -50,14 +50,14 @@
                 else
                 {
                   
-               <td>     
-                <InputSelect @bind-Value="dto.Category" OnValidSubmit="()=>ChangeStock(dto)" class="form-control">
-    @foreach (var cate in categories)
-    {
-        <option value="@cate.Name">@cate.Name</option>
-    }
-</InputSelect>
-</td>
+                    <td>     
+                        <InputSelect @bind-Value="dto.Category" OnValidSubmit="()=>ChangeStock(dto)" class="form-control">
+                            @foreach (var cate in categories)
+                            {
+                                <option value="@cate.Name">@cate.Name</option>
+                            }
+                        </InputSelect>
+                    </td>
 
                     <td>
                         <EditForm Model="@dto" OnValidSubmit="() => ChangeStock(dto)">

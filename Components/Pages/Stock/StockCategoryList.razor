@@ -5,9 +5,25 @@
 <PageTitle>CategoryList</PageTitle>
 <h3>CategoryList</h3>
 <hr />
+<div class="d-flex justify-content-end">
+    <button @onclick="BeginCreate" class="btn btn-primary">추가</button>
+</div>
+@code {
+    [CascadingParameter]
+    public IModalService Modal { get; set; } = default!;
 
+    private async Task BeginCreate()
+    {
+        var modal = Modal.Show<StockCategoryCreate>("Category Creation");
+        var result = await modal.Result;
 
-<button class="btn btn-primary" type="submit" @onclick="()=>BeginCreate()">추가</button>
+        if (!result.Cancelled)
+        {
+            await InitialDataBring();
+            StateHasChanged();
+        }
+    }
+}
 
 <table class="table">
     <thead>
@@ -22,7 +38,6 @@
         @foreach (var cate in categories)
         {
             <tr>
-
                 <td>@cate.CategoryId</td>
                 <td>
                     <EditForm Model="@cate" OnValidSubmit="() => ChangeCategory(cate)">
@@ -34,7 +49,6 @@
                         <InputText @bind-Value="cate.Description" class="form-control" />
                     </EditForm>
                 </td>
-
                 <td>
                     <EditForm Model="@cate" OnValidSubmit="() => ChangeCategory(cate)">
                         <button class="btn btn-success btn-sm" type="submit">저장</button>
@@ -42,12 +56,10 @@
                     </EditForm>
                     <button class="btn btn-danger btn-sm" type="button" @onclick="() => DeleteStock(cate)">삭제</button>
                 </td>
-                
             </tr>
         }
     </tbody>
 </table>
-
 
 @code {
     List<StockCategory> categories = new();
@@ -75,13 +87,9 @@
     {
         StateHasChanged();
     }
+
     private async Task InitialDataBring()
     {
         categories = await stockCategoryService.FindAllStockCategories();
     }
-    private async Task BeginCreate()
-    {
-        return;
-    }
-
 }

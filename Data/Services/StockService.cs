@@ -1,4 +1,5 @@
-﻿using StockProject.Data.Dtos;
+﻿using Microsoft.EntityFrameworkCore;
+using StockProject.Data.Dtos;
 using StockProject.Data.Entities;
 using StockProject.Data.Repositories;
 using static StockProject.Data.Mapper;
@@ -29,6 +30,12 @@ namespace StockProject.Data.Services
             var category = await _stockCategoryRepository.GetStockCategoryByName(dto.Category)
                 ?? throw new KeyNotFoundException($"Category '{dto.Category}' not found");
 
+            var existingStock = await _stockRepository.GetStockByNameAsync(dto.ProductName);
+            if (existingStock != null)
+            {
+                throw new InvalidOperationException($"Stock '{dto.ProductName}' already exists.");
+            }
+
             try
             {
                 StockEntity entity = StockDtoToEntity(dto, category);
@@ -46,7 +53,6 @@ namespace StockProject.Data.Services
                 throw;
             }
         }
-
 
 
 
