@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace StockProject.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialStart : Migration
+    public partial class initialedit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -60,12 +60,18 @@ namespace StockProject.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Title = table.Column<string>(type: "TEXT", nullable: false),
-                    Url = table.Column<string>(type: "TEXT", nullable: false),
-                    Img = table.Column<string>(type: "TEXT", nullable: false)
+                    Url = table.Column<string>(type: "TEXT", nullable: true),
+                    Img = table.Column<string>(type: "TEXT", nullable: false),
+                    BoardId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Boards", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Boards_Boards_BoardId",
+                        column: x => x.BoardId,
+                        principalTable: "Boards",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -271,6 +277,11 @@ namespace StockProject.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Boards_BoardId",
+                table: "Boards",
+                column: "BoardId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Stocks_CategoryId",

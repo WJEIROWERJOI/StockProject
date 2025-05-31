@@ -23,6 +23,7 @@ public static class ServiceExtensions
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
 
+        services.AddScoped<StockCategoryService>();
         services.AddScoped<StockTransactionRepository>();
         services.AddScoped<StockCategoryRepository>();
         services.AddScoped<StockRepository>();

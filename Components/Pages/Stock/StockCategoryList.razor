@@ -1,0 +1,87 @@
+﻿@page "/stock/category"
+@using StockProject.Data.Services
+@inject StockCategoryService stockCategoryService
+
+<PageTitle>CategoryList</PageTitle>
+<h3>CategoryList</h3>
+<hr />
+
+
+<button class="btn btn-primary" type="submit" @onclick="()=>BeginCreate()">추가</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Name</th>
+            <th scope="col">Description</th>
+            <th scope="col">Option</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cate in categories)
+        {
+            <tr>
+
+                <td>@cate.CategoryId</td>
+                <td>
+                    <EditForm Model="@cate" OnValidSubmit="() => ChangeCategory(cate)">
+                        <InputText @bind-Value="cate.Name" class="form-control" />
+                    </EditForm>
+                </td>
+                <td>
+                    <EditForm Model="@cate" OnValidSubmit="() => ChangeCategory(cate)">
+                        <InputText @bind-Value="cate.Description" class="form-control" />
+                    </EditForm>
+                </td>
+
+                <td>
+                    <EditForm Model="@cate" OnValidSubmit="() => ChangeCategory(cate)">
+                        <button class="btn btn-success btn-sm" type="submit">저장</button>
+                        <button class="btn btn-info btn-sm" type="button" @onclick="() => CancelEdit(cate)">취소</button>
+                    </EditForm>
+                    <button class="btn btn-danger btn-sm" type="button" @onclick="() => DeleteStock(cate)">삭제</button>
+                </td>
+                
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    List<StockCategory> categories = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitialDataBring();
+    }
+
+    private async Task ChangeCategory(StockCategory cate)
+    {
+        await stockCategoryService.UpdateStockCategoryAsync(cate);
+        await InitialDataBring();
+        StateHasChanged();
+    }
+
+    private async Task DeleteStock(StockCategory cate)
+    {
+        await stockCategoryService.DeleteStockCategoryAsync(cate);
+        await InitialDataBring();
+        StateHasChanged();
+    }
+
+    private void CancelEdit(StockCategory cate)
+    {
+        StateHasChanged();
+    }
+    private async Task InitialDataBring()
+    {
+        categories = await stockCategoryService.FindAllStockCategories();
+    }
+    private async Task BeginCreate()
+    {
+        return;
+    }
+
+}

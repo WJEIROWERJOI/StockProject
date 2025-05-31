@@ -11,8 +11,8 @@ using StockProject.Data;
 namespace StockProject.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250529120453_InitialStart")]
-    partial class InitialStart
+    [Migration("20250531060819_initialedit")]
+    partial class initialedit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -154,6 +154,9 @@ namespace StockProject.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("BoardId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Img")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -163,10 +166,11 @@ namespace StockProject.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Url")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BoardId");
 
                     b.ToTable("Boards", (string)null);
                 });
@@ -387,6 +391,13 @@ namespace StockProject.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("StockProject.Data.Entities.Board", b =>
+                {
+                    b.HasOne("StockProject.Data.Entities.Board", null)
+                        .WithMany("Boards")
+                        .HasForeignKey("BoardId");
+                });
+
             modelBuilder.Entity("StockProject.Data.Entities.StockEntity", b =>
                 {
                     b.HasOne("StockProject.Data.Entities.StockCategory", "Category")
@@ -401,6 +412,11 @@ namespace StockProject.Migrations
                     b.HasOne("StockProject.Data.Entities.StockEntity", null)
                         .WithMany("Transactions")
                         .HasForeignKey("StockEntityId");
+                });
+
+            modelBuilder.Entity("StockProject.Data.Entities.Board", b =>
+                {
+                    b.Navigation("Boards");
                 });
 
             modelBuilder.Entity("StockProject.Data.Entities.StockEntity", b =>

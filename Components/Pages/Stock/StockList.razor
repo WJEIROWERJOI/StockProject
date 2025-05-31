@@ -6,6 +6,7 @@
 @rendermode InteractiveServer
 @inject StockService stockService
 @inject AuthenticationStateProvider auth
+@inject StockCategoryService stockCategoryService
 @inject ICurrentUserService currentUserService
 @* @attribute [Authorize] *@
 
@@ -48,7 +49,16 @@
                 }
                 else
                 {
-                    <td>@dto.Category</td>
+                  
+               <td>     
+                <InputSelect @bind-Value="dto.Category" OnValidSubmit="()=>ChangeStock(dto)" class="form-control">
+    @foreach (var cate in categories)
+    {
+        <option value="@cate.Name">@cate.Name</option>
+    }
+</InputSelect>
+</td>
+
                     <td>
                         <EditForm Model="@dto" OnValidSubmit="() => ChangeStock(dto)">
                             <InputText @bind-Value="dto.ProductName" class="form-control" />
@@ -87,12 +97,11 @@
 @code {
     private List<StockDto> dtos = new();
     private string ErrorMessage = "";
-
+    private List<StockCategory> categories = new();
 
     protected override async Task OnInitializedAsync()
     {
-
-
+        categories = await stockCategoryService.FindAllStockCategories();
         await InitialDataBring();
     }
 
