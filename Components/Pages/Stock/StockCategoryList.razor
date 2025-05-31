@@ -1,7 +1,7 @@
 ﻿@page "/stock/category"
 @using StockProject.Data.Services
 @inject StockCategoryService stockCategoryService
-
+@inject IToastService ToastService
 <PageTitle>CategoryList</PageTitle>
 <h3>CategoryList</h3>
 <hr />
@@ -71,14 +71,48 @@
 
     private async Task ChangeCategory(StockCategory cate)
     {
-        await stockCategoryService.UpdateStockCategoryAsync(cate);
+        try
+        {
+            await stockCategoryService.UpdateStockCategoryAsync(cate);
+            ToastService.ShowSuccess($"{cate.Name} changed Successfully!");
+        }
+        catch (KeyNotFoundException ex)
+        {
+            ToastService.ShowError($"데이터를 찾을 수 없습니다: {ex.Message}");
+            return;
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"오류 발생: {ex.Message}");
+            return;
+        }
         await InitialDataBring();
         StateHasChanged();
     }
 
     private async Task DeleteStock(StockCategory cate)
     {
-        await stockCategoryService.DeleteStockCategoryAsync(cate);
+        try
+        {
+            var modal = Modal.Show<DeleteConfirmModal>("Confirm Delete");
+            var result = await modal.Result;
+
+            if (!result.Cancelled)
+            {
+                await stockCategoryService.DeleteStockCategoryAsync(cate);
+                ToastService.ShowSuccess($"{cate.Name} deleted Successfully!");
+            }
+        }
+        catch (KeyNotFoundException ex)
+        {
+            ToastService.ShowError($"데이터를 찾을 수 없습니다: {ex.Message}");
+            return;
+        }
+        catch (Exception ex)
+        {
+            ToastService.ShowError($"오류 발생: {ex.Message}");
+            return;
+        }
         await InitialDataBring();
         StateHasChanged();
     }
