@@ -398,7 +398,7 @@ namespace StockProject.Migrations
             modelBuilder.Entity("StockProject.Data.Entities.StockEntity", b =>
                 {
                     b.HasOne("StockProject.Data.Entities.StockCategory", "Category")
-                        .WithMany()
+                        .WithMany("Stocks")
                         .HasForeignKey("CategoryId");
 
                     b.Navigation("Category");
@@ -414,6 +414,11 @@ namespace StockProject.Migrations
             modelBuilder.Entity("StockProject.Data.Entities.Board", b =>
                 {
                     b.Navigation("Boards");
+                });
+
+            modelBuilder.Entity("StockProject.Data.Entities.StockCategory", b =>
+                {
+                    b.Navigation("Stocks");
                 });
 
             modelBuilder.Entity("StockProject.Data.Entities.StockEntity", b =>

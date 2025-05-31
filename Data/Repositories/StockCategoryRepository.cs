@@ -39,19 +39,24 @@ namespace StockProject.Data.Repositories
 
         public async Task<List<StockCategory>> GetStockCategories()
         {
-            return await _context.StockCategories.ToListAsync();
+            return await _context.StockCategories
+                .Include(s => s.Stocks)
+                .ToListAsync();
         }
 
         public async Task<StockCategory?> GetStockCategoryById(int id)
         {
-            return await _context.StockCategories.FindAsync(id);
+            return await _context.StockCategories
+                .Include(s => s.Stocks)
+                .FirstOrDefaultAsync(s => s.CategoryId == id);
         }
 
         public async Task<StockCategory?> GetStockCategoryByName(string name)
         {
             return await _context.StockCategories
                 .Where(s => s.Name.ToLower() == name.ToLower())
-    .FirstOrDefaultAsync();
+                .Include(s=>s.Stocks)
+                .FirstOrDefaultAsync();
         }
 
         // u

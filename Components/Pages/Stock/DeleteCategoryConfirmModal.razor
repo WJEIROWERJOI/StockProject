@@ -1,0 +1,14 @@
+﻿<div>
+    <p>Does it Contains Many Stocks in Category,<br />
+        Do you Check it?</p>
+
+    <button @onclick="Close" class="btn btn-warning">OK</button>
+    <button @onclick="Cancel" class="btn btn-secondary">Cancel</button>
+</div>
+
+@code {
+
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    async Task Close() => await BlazoredModal.CloseAsync(ModalResult.Ok(true));
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+}

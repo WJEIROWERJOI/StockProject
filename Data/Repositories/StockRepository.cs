@@ -36,12 +36,16 @@ namespace StockProject.Data.Repositories
 
         public async Task<StockEntity?> GetStockByIdAsync(string id)
         {
-            return await _context.Stocks.FirstOrDefaultAsync(s => s.Id == id);
+            return await _context.Stocks
+                .Include(s => s.Category)
+                .FirstOrDefaultAsync(s => s.Id == id);
         }
 
         public async Task<StockEntity?> GetStockByNameAsync(string name)
         {
-            return await _context.Stocks.FirstOrDefaultAsync(s => s.ProductName == name);
+            return await _context.Stocks
+                .Include(s => s.Category)
+                .FirstOrDefaultAsync(s => s.ProductName == name);
         }
         //u
 
@@ -56,6 +60,7 @@ namespace StockProject.Data.Repositories
         public async Task DeleteStockAsync(string id)
         {
             var stock = await _context.Stocks
+                .Include(s => s.Category)
                 .Include(s => s.Transactions)
                 .FirstOrDefaultAsync(s => s.Id == id);
             if (stock != null)
