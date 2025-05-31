@@ -1,5 +1,6 @@
 ﻿@using StockProject.Data.Services
 @inject StockCategoryService stockCategoryService
+@inject IToastService toastService
 <div>
     <EditForm Model="@category" OnValidSubmit="() => Close(category)">
         <div class="form-floating mb-3">
@@ -21,12 +22,20 @@
 @code {
     [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
     StockCategory category = new();
-
-
     async Task Close(StockCategory stockCategory)
     {
-        await stockCategoryService.CreateStockCategory(stockCategory);
-        await BlazoredModal.CloseAsync(ModalResult.Ok(true));
+        try
+        {
+            await stockCategoryService.CreateStockCategory(stockCategory);
+            toastService.ShowSuccess($"{stockCategory.Name} created successfully.");    
+            await BlazoredModal.CloseAsync(ModalResult.Ok(true));
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError($"{ex.Message}");
+            await BlazoredModal.CancelAsync();
+        }
+
     }
     async Task Cancel() => await BlazoredModal.CancelAsync();
 

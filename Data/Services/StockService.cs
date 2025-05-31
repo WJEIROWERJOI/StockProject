@@ -27,17 +27,15 @@ namespace StockProject.Data.Services
         //c
         public async Task CreateStockAsync(StockDto dto)
         {
-            var category = await _stockCategoryRepository.GetStockCategoryByName(dto.Category)
-                ?? throw new KeyNotFoundException($"Category '{dto.Category}' not found");
 
-            var existingStock = await _stockRepository.GetStockByNameAsync(dto.ProductName);
-            if (existingStock != null)
+            if (await _stockRepository.NameExistAsync(dto.ProductName))
             {
                 throw new Exception($"Stock '{dto.ProductName}' already exists.");
             }
-
             try
             {
+                var category = await _stockCategoryRepository.GetStockCategoryByName(dto.Category)
+                                ?? throw new KeyNotFoundException($"Category '{dto.Category}' not found");
                 StockEntity entity = StockDtoToEntity(dto, category);
                 entity.CreatedAt = DateTime.UtcNow;
                 entity.LastUpdatedAt = DateTime.UtcNow;
@@ -68,7 +66,7 @@ namespace StockProject.Data.Services
         //u
         public async Task ChangeAmountAsync(StockDto dto, int amount)
         {
-            if(amount == 0)
+            if (amount == 0)
             {
                 return;
             }
@@ -104,7 +102,7 @@ namespace StockProject.Data.Services
                 var transaction = await CreateStockTransactionAsync(entity, 0, "Stock changed", dto.UserId ?? string.Empty);
                 entity.Transactions.Add(transaction);
                 entity.ProductName = dto.ProductName;
-                entity.Description = dto.Description;
+                entity.Description = dto.Description ?? string.Empty;
                 entity.Category = await _stockCategoryRepository.GetStockCategoryByName(dto.Category)
                     ?? throw new KeyNotFoundException($"Category '{dto.Category}' not found");
                 entity.Quantity = dto.Quantity;
@@ -146,7 +144,7 @@ namespace StockProject.Data.Services
 
 
 
-        public async Task<StockTransaction> CreateStockTransactionAsync(StockEntity stock, int amount, string remark,string userId)
+        public async Task<StockTransaction> CreateStockTransactionAsync(StockEntity stock, int amount, string remark, string userId)
         {
             try
             {

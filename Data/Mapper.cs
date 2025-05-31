@@ -5,7 +5,6 @@ namespace StockProject.Data
 {
     public static class Mapper
     {
-        
         public static UserEntity UserRegisterDtoToEntity(UserRegisterDto dto)
         {
             return new UserEntity()
@@ -17,7 +16,6 @@ namespace StockProject.Data
                 LastUpdatedAt = DateTime.UtcNow
             };
         }
-
         public static StockDto StockEntityToDto(StockEntity entity)
         {
             return new StockDto()
@@ -38,7 +36,7 @@ namespace StockProject.Data
                 Id = dto.Id,
                 Category = category,
                 ProductName = dto.ProductName,
-                Description = dto.Description,
+                Description = dto.Description ?? string.Empty,
                 Quantity = dto.Quantity,
                 CreatedAt = dto.CreatedAt,
                 LastUpdatedAt = dto.LastUpdatedAt

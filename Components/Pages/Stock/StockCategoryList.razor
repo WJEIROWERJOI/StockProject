@@ -5,18 +5,18 @@
 <PageTitle>CategoryList</PageTitle>
 <h3>CategoryList</h3>
 <hr />
+
 <div class="d-flex justify-content-end">
     <button @onclick="BeginCreate" class="btn btn-primary">추가</button>
 </div>
+
 @code {
     [CascadingParameter]
     public IModalService Modal { get; set; } = default!;
-
     private async Task BeginCreate()
     {
         var modal = Modal.Show<StockCategoryCreate>("Category Creation");
         var result = await modal.Result;
-
         if (!result.Cancelled)
         {
             await InitialDataBring();

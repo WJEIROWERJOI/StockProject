@@ -1,0 +1,66 @@
+﻿@using Microsoft.AspNetCore.Mvc
+@using StockProject.Data.Dtos
+@using StockProject.Data.Services
+@inject StockCategoryService stockCategoryService
+@inject IToastService toastService
+@inject StockService stockService
+
+<div>
+    <EditForm Model="@dto" OnValidSubmit="() => Close(dto)">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-floating mb-3">
+            <InputSelect @bind-Value="dto.Category" class="form-control">
+                @foreach (var cate in categories)
+                {
+                    <option value="@cate.Name">@cate.Name</option>
+                }
+            </InputSelect>
+            <label>Category</label>
+        </div>
+        <div class="form-floating mb-3">
+            <InputText @bind-Value="dto.ProductName" class="form-control" />
+            <label>ProductName</label>
+        </div>
+        <div class="form-floating mb-3">
+            <InputText @bind-Value="dto.Description" class="form-control" />
+            <label>Description</label>
+        </div>
+        <div class="form-floating mb-3">
+            <InputNumber @bind-Value="dto.Quantity" class="form-control" />
+            <label>Quantity</label>
+        </div>
+
+        <button class="btn btn-success" type="submit">저장</button>
+        <button class="btn btn-info" type="button" @onclick="Cancel">취소</button>
+    </EditForm>
+</div>
+
+
+
+
+@code {
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    private List<StockCategory> categories { get; set; } = new();
+    private StockDto dto = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await stockCategoryService.FindAllStockCategories();
+    }
+    async Task Close(StockDto dto)
+    {
+        try
+        {
+            await stockService.CreateStockAsync(dto);
+            toastService.ShowSuccess($"{dto.ProductName} created successfully.");
+            await BlazoredModal.CloseAsync(ModalResult.Ok(true));
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError($"{ex.Message}");
+            await BlazoredModal.CancelAsync();
+        }
+    }
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+}

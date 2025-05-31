@@ -23,6 +23,10 @@ namespace StockProject.Data.Repositories
             return stock;
         }
         //r
+        public async Task<bool> NameExistAsync(string str)
+        {
+            return await _context.Stocks.AnyAsync(p => p.ProductName.ToLower() == str.ToLower());
+        }
         public async Task<List<StockEntity>> GetAllStockAsync()
         {
             return await _context.Stocks
