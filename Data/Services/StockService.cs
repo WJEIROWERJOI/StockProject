@@ -33,7 +33,7 @@ namespace StockProject.Data.Services
             var existingStock = await _stockRepository.GetStockByNameAsync(dto.ProductName);
             if (existingStock != null)
             {
-                throw new InvalidOperationException($"Stock '{dto.ProductName}' already exists.");
+                throw new Exception($"Stock '{dto.ProductName}' already exists.");
             }
 
             try
