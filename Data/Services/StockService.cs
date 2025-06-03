@@ -42,7 +42,9 @@ namespace StockProject.Data.Services
                 entity.LastUpdatedAt = DateTime.UtcNow;
                 var transaction = await CreateStockTransactionAsync(entity, dto.Amount, "Stock Created", dto.UserId ?? string.Empty);
                 entity.Transactions.Add(transaction);
+
                 category.Stocks.Add(entity);
+
                 await _stockRepository.CreateStockAsync(entity);
                 
             }
@@ -66,7 +68,6 @@ namespace StockProject.Data.Services
             return dtos;
         }
 
-
         //u
         public async Task ChangeAmountAsync(StockDto dto, int amount)
         {
@@ -74,8 +75,6 @@ namespace StockProject.Data.Services
             {
                 return;
             }
-
-
             var entity = await _stockRepository.GetStockByIdAsync(dto.Id)
                 ?? throw new KeyNotFoundException($"Stock '{dto.ProductName}' not found");
             try
