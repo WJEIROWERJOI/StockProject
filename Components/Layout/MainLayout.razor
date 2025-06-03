@@ -1,5 +1,7 @@
 ﻿@using Blazored.Toast
 @using Blazored.Toast.Configuration
+@using StockProject.Components.Pages.User
+@inject NavigationManager nav
 @inherits LayoutComponentBase
 
 
@@ -28,8 +30,21 @@
     </div>
     <main>
         <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
+            <AuthorizeView>
+
+                <Authorized>
+                    <span>
+                        @context.User.Identity?.Name
+                    </span>
+                    <a href="Account/Logout" class="btn btn-primary">Logout</a>
+                </Authorized>
+
+                <NotAuthorized>
+           <a href="User/Login1" class="btn btn-primary">Login</a>
+                </NotAuthorized>
+
+                </AuthorizeView>
+</div>
         <article class="content px-4">
             @Body
         </article>

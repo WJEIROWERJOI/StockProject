@@ -12,17 +12,10 @@ public static class ServiceExtensions
 {
     public static IServiceCollection AddAppServices(this IServiceCollection services)
     {
-
-        //services.AddScoped<UserEntityService>();
-        //services.AddScoped<BoardService>();
-        //services.AddScoped<CommentService>();
-        //services.AddScoped<PostService>();
-
         services.AddBlazoredModal();
         services.AddBlazoredToast();
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
-
         services.AddScoped<StockCategoryService>();
         services.AddScoped<StockTransactionRepository>();
         services.AddScoped<StockCategoryRepository>();
@@ -37,6 +30,22 @@ public static class ServiceExtensions
         services.AddRazorComponents()
             .AddInteractiveServerComponents();
         services.AddCascadingAuthenticationState();
+        
+        //var repositoryTypes = typeof(StockRepository).Assembly.GetTypes()
+        //.Where(t => t.Name.EndsWith("Repository"));
+        //foreach (var type in repositoryTypes)
+        //{
+        //    services.AddScoped(type);
+        //}
+
+        //var serviceTypes = typeof(StockService).Assembly.GetTypes()
+        //.Where(t => t.Name.EndsWith("Service"));
+        //foreach (var type in serviceTypes)
+        //{
+        //    services.AddScoped(type);
+        //}
+
+
 
         return services;
     }

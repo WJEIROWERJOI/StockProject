@@ -22,6 +22,25 @@ namespace StockProject.Components.Pages.Account
 
             var accountGroup = endpoints.MapGroup("/Account");
 
+
+    //        accountGroup.MapPost("/Login", async (
+    //HttpContext context,
+    //[FromServices] SignInManager<UserEntity> signInManager,
+    //[FromForm] string userName,
+    //[FromForm] string password,
+    //[FromForm] bool rememberMe) =>
+    //        {
+    //            var result = await signInManager.PasswordSignInAsync(userName, password, rememberMe, lockoutOnFailure: false);
+    //            if (result.Succeeded)
+    //            {
+    //                return Results.Ok(new { success = true });
+    //            }
+    //            else
+    //            {
+    //                return Results.BadRequest(new { success = false, message = "Invalid login attempt." });
+    //            }
+    //        });
+
             accountGroup.MapPost("/PerformExternalLogin", (
                 HttpContext context,
                 [FromServices] SignInManager<UserEntity> signInManager,

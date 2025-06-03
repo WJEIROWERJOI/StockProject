@@ -9,13 +9,15 @@ namespace StockProject.Data.Services
         private readonly ApplicationDbContext _context;
         private readonly UserManager<UserEntity> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly SignInManager<UserEntity> _signInManager;
         private readonly LogService _logService;
-        public UserService(ApplicationDbContext context, UserManager<UserEntity> userManager, RoleManager<IdentityRole> roleManager,LogService logService)
+        public UserService(ApplicationDbContext context, UserManager<UserEntity> userManager, RoleManager<IdentityRole> roleManager,LogService logService,SignInManager<UserEntity> signInManager)
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
             _logService = logService;
+            _signInManager = signInManager;
         }
         
         //c
@@ -39,9 +41,25 @@ namespace StockProject.Data.Services
 
 
         }
+        //r
+        //u
+        //d
 
 
-
+        //Login
+        public async Task<IdentityResult> UserSignIn(string username,string password,bool remember)
+        {
+            var result = await _signInManager.PasswordSignInAsync(username,password,remember, false);
+            //Console.WriteLine(result);
+            if (result.Succeeded)
+            {
+                return IdentityResult.Success;
+            }
+            else
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "fail login" });
+            }
+        }
 
 
 
