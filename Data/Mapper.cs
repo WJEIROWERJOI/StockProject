@@ -33,7 +33,7 @@ namespace StockProject.Data
         {
             return new StockEntity()
             {
-                Id = dto.Id ?? Guid.NewGuid().ToString(),
+                // Id = dto.Id ?? Guid.NewGuid().ToString(),
                 Category = category,
                 ProductName = dto.ProductName,
                 Description = dto.Description ?? string.Empty,
