@@ -29,11 +29,11 @@ namespace StockProject.Data
                 LastUpdatedAt = entity.LastUpdatedAt
             };
         }
-        public static StockEntity StockDtoToEntity(StockDto dto,StockCategory category)
+        public static StockEntity StockDtoToEntity(StockDto dto, StockCategory category)
         {
             return new StockEntity()
             {
-                Id = dto.Id,
+                Id = dto.Id ?? Guid.NewGuid().ToString(),
                 Category = category,
                 ProductName = dto.ProductName,
                 Description = dto.Description ?? string.Empty,

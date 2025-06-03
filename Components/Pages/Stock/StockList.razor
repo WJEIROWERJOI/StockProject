@@ -62,16 +62,18 @@
                     <td>
                         <div class="input-group input-group-sm">
                             <input class="form-control text-center" style="max-width: 50px;" type="number" @bind="dto.Amount" />
-                            <button class="btn btn-primary btn-sm" type="submit" @onclick="() => ChangeAmount(dto, dto.Amount)">+</button>
-                            <button class="btn btn-primary btn-sm" type="submit" @onclick="() => ChangeAmount(dto, -dto.Amount)">-</button>
+                            <button class="btn btn-primary btn-sm" type="submit"
+                                @onclick="() => ChangeAmount(dto, dto.Amount)">+</button>
+                            <button class="btn btn-primary btn-sm" type="submit"
+                                @onclick="() => ChangeAmount(dto, -dto.Amount)">-</button>
                         </div>
                         <button class="btn btn-primary btn-sm" type="button" @onclick="() => EnterEditMode(dto)">수정</button>
                     </td>
                 }
                 else
                 {
-                  
-                    <td>     
+
+                    <td>
                         <InputSelect @bind-Value="dto.Category" OnValidSubmit="()=>ChangeStock(dto)" class="form-control">
                             @foreach (var cate in categories)
                             {
@@ -123,7 +125,7 @@
     {
         categories = await stockCategoryService.FindAllStockCategories();
         await InitialDataBring();
-        
+
     }
 
     private async Task ChangeAmount(StockDto dto, int amount)
@@ -132,8 +134,8 @@
         {
             dto.UserId = currentUserService.UserId;
             await stockService.ChangeAmountAsync(dto, amount);
-            if(amount != 0)
-            ToastService.ShowSuccess($"{dto.ProductName} changed successfully!:{dto.Amount}");
+            if (amount != 0)
+                ToastService.ShowSuccess($"{dto.ProductName} changed successfully!:{dto.Amount}");
         }
         catch (KeyNotFoundException ex)
         {
@@ -171,13 +173,20 @@
         StateHasChanged();
     }
 
-private async Task DeleteStock(StockDto dto)
+    private async Task DeleteStock(StockDto dto)
     {
         try
         {
-            dto.UserId = currentUserService.UserId;
-           await stockService.DeleteStockAsync(dto);
-           ToastService.ShowSuccess($"{dto.ProductName} deleted Successfully!");
+            var modal = Modal.Show<DeleteConfirmModal>("Confirm Delete");
+            var result = await modal.Result;
+
+            if (!result.Cancelled)
+            {
+                dto.UserId = currentUserService.UserId;
+                await stockService.DeleteStockAsync(dto);
+                ToastService.ShowSuccess($"{dto.ProductName} deleted Successfully!");
+
+            }
         }
         catch (KeyNotFoundException ex)
         {

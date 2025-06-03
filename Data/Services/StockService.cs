@@ -35,21 +35,16 @@ namespace StockProject.Data.Services
             try
             {
                 var category = await _stockCategoryRepository.GetStockCategoryByName(dto.Category)
-                                ?? throw new KeyNotFoundException($"Category '{dto.Category}' not found");
+                                                ?? throw new Exception($"Category '{dto.Category}' not found");
 
-
-
-                StockEntity entity = StockDtoToEntity(dto, category);
-
-                category.Stocks.Add(entity);
-                //await _stockCategoryRepository.UpdateStockCategory(category);
-
-                var transaction = await CreateStockTransactionAsync(entity, dto.Amount, "Stock Created", dto.UserId ?? string.Empty);
-                entity.Transactions.Add(transaction);
+                var entity = StockDtoToEntity(dto, category);
                 entity.CreatedAt = DateTime.UtcNow;
                 entity.LastUpdatedAt = DateTime.UtcNow;
-
+                var transaction = await CreateStockTransactionAsync(entity, dto.Amount, "Stock Created", dto.UserId ?? string.Empty);
+                entity.Transactions.Add(transaction);
+                category.Stocks.Add(entity);
                 await _stockRepository.CreateStockAsync(entity);
+                
             }
             catch (Exception ex)
             {

@@ -13,9 +13,7 @@ namespace StockProject.Data.Dtos
 
         [Required(ErrorMessage = "Product name is required.")]
         public string ProductName { get; set; } = string.Empty;
-
         public string? Description { get; set; } = string.Empty;
-
         [Range(0, int.MaxValue, ErrorMessage = "Cannot be less than 0.")]
         public int Quantity { get; set; }
         public int Amount { get; set; }
