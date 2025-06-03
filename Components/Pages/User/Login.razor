@@ -1,31 +1,23 @@
 ﻿@page "/User/Login"
+
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
 @using System.ComponentModel.DataAnnotations
-@using StockProject.Data.Services
+@using StockProject.Components.Pages.Account
+@using StockProject.Components.Pages.Account.Shared
 
-@* @inject ICurrentUserService currentUserService *@
+@inject IdentityRedirectManager RedirectManager
 @inject UserManager<UserEntity> userManager
 @inject SignInManager<UserEntity> signInManager
-@inject NavigationManager nav
 
 <PageTitle>UserLogin</PageTitle>
 <h3>Login</h3>
 <hr />
 
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-    var statusMessageClass = errorMessage.StartsWith("Error") ? "danger" : "success";
-    <div class="alert alert-@statusMessageClass" role="alert">
-        @errorMessage
-    </div>
-}
-
-@* <StatusMessage Message="@errorMessage" /> *@
+<StatusMessage Message="@errorMessage" />
 <EditForm Model="Input" method="post" OnValidSubmit="LoginUser">
     <DataAnnotationsValidator />
-    @* <ValidationSummary /> *@
-    @* <ValidationSummary class="text-danger" role="alert" /> *@
+    <ValidationSummary class="text-danger" role="alert" />
     <div class="form-floating mb-3">
         <InputText @bind-Value="Input.Name" class="form-control" autocomplete="username" aria-required="true"
             placeholder="UserName" />
@@ -49,17 +41,54 @@
     </div>
 </EditForm>
 <div class="d-flex justify-content-end mt-3">
-    @* <NavLink class="btn btn-secondary mt-3" href="/User/ForgotPassword">Forgot Password?</NavLink> *@
     <NavLink class="btn btn-info mt-3" href="/User/Register">Register</NavLink>
 </div>
 
 @code {
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
 
     [SupplyParameterFromForm]
     private InputModel Input { get; set; } = new();
     private string? errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (HttpMethods.IsGet(HttpContext.Request.Method))
+        {
+            // Clear the existing external cookie to ensure a clean login process
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+        }
+    }
+
+    private async Task LoginUser()
+    {
+        @* if (string.IsNullOrEmpty(Input.Name) || string.IsNullOrEmpty(Input.Password))
+        {
+            errorMessage = "Error: UserName and Password are required.";
+            return;
+        }
+
+        var user = await userManager.FindByNameAsync(Input.Name);
+        if (user == null)
+        {
+            errorMessage = "Error: User cannot find";
+            return;
+        } *@
+
+        var result = await signInManager.PasswordSignInAsync(Input.Name, Input.Password, Input.RememberMe, false);
+        if (result.Succeeded)
+        {
+            RedirectManager.RedirectTo(ReturnUrl);
+        }
+        else
+        {
+            errorMessage = "Error: Invalid login attempt.";
+        }
+    }
+
     private sealed class InputModel
     {
         [Required(ErrorMessage = "UserName is required.")]
@@ -72,44 +101,5 @@
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
     }
-    @* protected override void OnInitialized()
-    {
-        if (currentUserService.IsSignedIn())
-        {
-            nav.NavigateTo("/", forceLoad: true);
-        }
-    } *@
-    protected override async Task OnInitializedAsync()
-    {
-        if (HttpMethods.IsGet(HttpContext.Request.Method))
-        {
-            // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-        }
-    }
-    private async Task LoginUser()
-    {
-        @* if (string.IsNullOrEmpty(Input.Name) || string.IsNullOrEmpty(Input.Password))
-        {
-            errorMessage = "Error: UserName and Password are required.";
-            return;
-        } *@
 
-        var user = await userManager.FindByNameAsync(Input.Name);
-        if (user == null)
-        {
-            errorMessage = "Error: User cannot find";
-            return;
-        }
-
-        var result = await signInManager.PasswordSignInAsync(Input.Name, Input.Password, Input.RememberMe, false);
-        if (result.Succeeded)
-        {
-            nav.NavigateTo(nav.BaseUri);
-        }
-        else
-        {
-            errorMessage = "Error: Invalid login attempt.";
-        }
-    }
 }
