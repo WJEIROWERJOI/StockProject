@@ -9,13 +9,11 @@
     <link rel="stylesheet" href="app.css" />
     <link rel="stylesheet" href="StockProject.styles.css" />
     @* <link rel="icon" type="image/png" href="favicon.png" /> *@
-    <HeadOutlet @rendermode="@RenderModeForPage"/>
-    @* <HeadOutlet/> *@
+    <HeadOutlet @rendermode="@RenderModeForPage" />
 </head>
 
 <body>
     <Routes @rendermode="@RenderModeForPage" />
-    @* <Routes /> *@
     <script src="_framework/blazor.web.js"></script>
     <link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet" />
 </body>
@@ -28,9 +26,11 @@
     private HttpContext HttpContext { get; set; } = default!;
 
     private IComponentRenderMode? RenderModeForPage =>
-        (HttpContext.Request.Path.StartsWithSegments("/Account") || HttpContext.Request.Path.StartsWithSegments("/User"))
-        // HttpContext.Request.Path.StartsWithSegments("/User")   
-        ? null
-            : RenderMode.InteractiveServer;
-}
+    (HttpContext.Request.Path.StartsWithSegments("/Account") || HttpContext.Request.Path.StartsWithSegments("/User"))
+    ? null
+    : RenderMode.InteractiveServer;
 
+    // HttpContext.Request.Path.StartsWithSegments("/User")
+
+
+}

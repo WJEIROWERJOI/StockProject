@@ -118,6 +118,7 @@
 }
 
 @code {
+    private Dictionary<string, StockDto> originalData = new();
     private List<StockDto> dtos = new();
     private string ErrorMessage = "";
     private List<StockCategory> categories = new();
@@ -207,12 +208,35 @@
 
     private void EnterEditMode(StockDto dto)
     {
+        originalData[dto.Id] = new StockDto
+    {
+        Id = dto.Id,
+        Category = dto.Category,
+        ProductName = dto.ProductName,
+        Description = dto.Description,
+        Quantity = dto.Quantity,
+        CreatedAt = dto.CreatedAt,
+        LastUpdatedAt = dto.LastUpdatedAt
+    };
+
         dto.IsEditing = true;
         StateHasChanged();
     }
 
     private void CancelEdit(StockDto dto)
     {
+        if (originalData.ContainsKey(dto.Id))
+    {
+        var original = originalData[dto.Id];
+
+        dto.Category = original.Category;
+        dto.ProductName = original.ProductName;
+        dto.Description = original.Description;
+        dto.Quantity = original.Quantity;
+        dto.CreatedAt = original.CreatedAt;
+        dto.LastUpdatedAt = original.LastUpdatedAt;
+    }
+
         dto.IsEditing = false;
         StateHasChanged();
     }

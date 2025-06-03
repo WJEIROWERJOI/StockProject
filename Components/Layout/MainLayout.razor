@@ -29,22 +29,6 @@
         <NavMenu />
     </div>
     <main>
-        <div class="top-row px-4">
-            <AuthorizeView>
-
-                <Authorized>
-                    <span>
-                        @context.User.Identity?.Name
-                    </span>
-                    <a href="Account/Logout" class="btn btn-primary">Logout</a>
-                </Authorized>
-
-                <NotAuthorized>
-           <a href="User/Login" class="btn btn-primary">Login</a>
-                </NotAuthorized>
-
-                </AuthorizeView>
-</div>
         <article class="content px-4">
             @Body
         </article>
