@@ -3,7 +3,9 @@
 @using Microsoft.AspNetCore.Identity
 @using System.ComponentModel.DataAnnotations
 @using StockProject.Components.Pages.Account.Shared
+@using StockProject.Data.Services
 
+@inject ICurrentUserService currentUserService
 @inject UserManager<UserEntity> userManager
 @inject SignInManager<UserEntity> signInManager
 @inject NavigationManager nav
@@ -12,27 +14,30 @@
 <h3>Login</h3>
 <hr />
 
-@* @if (!string.IsNullOrEmpty(errorMessage))
+@if (!string.IsNullOrEmpty(errorMessage))
 {
     var statusMessageClass = errorMessage.StartsWith("Error") ? "danger" : "success";
     <div class="alert alert-@statusMessageClass" role="alert">
         @errorMessage
     </div>
-} *@
-<StatusMessage Message="@errorMessage" />
+}
+
+@* <StatusMessage Message="@errorMessage" /> *@
 <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
-    <DataAnnotationsValidator />
+    @* <DataAnnotationsValidator /> *@
     @* <ValidationSummary /> *@
-    <ValidationSummary class="text-danger" role="alert" />
+    @* <ValidationSummary class="text-danger" role="alert" /> *@
     <div class="form-floating mb-3">
-        <InputText @bind-Value="Input.Name" class="form-control" autocomplete="username" aria-required="true" placeholder="UserName" />
+        <InputText @bind-Value="Input.Name" class="form-control" autocomplete="username" aria-required="true"
+            placeholder="UserName" />
         <label class="form-label">UserName</label>
-        <ValidationMessage For="() => Input.Name" class="text-danger" />
+        @* <ValidationMessage For="() => Input.Name" class="text-danger" /> *@
     </div>
     <div class="form-floating mb-3">
-        <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+        <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password"
+            aria-required="true" placeholder="password" />
         <label for="password" class="form-label">Password</label>
-        <ValidationMessage For="() => Input.Password" class="text-danger" />
+        @* <ValidationMessage For="() => Input.Password" class="text-danger" /> *@
     </div>
     <div class="checkbox mb-3">
         <label class="form-label">
@@ -44,14 +49,17 @@
         <button type="submit" class="w-100 btn btn-primary">Log in</button>
     </div>
 </EditForm>
+<div class="d-flex justify-content-end mt-3">
+    @* <NavLink class="btn btn-secondary mt-3" href="/User/ForgotPassword">Forgot Password?</NavLink> *@
+    <NavLink class="btn btn-info mt-3" href="/User/Register">Register</NavLink>
+</div>
 
 @code {
-    [CascadingParameter]
-    private HttpContext HttpContext { get; set; } = default!;
+    @* [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!; *@
     [SupplyParameterFromForm]
     private InputModel Input { get; set; } = new();
     private string? errorMessage = string.Empty;
-
     private sealed class InputModel
     {
         [Required]
@@ -64,24 +72,43 @@
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
     }
+    protected override void OnInitialized()
+    {
+        if (currentUserService.IsSignedIn())
+        {
+            nav.NavigateTo("/", forceLoad: true);
+        }
+    }
 
     private async Task LoginUser()
     {
+        @* if (string.IsNullOrEmpty(Input.Name) || string.IsNullOrEmpty(Input.Password))
+        {
+            errorMessage = "Error: UserName or Password cannot be empty.";
+            return;
+        }
+        else
+        { *@
+
         var user = await userManager.FindByNameAsync(Input.Name);
         if (user == null)
         {
-            errorMessage = "Danger: User cannot find";
+            errorMessage = "Error: User cannot find";
             return;
-        }
-        var result = await signInManager.PasswordSignInAsync(Input.Name, Input.Password, Input.RememberMe, false);
-        if (result.Succeeded)
-        {
-            nav.NavigateTo(nav.BaseUri);
         }
         else
         {
-            errorMessage = "Error: Invalid login attempt.";
+            var result = await signInManager.PasswordSignInAsync(Input.Name, Input.Password, Input.RememberMe, false);
+            if (result.Succeeded)
+            {
+                nav.NavigateTo(nav.BaseUri);
+            }
+            else
+            {
+                errorMessage = "Error: Invalid login attempt.";
+            }
         }
+
+
     }
- 
 }

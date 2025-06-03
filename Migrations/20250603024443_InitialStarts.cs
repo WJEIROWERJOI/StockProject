@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace StockProject.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialStart : Migration
+    public partial class InitialStarts : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -213,7 +213,8 @@ namespace StockProject.Migrations
                         name: "FK_Stocks_StockCategories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "StockCategories",
-                        principalColumn: "CategoryId");
+                        principalColumn: "CategoryId",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(

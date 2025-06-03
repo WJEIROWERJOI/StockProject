@@ -399,7 +399,8 @@ namespace StockProject.Migrations
                 {
                     b.HasOne("StockProject.Data.Entities.StockCategory", "Category")
                         .WithMany("Stocks")
-                        .HasForeignKey("CategoryId");
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Category");
                 });

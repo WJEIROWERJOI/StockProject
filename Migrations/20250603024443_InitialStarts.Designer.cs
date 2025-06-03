@@ -11,8 +11,8 @@ using StockProject.Data;
 namespace StockProject.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250531151555_InitialStart")]
-    partial class InitialStart
+    [Migration("20250603024443_InitialStarts")]
+    partial class InitialStarts
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -402,7 +402,8 @@ namespace StockProject.Migrations
                 {
                     b.HasOne("StockProject.Data.Entities.StockCategory", "Category")
                         .WithMany("Stocks")
-                        .HasForeignKey("CategoryId");
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Category");
                 });

@@ -5,5 +5,6 @@
         string? UserId { get; }
         string? UserName { get; }
         string? Email { get; }
+        bool IsSignedIn();
     }
 }

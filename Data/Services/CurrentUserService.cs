@@ -19,5 +19,10 @@ namespace StockProject.Data.Services
 
         public string? Email =>
             _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value;
+
+        public bool IsSignedIn()
+        {
+            return _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
+        }
     }
 }

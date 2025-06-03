@@ -7,6 +7,7 @@
 <hr />
 
 <div class="d-flex justify-content-end">
+
     <button @onclick="BeginCreate" class="btn btn-primary">추가</button>
 </div>
 
@@ -52,29 +53,31 @@
                 <td>
                     <EditForm Model="@cate" OnValidSubmit="() => ChangeCategory(cate)">
                         <button class="btn btn-success btn-sm" type="submit">저장</button>
-                        <button class="btn btn-info btn-sm" type="button" @onclick="() => CancelEdit(cate)">취소</button>
+                        <button class="btn btn-info btn-sm" type="button" @onclick="CancelEdit">취소</button>
                     </EditForm>
                     <button class="btn btn-danger btn-sm" type="button" @onclick="() => DeleteStock(cate)">삭제</button>
                 </td>
             </tr>
+            @* </EditForm> *@        
         }
     </tbody>
 </table>
 
 @code {
-    List<StockCategory> categories = new();
+    [SupplyParameterFromForm]
+    List<StockCategory> categories { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
         await InitialDataBring();
     }
 
-    private async Task ChangeCategory(StockCategory cate)
+    private async Task ChangeCategory(StockCategory category)
     {
         try
         {
-            await stockCategoryService.UpdateStockCategoryAsync(cate);
-            toastService.ShowSuccess($"{cate.Name} changed Successfully!");
+            await stockCategoryService.UpdateStockCategoryAsync(category);
+            toastService.ShowSuccess($"{category.Name} changed Successfully!");
         }
         catch (KeyNotFoundException ex)
         {
@@ -90,17 +93,27 @@
         StateHasChanged();
     }
 
-    private async Task DeleteStock(StockCategory cate)
+    private async Task TempChangeCategory(StockCategory category)
+    {
+        await stockCategoryService.UpdateStockCategoryAsync(category);
+        toastService.ShowSuccess($"{category.Name} changed Successfully!");
+
+        await InitialDataBring();
+        @* StateHasChanged(); *@
+    }
+
+
+    private async Task DeleteStock(StockCategory category)
     {
         try
         {
-            if (await stockCategoryService.CheckStockCategoryStocks(cate))
+            if (await stockCategoryService.CheckStockCategoryStocks(category))
             {
                 var beforemodal = Modal.Show<DeleteCategoryConfirmModal>("Confirm Delete");
                 var beforeresult = await beforemodal.Result;
                 if (beforeresult.Cancelled)
                 {
-                    return;           
+                    return;
                 }
             }
             var modal = Modal.Show<DeleteConfirmModal>("Confirm Delete");
@@ -108,8 +121,8 @@
 
             if (!result.Cancelled)
             {
-                await stockCategoryService.DeleteStockCategoryAsync(cate);
-                toastService.ShowSuccess($"{cate.Name} deleted Successfully!");
+                await stockCategoryService.DeleteStockCategoryAsync(category);
+                toastService.ShowSuccess($"{category.Name} deleted Successfully!");
             }
         }
         catch (KeyNotFoundException ex)
@@ -126,8 +139,9 @@
         StateHasChanged();
     }
 
-    private void CancelEdit(StockCategory cate)
+    private async Task CancelEdit()
     {
+        await InitialDataBring();
         StateHasChanged();
     }
 
