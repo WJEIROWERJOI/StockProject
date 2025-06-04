@@ -42,6 +42,12 @@ namespace StockProject.Data.Services
 
         }
         //r
+        public async Task<UserEntity?> GetUserByNameAsync(string str)
+        {
+            return await _userManager.FindByNameAsync(str);
+        }
+
+
         //u
         //d
 

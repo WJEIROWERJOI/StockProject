@@ -13,6 +13,7 @@
 </head>
 
 <body>
+    @* <component typeof="" *@
     <Routes @rendermode="@RenderModeForPage" />
     <script src="_framework/blazor.web.js"></script>
     <link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet" />
@@ -25,7 +26,7 @@
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
 
-    private IComponentRenderMode? RenderModeForPage =>
+    private IComponentRenderMode? RenderModeForPage => //HttpContext.Request.Path.StartsWithSegments("/Account")
     (HttpContext.Request.Path.StartsWithSegments("/Account") || HttpContext.Request.Path.StartsWithSegments("/User"))
     ? null
     : RenderMode.InteractiveServer;

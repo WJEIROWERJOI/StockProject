@@ -29,6 +29,29 @@
         <NavMenu />
     </div>
     <main>
+        <AuthorizeView>
+            <Authorized>
+                <div class="top-row px-4">
+                    <span class="me-5">
+                        <a href="/Account/Manage" class="btn btn-primary">Hello @context.User.Identity?.Name</a>
+                    </span>
+                    <form action="Account/Logout" method="post">
+                        <AntiforgeryToken />
+                        <input type="hidden" name="ReturnUrl" value="@nav.ToBaseRelativePath(nav.Uri)" />
+                        <button type="submit" class="btn btn-primary">Logout</button>
+                    </form>
+                </div>
+            </Authorized>
+<NotAuthorized>
+                <div class="top-row px-4">
+                    <NavLink href="/Account/Login" class="btn btn-primary" target="_self" ReturnUrl="@nav.Uri">Login</NavLink>
+                </div>
+</NotAuthorized>
+        </AuthorizeView>
+
+
+
+        
         <article class="content px-4">
             @Body
         </article>
