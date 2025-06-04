@@ -1,7 +1,10 @@
 ﻿@page "/stock/category"
+@using Microsoft.AspNetCore.Authorization
 @using StockProject.Data.Services
 @inject StockCategoryService stockCategoryService
 @inject IToastService toastService
+@attribute [Authorize(Roles="Admin")]
+
 <PageTitle>CategoryList</PageTitle>
 <h3>CategoryList</h3>
 <hr />
