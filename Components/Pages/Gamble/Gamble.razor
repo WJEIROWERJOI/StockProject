@@ -1,6 +1,10 @@
 ﻿@page "/Gamble/Dice"
 @rendermode InteractiveServer
 
+@using StockProject.Data.Services
+
+@inject ICurrentUserService currentUserService
+
     <p>@diceSrc</p>
     <p>@diceValue</p>
     <p>@Input.Wallet</p>
@@ -53,6 +57,9 @@
         StateHasChanged();
 
     }
-
+    protected override async Task OnInitializedAsync()
+    {
+    // =currentUserService.UserId   
+    }
 
 }
