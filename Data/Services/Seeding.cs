@@ -8,15 +8,26 @@ public static class Seeding
     {
         var logService = new LogService();
 
-        //if (!context.Boards.Any())
-        //{
-        //    List<Board> brds = new List<Board> {
-        //    new Board { Title = "User List", Url = "/list", Img = "bi bi-person-fill-nav-menu" },
-        //    new Board { Title = "User Register", Url = "/register", Img = "bi bi-lock-nav-menu" },
-        //    new Board { Title = "Post", Url = "/posts/lists", Img = "bi bi-list-nested-nav-menu" }
-        //};
-        //    context.Boards.AddRange(brds);
-        //}
+        if (!context.Boards.Any())
+        {
+            List<Board> brds = new List<Board> {
+            new Board { Title = "StockList", Url = "/stock/list", Img = "bi bi-plus-square-fill-nav-menu",Primary=true },
+            new Board { Title = "StockCategory", Url = "/stock/category", Img = "bi bi-lock-nav-menu",Primary=true },
+            new Board {Title = "UserLogin",
+                Url="/Account/Login",
+                Img="bi bi-plus-square-fill-nav-menu",
+                Primary=true,
+                Boards = new List<Board> {
+                                    new Board {
+                                                    Title = "Register",
+                                                    Url = "/User/Register"
+                                               }
+
+                                          }
+        }
+            };
+            context.Boards.AddRange(brds);
+        }
 
 
         if (!context.StockCategories.Any())

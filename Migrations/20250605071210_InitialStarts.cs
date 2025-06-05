@@ -62,6 +62,7 @@ namespace StockProject.Migrations
                     Title = table.Column<string>(type: "TEXT", nullable: false),
                     Url = table.Column<string>(type: "TEXT", nullable: true),
                     Img = table.Column<string>(type: "TEXT", nullable: false),
+                    Primary = table.Column<bool>(type: "INTEGER", nullable: false),
                     BoardId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>

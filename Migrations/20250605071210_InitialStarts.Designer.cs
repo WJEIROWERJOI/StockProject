@@ -11,7 +11,7 @@ using StockProject.Data;
 namespace StockProject.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250603024443_InitialStarts")]
+    [Migration("20250605071210_InitialStarts")]
     partial class InitialStarts
     {
         /// <inheritdoc />
@@ -160,6 +160,9 @@ namespace StockProject.Migrations
                     b.Property<string>("Img")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("Primary")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Title")
                         .IsRequired()

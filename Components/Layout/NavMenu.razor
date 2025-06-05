@@ -1,5 +1,7 @@
-﻿@implements IDisposable
+﻿@using StockProject.Data.Services
+@implements IDisposable
 
+@inject BoardService boardService
 @inject NavigationManager NavigationManager
 
 <div class="top-row ps-3 navbar navbar-dark">
@@ -24,7 +26,7 @@
             </NavLink>
         </div> *@
 
-        <div class="nav-item px-3">
+        @* <div class="nav-item px-3">
             <NavLink class="nav-link" href="stock/list">
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> StockList
             </NavLink>
@@ -33,7 +35,7 @@
             <NavLink class="nav-link" href="stock/category">
                 <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> StockCategory
             </NavLink>
-        </div>
+        </div> *@
         @* <div class="nav-item px-3">
             <NavLink class="nav-link" href="weather">
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
@@ -81,16 +83,46 @@
                 </div>
             </NotAuthorized>
         </AuthorizeView> *@
+
+        @foreach (var board in boards)
+        {
+            if(board.Primary){
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href=@board.Url>
+                    <span class=@board.Img aria-hidden="true"></span> @board.Title
+                </NavLink>
+                @if (board.Boards != null)
+                {
+                    @foreach (var inner in board.Boards)
+                    {
+                                <NavLink class="nav-link" style="padding-left:20px;" href=@inner.Url>@inner.Title</NavLink>
+                           
+                    }
+                }
+
+            </div>
+            }
+        }
+
+
+
+
+
+
     </nav>
 </div>
 
 @code {
+    List<Board> boards = new();
+
+
     private string? currentUrl;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
+        boards = await boardService.GetAllBoardAsync();
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)

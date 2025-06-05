@@ -9,9 +9,8 @@ namespace StockProject.Data.Entities
         public required string Title { get; set; } = string.Empty;
         public string? Url { get; set; }
         public List<Board> Boards { get; set; } = new();
-        //public string Icon { get; set; } = "";
-        //public bool RequiresAuth { get; set; } = false;
-        //public UserRole? RequiredRole { get; set; } = null;
         public string Img { get; set; } = string.Empty;
+        public bool Primary { get; set; }
+
     }
 }

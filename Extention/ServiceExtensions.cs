@@ -16,6 +16,10 @@ public static class ServiceExtensions
         services.AddBlazoredToast();
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+        services.AddScoped<BoardRepository>();
+        services.AddScoped<BoardService>();
+        
         services.AddScoped<StockCategoryService>();
         services.AddScoped<StockTransactionRepository>();
         services.AddScoped<StockCategoryRepository>();
