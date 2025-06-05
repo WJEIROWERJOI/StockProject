@@ -5,16 +5,8 @@
 @inherits LayoutComponentBase
 
 
-<BlazoredToasts Position="ToastPosition.BottomRight"
-                Timeout="10"
-                IconType="IconType.Material"
-                ErrorIcon="😓"
-                InfoIcon="😊"
-                SuccessIcon="🎉"
-                WarningIcon="⚠️"
-                ShowProgressBar="@true"
-                ShowCloseButton="@true"
-                MaxToastCount="3">
+<BlazoredToasts Position="ToastPosition.BottomRight" Timeout="10" IconType="IconType.Material" ErrorIcon="😓"
+    InfoIcon="😊" SuccessIcon="🎉" WarningIcon="⚠️" ShowProgressBar="@true" ShowCloseButton="@true" MaxToastCount="3">
     <CloseButtonContent>
         <div>
             <span class="myCloseButtonStyleClass">&times;</span>
@@ -42,16 +34,17 @@
                     </form>
                 </div>
             </Authorized>
-<NotAuthorized>
+            <NotAuthorized>
                 <div class="top-row px-4">
-                    <NavLink href="/Account/Login" class="btn btn-primary" target="_self" ReturnUrl="@nav.Uri">Login</NavLink>
+                    <NavLink href="/Account/Login" class="btn btn-primary" target="_self" ReturnUrl="@nav.Uri">Login
+                    </NavLink>
                 </div>
-</NotAuthorized>
+            </NotAuthorized>
         </AuthorizeView>
 
 
 
-        
+
         <article class="content px-4">
             @Body
         </article>

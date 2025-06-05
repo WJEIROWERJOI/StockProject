@@ -63,7 +63,7 @@
             }
             else
             {
-                var result = await userService.UserSignIn(Input.Name, Input.Password, Input.RememberMe);
+                 var result = await userService.UserSignInAsync(Input.Name, Input.Password, Input.RememberMe);
                 if (result.Succeeded)
                 {
                     errorMessage = "Success: good Login Attempt";

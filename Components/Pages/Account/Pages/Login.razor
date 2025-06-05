@@ -6,6 +6,7 @@
 @using StockProject.Data
 @using StockProject.Data.Services
 
+@inject UserService userService
 @inject ICurrentUserService currentUserService
 @inject SignInManager<UserEntity> SignInManager
 @inject ILogger<Login> Logger
@@ -93,13 +94,14 @@
     {
         // This doesn't count login failures towards account lockout
         // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-        var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+        @* var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false); *@
+        var result = await userService.UserSignInAsync(Input.Email, Input.Password,Input.RememberMe);
         if (result.Succeeded)
         {
             Logger.LogInformation("User logged in.");
             RedirectManager.RedirectTo(ReturnUrl);
         }
-        else if (result.RequiresTwoFactor)
+        @* else if (result.RequiresTwoFactor)
         {
             RedirectManager.RedirectTo(
                 "Account/LoginWith2fa",
@@ -109,7 +111,7 @@
         {
             Logger.LogWarning("User account locked out.");
             RedirectManager.RedirectTo("Account/Lockout");
-        }
+        } *@
         else
         {
             errorMessage = "Error: Invalid login attempt.";

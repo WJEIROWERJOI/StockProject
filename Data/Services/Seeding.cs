@@ -2,6 +2,7 @@
 using StockProject.Data.Entities;
 
 namespace StockProject.Data.Services;
+
 public static class Seeding
 {
     public static async Task SeedingBoard(ApplicationDbContext context, RoleManager<IdentityRole> roleManager, UserManager<UserEntity> userManager)
@@ -24,7 +25,8 @@ public static class Seeding
                                                }
 
                                           }
-        }
+        },
+            new Board { Title = "Gamble", Url = "/Gamble/Dice", Img = "bi bi-plus-square-fill-nav-menu",Primary=true }
             };
             context.Boards.AddRange(brds);
         }

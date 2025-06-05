@@ -1,0 +1,58 @@
+﻿@page "/Gamble/Dice"
+@rendermode InteractiveServer
+
+    <p>@diceSrc</p>
+    <p>@diceValue</p>
+    <p>@Input.Wallet</p>
+
+    <img src="@diceSrc" class="dice-image" />
+
+    <EditForm Model="Input" OnValidSubmit="RollDice">
+        <label class="form-label">얼마검?</label>
+        <InputNumber @bind-Value="Input.Guest" class="form-control" />
+        <label class="form-label">어디에검?</label>
+        <InputNumber @bind-Value="Input.Host" class="form-control" />
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </EditForm>
+<p>@resultMessage</p>
+
+@* <button class="btn btn-primary" @onclick="RollDice">Roll Dice</button> *@
+@code {
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = new();
+    private sealed class InputModel
+    {
+        public int Guest { get; set; } = 1;
+        public int Host { get; set; }
+        @* public string Password { get; set; } = ""; *@
+        public int Wallet { get; set; } = 100;
+    }
+
+    int diceValue = 1;
+    string diceSrc = "Dice/dice_1.png";
+    string resultMessage = string.Empty;
+    async Task RollDice()
+    {
+        resultMessage = string.Empty;
+        diceSrc = "Dice/dice_roll.png";
+        StateHasChanged();
+        await Task.Delay(500);
+        Random random = new Random();
+        diceValue = random.Next(1, 7);
+        diceSrc = $"Dice/dice_{diceValue}.png";
+
+        if (diceValue == Input.Host)
+        {
+        }
+        else
+        {
+        }
+
+        @* Console.WriteLine(result); *@
+        @* resultMessage = result; *@
+        StateHasChanged();
+
+    }
+
+
+}

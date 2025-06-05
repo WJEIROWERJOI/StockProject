@@ -11,8 +11,8 @@ using StockProject.Data;
 namespace StockProject.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250605071210_InitialStarts")]
-    partial class InitialStarts
+    [Migration("20250605111900_InitialStart")]
+    partial class InitialStart
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

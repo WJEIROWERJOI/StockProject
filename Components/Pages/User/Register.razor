@@ -1,8 +1,8 @@
 ﻿@page "/User/Register"
 @using StockProject.Data.Dtos
 @using StockProject.Data.Services
-
-
+@* @rendermode InteractiveServer *@
+@* @inject IToastService toastService *@
 @inject UserService userService
 @inject NavigationManager nav
 
@@ -59,8 +59,17 @@
 
     private async Task GoRegister()
     {
+        try{
         await userService.CreateUser(dto);
-        nav.NavigateTo(nav.BaseUri,true);
+        Console.WriteLine("회원가입 성공");
+        @* toastService.ShowSuccess("회원가입이 완료되었습니다."); *@
+        nav.NavigateTo("/Account/Login",true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"회원가입 실패: {ex.Message}");
+            @* toastService.ShowError($"회원가입에 실패했습니다: {ex.Message}"); *@
+        }
         // public async Task CreateUser(UserRegisterDto dto)
        
     }
