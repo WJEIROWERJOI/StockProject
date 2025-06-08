@@ -2,16 +2,17 @@
 
 <div class="card mb-3">
     <div class="card-body text-center">
+
         <p class="fs-5 fw-semibold mb-3">
             @GetModeMessage(GameMode)
         </p>
+        
         @if (GameMode is 1 or 2 or 3)
         {
             diceCount = 1;
         }
         else if (GameMode is 4 or 5)
         {
-
             <div class="mb-3">
                 <label class="form-label fw-bold">Number of Dice</label>
                 <select @bind=@diceCount class="form-select">
@@ -20,7 +21,6 @@
                         <option value=@i>@i</option>
                     }
                 </select>
-                @* <InputNumber @bind-Value="diceCount" class="form-control w-50 mx-auto" min="1" /> *@
             </div>
         }
 
@@ -40,11 +40,11 @@
 
     private string GetModeMessage(int mode) => mode switch
     {
-        1 => "🎲 Odd or Even Mode Selected",
-        2 => "🎯 Exact Number Mode Selected",
-        3 => "📈 High or Low Mode Selected",
-        4 => "➕ Sum Bet Mode Selected",
-        5 => "📊 High or Low Sum Bet Mode Selected",
+        1 => "Odd or Even Mode Selected",
+        2 => "Exact Number Mode Selected",
+        3 => "High or Low Mode Selected",
+        4 => "Sum Bet Mode Selected",
+        5 => "High or Low Sum Bet Mode Selected",
         _ => ""
     };
 
