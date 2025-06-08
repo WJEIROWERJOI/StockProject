@@ -6,6 +6,7 @@ namespace StockProject.Data
 {
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<UserEntity>(options)
     {
+        public DbSet<Point> Points { get; set; }
         public DbSet<StockEntity> Stocks { get; set; }
         public DbSet<StockCategory> StockCategories { get; set; }
         public DbSet<StockTransaction> StockTransactions { get; set; }
@@ -13,11 +14,12 @@ namespace StockProject.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            
+
             builder.Entity<StockEntity>().ToTable("Stocks");
             builder.Entity<StockCategory>().ToTable("StockCategories");
             builder.Entity<StockTransaction>().ToTable("StockTransactions");
             builder.Entity<Board>().ToTable("Boards");
+            builder.Entity<Point>().ToTable("Points");
 
 
 

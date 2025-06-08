@@ -12,6 +12,11 @@ public static class ServiceExtensions
 {
     public static IServiceCollection AddAppServices(this IServiceCollection services)
     {
+
+
+        services.AddScoped<PointRepository>();
+        services.AddScoped<PointService>();
+
         services.AddBlazoredModal();
         services.AddBlazoredToast();
         services.AddHttpContextAccessor();

@@ -2,18 +2,58 @@
 
 @using StockProject.Data.Services
 
+@inject IToastService toastService
+@inject IModalService modalService
 @inject ICurrentUserService currentUserService
+@inject PointService pointService
+@inject NavigationManager nav
+<PageTitle>InitialGamble</PageTitle>
+<h2>Gamble</h2>
+<hr />
 
+Welcome to the Gamble Page!
+<br />
+<br />
 
-@code{
+@if(currentPoint == null)
+{
+    <p>you dont have Point entity</p>
+}
+else
+{
+<p>@currentPoint!.UserId</p>
+<p>@currentPoint.UserName</p>
+<p>@currentPoint.Money</p>
+<p>@currentPoint.CreatedAt.AddHours(9).ToString("yyyy-MM-dd HH:mm:ss")</p>
+<p>@currentPoint.UpdatedAt.AddHours(9).ToString("yyyy-MM-dd HH:mm:ss")</p>
+}
 
+<br />
 
+<div class="column">
+    <a class="btn btn-primary" href="/Gamble/Dice">Dice</a>
+    <a class="btn btn-primary" href="/Gamble/Slot">Slot</a>
+</div>
+
+@code {
+    Point? currentPoint;
     protected override async Task OnInitializedAsync()
     {
-        if(currentUserService.IsSignedIn()){
-            
+        currentPoint = await pointService.SetCurrentUser();
+        if (currentPoint == null)
+        {
+             var modal = modalService.Show<InitialGambleModal>("You dont have Point Entity so you need to create it!");
+            var result = await modal.Result;
+            if(!result.Cancelled)
+            {
+                currentPoint = await pointService.InitialCreate();
+                toastService.ShowSuccess("Initial Point Entity Created Successfully!");
+            }
+            else{
+                toastService.ShowError("Initial Point Entity Creation Cancelled!");
+            }
+
         }
     }
-
 
 }

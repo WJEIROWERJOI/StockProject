@@ -26,7 +26,7 @@ public static class Seeding
 
                                           }
         },
-            new Board { Title = "Gamble", Url = "/Gamble/Dice", Img = "bi bi-plus-square-fill-nav-menu",Primary=true }
+            new Board { Title = "Gamble", Url = "/Gamble", Img = "bi bi-plus-square-fill-nav-menu",Primary=true }
             };
             context.Boards.AddRange(brds);
         }
