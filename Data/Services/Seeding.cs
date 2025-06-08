@@ -23,10 +23,14 @@ public static class Seeding
                                                     Title = "Register",
                                                     Url = "/User/Register"
                                                }
-
                                           }
         },
-            new Board { Title = "Gamble", Url = "/Gamble", Img = "bi bi-plus-square-fill-nav-menu",Primary=true }
+            new Board { Title = "Gamble", Url = "/Gamble", Img = "bi bi-plus-square-fill-nav-menu",Primary=true,Boards = new List<Board> {
+                                    new Board {
+                                                    Title = "Dice",
+                                                    Url = "/Gamble/Dice"
+                                               }
+                                          } }
             };
             context.Boards.AddRange(brds);
         }

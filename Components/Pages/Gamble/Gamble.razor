@@ -8,6 +8,7 @@
 @inject PointService pointService
 @inject NavigationManager nav
 <PageTitle>InitialGamble</PageTitle>
+
 <h2>Gamble</h2>
 <hr />
 
@@ -28,11 +29,12 @@ else
 <p>@currentPoint.UpdatedAt.AddHours(9).ToString("yyyy-MM-dd HH:mm:ss")</p>
 }
 
+
 <br />
 
 <div class="column">
     <a class="btn btn-primary" href="/Gamble/Dice">Dice</a>
-    <a class="btn btn-primary" href="/Gamble/Slot">Slot</a>
+    @* <a class="btn btn-primary" href="/Gamble/Slot">Slot</a> *@
 </div>
 
 @code {

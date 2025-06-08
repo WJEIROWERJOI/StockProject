@@ -1,0 +1,46 @@
+﻿@using StockProject.Data.Services
+@inherits LayoutComponentBase
+@layout StockProject.Components.Layout.MainLayout
+
+@inject PointService pointService
+
+<div>
+    <div class="row">
+
+        <div class="col-md-9">
+            @Body
+        </div>
+        
+        <div class="col-md-3 border mt-3 p-3">
+            <h5 class="text-primary">Current</h5>
+
+            <ul class="list-group">
+                @* <li class="list-group-item">
+            <strong>Hello:</strong> @point?.UserId
+        </li> *@
+                <li class="list-group-item">
+                    <strong>UserName:</strong> @point?.UserName
+                </li>
+                <li class="list-group-item">
+                    <strong>Money:</strong> @point?.Money
+                </li>
+                <li class="list-group-item">
+                    <strong>CreatedAt:</strong> @point?.CreatedAt.AddHours(9).ToString("yy-MM-dd HH:mm")
+                </li>
+                <li class="list-group-item">
+                    <strong>LastUpdatedAt:</strong> @point?.UpdatedAt.AddHours(9).ToString("yyMMdd HH:mm:ss")
+                </li>
+            </ul>
+            <button class="btn btn-primary mt-3">Button</button>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    Point? point;
+    protected override async Task OnInitializedAsync()
+    {
+        point = await pointService.GetPointLayOutAsync();
+    }
+}

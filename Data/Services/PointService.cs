@@ -18,6 +18,15 @@ namespace StockProject.Data.Services
             await _pointRepository.CreatePoint(point);
         }
         //r
+        public async Task<Point?> GetPointLayOutAsync()
+        {
+            if (_currentUserService == null || !_currentUserService.IsSignedIn())
+            {
+                return new Point();
+            }
+            return await _pointRepository.FindPointByUserIdAsync(_currentUserService.UserId!);
+        }
+        
         public async Task<Point?> GetPointByIdAsync(int id)
         {
             return await _pointRepository.FindPointByIdAsync(id);
@@ -59,6 +68,34 @@ namespace StockProject.Data.Services
 
             return newPoint;
         }
+        public async Task<Point?> ResetPoint()
+        {
+            if (_currentUserService == null || !_currentUserService.IsSignedIn())
+            {
+                return null;
+            }
+            var currentPoint = await _pointRepository.FindPointByUserIdAsync(_currentUserService.UserId!);
+            if (currentPoint != null)
+            {
+                currentPoint.Money = 100;
+                currentPoint.UpdatedAt = DateTime.UtcNow;
+                await _pointRepository.UpdatePoint(currentPoint);
+            }
+            else
+            {
+                currentPoint = new Point
+                {
+                    UserId = _currentUserService.UserId!,
+                    UserName = _currentUserService.UserName ?? "Temp",
+                    Money = 100,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                await _pointRepository.CreatePoint(currentPoint);
+            }
+            return currentPoint;
+        }
+
         //u
         public async Task UpdatePoint(Point point)
         {

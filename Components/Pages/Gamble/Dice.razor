@@ -2,64 +2,220 @@
 @rendermode InteractiveServer
 
 @using StockProject.Data.Services
-
 @inject ICurrentUserService currentUserService
+@inject PointService pointService
 
+@* 
     <p>@diceSrc</p>
     <p>@diceValue</p>
-    <p>@Input.Wallet</p>
+    <p>@Input.Wallet</p> *@
 
-    <img src="@diceSrc" class="dice-image" />
+<div class="form-group">
+    <label class="form-label">Select Dice Betting Mode</label>
+    <InputRadioGroup @bind-Value="GameMode" class="form-control">
+        <div class="form-check">
+            <InputRadio Value=1 class="form-check-input" />
+            <label class="form-check-label">Odd or Even</label>
+        </div>
+        <div class="form-check">
+            <InputRadio Value=2 class="form-check-input" />
+            <label class="form-check-label">Exact Number</label>
+        </div>
+        <div class="form-check">
+            <InputRadio Value=3 class="form-check-input" />
+            <label class="form-check-label">High or Low</label>
+        </div>
+        <div class="form-check">
+            <InputRadio Value=4 class="form-check-input" />
+            <label class="form-check-label">Sum Bet</label>
+        </div>
+        <div class="form-check">
+            <InputRadio Value=5 class="form-check-input" />
+            <label class="form-check-label">Range Bet</label>
+        </div>
+    </InputRadioGroup>
+</div>
+<hr />
 
-    <EditForm Model="Input" OnValidSubmit="RollDice">
-        <label class="form-label">얼마검?</label>
-        <InputNumber @bind-Value="Input.Guest" class="form-control" />
-        <label class="form-label">어디에검?</label>
-        <InputNumber @bind-Value="Input.Host" class="form-control" />
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </EditForm>
-<p>@resultMessage</p>
+@switch (GameMode)
+{
+    case 1:
+        <p>Odd or Even Mode Selected</p>
+        <img src="@diceSrc" />
+        <EditForm Model="Input" OnValidSubmit="RollDice">
+            <label class="form-label">Odd or Even</label>
+            <select @bind="Input.TargetNumber" class="form-select">
+                <option value="1">Odd</option>
+                <option value="2">Even</option>
+            </select>
+            <label class="form-label">Bet Amount</label>
+            <InputNumber @bind-Value="Input.BetAmount" class="form-control" />
+            <button class="btn btn-primary" type="submit">Roll Dice</button>
+        </EditForm>
+        break;
 
-@* <button class="btn btn-primary" @onclick="RollDice">Roll Dice</button> *@
+    case 2:
+        <p>Exact Number Mode Selected</p>
+
+
+        <img src="@diceSrc" class="dice-image" />
+
+        <EditForm Model="Input" OnValidSubmit="RollDice">
+
+            <label class="form-label">Target Number</label>
+            <select @bind="Input.TargetNumber" class="form-select">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+            </select>
+            @* <InputNumber @bind-Value="Input.TargetNumber" class="form-control" /> *@
+            <label class="form-label">Bet Amount</label>
+            <InputNumber @bind-Value="Input.BetAmount" class="form-control" />
+            <button class="btn btn-primary" type="submit">Roll Dice</button>
+        </EditForm>
+
+        break;
+    case 3:
+        <p>High or Low Mode Selected</p>
+        <img src="@diceSrc" />
+        <EditForm Model="Input" OnValidSubmit="RollDice">
+
+            <label class="form-label">High or Low</label>
+            <select @bind="Input.TargetNumber" class="form-select">
+                <option value="1">High</option>
+                <option value="2">Low</option>
+            </select>
+
+            <label class="form-label">Select TargetNumber</label>
+            <select @bind="Input.Temp" class="form-select">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+            </select>
+
+            <label class="form-label">Bet Amount</label>
+            <InputNumber @bind-Value="Input.BetAmount" class="form-control" />
+            <button class="btn btn-primary" type="submit">Roll Dice</button>
+        </EditForm>
+        break;
+    case 4:
+        <p>Sum Bet Mode Selected</p>
+
+        for (int i = 0; i < Input.Temp; i++)
+        {
+            <img src="@diceSrc" class="dice-image" />
+        }
+        <EditForm Model="Input" OnValidSubmit="RollDice">
+
+            <label class="form-label">Number of Dice</label> 
+            <InputNumber @bind-Value="Input.Temp" class="form-control" />
+
+            <label class="form-label">Target Sum</label>
+            <InputNumber @bind-Value="Input.TargetNumber" class="form-control" />
+
+            <label class="form-label">Bet Amount</label>
+            <InputNumber @bind-Value="Input.BetAmount" class="form-control" />
+
+        <button class="btn btn-primary" @onclick="RollDice">Roll Dice</button>
+        </EditForm>
+
+        break;
+    case 5:
+        <p>Range Bet Mode Selected</p>
+        <img src="@diceSrc" class="dice-image" />
+
+
+        <button class="btn btn-primary" @onclick="RollDice">Roll Dice</button>
+
+        break;
+}
+
+<p class="mt-3">@resultMessage</p>
+
+
 @code {
+
+    private int GameMode { get; set; } = 1;
+    protected override async Task OnInitializedAsync()
+    {
+        await pointService.SetCurrentUser();
+    }
+
     [SupplyParameterFromForm]
     private InputModel Input { get; set; } = new();
     private sealed class InputModel
     {
-        public int Guest { get; set; } = 1;
-        public int Host { get; set; }
-        @* public string Password { get; set; } = ""; *@
-        public int Wallet { get; set; } = 100;
+        public int Temp { get; set; } = 1;
+        public int TargetNumber { get; set; } = 1;
+        @* public int Count {get;set;} = 0; *@
+        public int BetAmount { get; set; } = 0;
     }
+    private int diceValue = 1;
+    private string diceSrc = "Dice/dice_1.png";
+    private string resultMessage = string.Empty;
 
-    int diceValue = 1;
-    string diceSrc = "Dice/dice_1.png";
-    string resultMessage = string.Empty;
-
-    async Task RollDice()
+    protected async Task RollDice()
     {
-        resultMessage = string.Empty;
         diceSrc = "Dice/dice_roll.png";
         StateHasChanged();
         await Task.Delay(500);
         Random random = new Random();
         diceValue = random.Next(1, 7);
         diceSrc = $"Dice/dice_{diceValue}.png";
-
-        if (diceValue == Input.Host)
+        switch (GameMode)
         {
-        }
-        else
-        {
-        }
+            case 1:
+                if (diceValue % 2 == Input.TargetNumber % 2)
+                {
+                    resultMessage = $"You rolled a {diceValue}. You win!";
+                    @* await pointService.AddPointsAsync(Input.BetAmount); *@
+                }
+                else
+                {
+                    resultMessage = $"You rolled a {diceValue}. You lose!";
+                    @* await pointService.SubtractPointsAsync(Input.BetAmount); *@
+                }
+                break;
+            case 2:
+                if (diceValue == Input.TargetNumber)
+                {
+                    resultMessage = $"You rolled a {diceValue}. You win!";
+                    @* await pointService.AddPointsAsync(Input.BetAmount); *@
+                }
+                else
+                {
+                    resultMessage = $"You rolled a {diceValue}. You lose!";
+                    @* await pointService.SubtractPointsAsync(Input.BetAmount); *@
+                }
+                break;
+            case 3:
+                //Input.TargetNumber = 1 for High, 2 for Low
+                //Temp is the number to compare against
+                if ((Input.TargetNumber == 1 && diceValue > Input.Temp) || (Input.TargetNumber == 2 && diceValue < Input.Temp))
+                {
+                    resultMessage = $"You rolled a {diceValue}. You win!";
+                    @* await pointService.AddPointsAsync(Input.BetAmount); *@
+                }
+                else
+                {
+                    resultMessage = $"You rolled a {diceValue}. You lose!";
+                    @* await pointService.SubtractPointsAsync(Input.BetAmount); *@
+                }
+                break;
+            case 4:
 
+                break;
+            case 5:
 
+                break;
+        }
         StateHasChanged();
-
-    }
-    protected override async Task OnInitializedAsync()
-    {
- 
     }
 
 }
