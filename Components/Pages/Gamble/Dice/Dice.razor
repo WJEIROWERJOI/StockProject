@@ -1,0 +1,36 @@
+﻿@page "/Gamble/Dice"
+
+@using StockProject.Data.Services
+@using System.ComponentModel.DataAnnotations
+@inject ICurrentUserService currentUserService
+@inject PointService pointService
+@inject IModalService modalService
+
+<button class="btn btn-primary" @onclick="CategorySelect">Change Game</button>
+<hr class="mb-5"/>
+
+<DiceGame GameMode=@GameMode/>
+
+@code {
+    private int GameMode { get; set; } = 1;
+    private async Task CategorySelect()
+    {
+        var parameter = new ModalParameters();
+        parameter.Add(nameof(CategoryModal.GameMode), GameMode);
+
+        var modal = modalService.Show<CategoryModal>("Select Dice Betting Mode",parameter);
+        var result = await modal.Result;
+
+        if (!result.Cancelled)
+        {
+            GameMode = result.Data as int? ?? 0;
+            StateHasChanged();
+        }
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        await pointService.SetCurrentUser();
+    }
+
+ 
+}
