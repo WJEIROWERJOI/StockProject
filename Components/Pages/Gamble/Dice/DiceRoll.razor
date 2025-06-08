@@ -6,7 +6,7 @@
 }
 
 <EditForm Model="Input" OnValidSubmit="() => RollDice(diceCount)">
-    @if (GameMode == 1)
+    @if (GameMode is 1)
     {
         <label class="form-label mt-3">Odd or Even</label>
         <select @bind="Input.Odd" class="form-select">
@@ -14,7 +14,7 @@
             <option value="2">Even</option>
         </select>
     }
-    else if (GameMode == 3 || GameMode == 5)
+    else if (GameMode is 3 or 5)
     {
         <label class="form-label mt-3">High or Low</label>
         <select @bind="Input.Odd" class="form-select">
@@ -23,7 +23,7 @@
         </select>
     }
 
-    @if (GameMode != 1)
+    @if (GameMode is not 1)
     {
         <label class="form-label mt-3">Target</label>
         <select @bind="Input.TargetNumber" class="form-select">
