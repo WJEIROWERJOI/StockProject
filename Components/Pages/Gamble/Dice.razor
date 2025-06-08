@@ -1,14 +1,10 @@
 ﻿@page "/Gamble/Dice"
-@rendermode InteractiveServer
 
 @using StockProject.Data.Services
+@using System.ComponentModel.DataAnnotations
 @inject ICurrentUserService currentUserService
 @inject PointService pointService
 
-@* 
-    <p>@diceSrc</p>
-    <p>@diceValue</p>
-    <p>@Input.Wallet</p> *@
 
 <div class="form-group">
     <label class="form-label">Select Dice Betting Mode</label>
@@ -37,12 +33,27 @@
 </div>
 <hr />
 
+
+@* <p>@diceValue</p>
+@foreach (var src in diceSrc)
+{
+    <p>@src</p>
+} *@
+
 @switch (GameMode)
 {
     case 1:
         <p>Odd or Even Mode Selected</p>
-        <img src="@diceSrc" />
-        <EditForm Model="Input" OnValidSubmit="RollDice">
+        <label class="form-label">Number of Dice</label>
+        <InputNumber @bind-Value=@diceCount class="form-control" @oninput="StateHasChanged" min="1" />
+
+        diceCount = 1;
+        foreach (var src in diceSrc)
+        {
+            <img src="@src" class="dice-image" />
+        }
+
+        <EditForm Model="Input" OnValidSubmit="() => RollDice(diceCount)">
             <label class="form-label">Odd or Even</label>
             <select @bind="Input.TargetNumber" class="form-select">
                 <option value="1">Odd</option>
@@ -58,9 +69,16 @@
         <p>Exact Number Mode Selected</p>
 
 
-        <img src="@diceSrc" class="dice-image" />
+        <label class="form-label">Number of Dice</label>
+        <InputNumber @bind-Value=@diceCount class="form-control" @oninput="StateHasChanged" min="1" />
 
-        <EditForm Model="Input" OnValidSubmit="RollDice">
+        diceCount = 1;
+        foreach (var src in diceSrc)
+        {
+            <img src="@src" class="dice-image" />
+        }
+
+        <EditForm Model="Input" OnValidSubmit="() => RollDice(diceCount)">
 
             <label class="form-label">Target Number</label>
             <select @bind="Input.TargetNumber" class="form-select">
@@ -80,8 +98,17 @@
         break;
     case 3:
         <p>High or Low Mode Selected</p>
-        <img src="@diceSrc" />
-        <EditForm Model="Input" OnValidSubmit="RollDice">
+        <label class="form-label">Number of Dice</label>
+        <InputNumber @bind-Value=@diceCount class="form-control" @oninput="StateHasChanged" min="1" />
+
+        diceCount = 1;
+
+        foreach (var src in diceSrc)
+        {
+            <img src="@src" class="dice-image" />
+        }
+
+        <EditForm Model="Input" OnValidSubmit="() => RollDice(diceCount)">
 
             <label class="form-label">High or Low</label>
             <select @bind="Input.TargetNumber" class="form-select">
@@ -106,36 +133,49 @@
         break;
     case 4:
         <p>Sum Bet Mode Selected</p>
-
-        for (int i = 0; i < Input.Temp; i++)
+        <label class="form-label">Number of Dice</label>
+        <InputNumber @bind-Value=@diceCount class="form-control" @oninput="StateHasChanged" min="1" />
+        @foreach (var src in diceSrc.Take(6))
         {
-            <img src="@diceSrc" class="dice-image" />
+            <img src="@src" class="dice-image" />
         }
-        <EditForm Model="Input" OnValidSubmit="RollDice">
 
-            <label class="form-label">Number of Dice</label> 
-            <InputNumber @bind-Value="Input.Temp" class="form-control" />
-
+        <EditForm Model="Input" OnValidSubmit="() => RollDice(diceCount)">
             <label class="form-label">Target Sum</label>
             <InputNumber @bind-Value="Input.TargetNumber" class="form-control" />
 
             <label class="form-label">Bet Amount</label>
             <InputNumber @bind-Value="Input.BetAmount" class="form-control" />
 
-        <button class="btn btn-primary" @onclick="RollDice">Roll Dice</button>
+            <button class="btn btn-primary" type="submit">Roll Dice</button>
         </EditForm>
 
         break;
     case 5:
         <p>Range Bet Mode Selected</p>
-        <img src="@diceSrc" class="dice-image" />
+        <label class="form-label">Number of Dice</label>
+        <InputNumber @bind-Value=@diceCount class="form-control" @oninput="StateHasChanged" min="1" />
+        @foreach (var src in diceSrc.Take(6))
+        {
+            <img src="@src" class="dice-image" />
+        }
+        <EditForm Model="Input" OnValidSubmit="() => RollDice(diceCount)">
+            <label class="form-label">Select Range</label>
+            <select @bind="Input.Temp" class="form-select">
+                <option value="1">High</option>
+                <option value="2">Low</option>
+            </select>
+            <label class="form-label">Target Sum</label>
+            <InputNumber @bind-Value="Input.TargetNumber" class="form-control" />
 
+            <label class="form-label">Bet Amount</label>
+            <InputNumber @bind-Value="Input.BetAmount" class="form-control" />
 
-        <button class="btn btn-primary" @onclick="RollDice">Roll Dice</button>
+            <button class="btn btn-primary" type="submit">Roll Dice</button>
 
+        </EditForm>
         break;
-}
-
+        }
 <p class="mt-3">@resultMessage</p>
 
 
@@ -151,23 +191,38 @@
     private InputModel Input { get; set; } = new();
     private sealed class InputModel
     {
-        public int Temp { get; set; } = 1;
-        public int TargetNumber { get; set; } = 1;
-        @* public int Count {get;set;} = 0; *@
-        public int BetAmount { get; set; } = 0;
+       [Range(1, int.MaxValue, ErrorMessage = "Only positive numbers are allowed!")] public int Temp { get; set; } = 1;
+       [Range(1, int.MaxValue, ErrorMessage = "Only positive numbers are allowed!")] public int TargetNumber { get; set; } = 1;
+       [Range(0, int.MaxValue, ErrorMessage = "Only positive numbers are allowed!")] public int BetAmount { get; set; } = 0;
     }
+    @* [Range(1, int.MaxValue, ErrorMessage = "Only positive numbers are allowed!")] *@
+    private int diceCount = 1;
     private int diceValue = 1;
-    private string diceSrc = "Dice/dice_1.png";
+    private List<string> diceSrc = new List<string> { "Dice/dice_1.png" };
     private string resultMessage = string.Empty;
 
-    protected async Task RollDice()
+    protected async Task RollDice(int count)
     {
-        diceSrc = "Dice/dice_roll.png";
+        @* diceSrc.RemoveAll(src => src.StartsWith("Dice/dice_")); *@
+        diceSrc.Clear();
+
+        diceSrc.Add("Dice/dice_roll.png");
+
+
         StateHasChanged();
         await Task.Delay(500);
+        diceSrc.Clear();
+        int diceTotal = 0;
         Random random = new Random();
-        diceValue = random.Next(1, 7);
-        diceSrc = $"Dice/dice_{diceValue}.png";
+        for (int i = 0; i < count; i++)
+        {
+
+            diceValue = random.Next(1, 7);
+            diceSrc.Add($"Dice/dice_{diceValue}.png");
+            diceTotal += diceValue;
+
+        }
+
         switch (GameMode)
         {
             case 1:
@@ -209,10 +264,28 @@
                 }
                 break;
             case 4:
-
+                if (diceTotal == Input.TargetNumber)
+                {
+                    resultMessage = $"You rolled a total of {diceTotal}. You win!";
+                    @* await pointService.AddPointsAsync(Input.BetAmount); *@
+                }
+                else
+                {
+                    resultMessage = $"You rolled a total of {diceTotal}. You lose!";
+                    @* await pointService.SubtractPointsAsync(Input.BetAmount); *@
+                }
                 break;
             case 5:
-
+                if((Input.Temp == 1 && diceTotal > Input.TargetNumber) || (Input.Temp == 2 && diceTotal < Input.TargetNumber))
+                {
+                    resultMessage = $"You rolled a total of {diceTotal}. You win!";
+                    @* await pointService.AddPointsAsync(Input.BetAmount); *@
+                }
+                else
+                {
+                    resultMessage = $"You rolled a total of {diceTotal}. You lose!";
+                    @* await pointService.SubtractPointsAsync(Input.BetAmount); *@
+                }
                 break;
         }
         StateHasChanged();
