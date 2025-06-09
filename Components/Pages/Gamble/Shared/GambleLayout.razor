@@ -4,6 +4,7 @@
 @inherits LayoutComponentBase
 @layout StockProject.Components.Layout.MainLayout
 
+@inject NavigationManager nav
 @inject PointService pointService
 
 <div>
@@ -44,12 +45,15 @@
     protected override async Task OnInitializedAsync()
     {
         point = await pointService.SetCurrentUser();
+        if(point?.Id == null){
+            
+        }
         pointService.OnPointUpdated += HandlePointUpdated;
     }
     private async void HandlePointUpdated()
     {
 
-        point = await pointService.SetCurrentUser();
+        @* point = await pointService.SetCurrentUser(); *@
         if (point!.Money <= 0)
         {
             var modal = modalService.Show<GambleResetModal>($"Out of Points – Reset?");
@@ -58,7 +62,10 @@
             if (!result.Cancelled)
             {
                 await pointService.ResetPoint();
-                StateHasChanged();
+                @* StateHasChanged(); *@
+            }
+            else{
+                nav.NavigateTo("/Gamble");
             }
         }
         StateHasChanged();

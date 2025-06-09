@@ -1,5 +1,5 @@
 ﻿@using StockProject.Data.Services
-
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject IToastService toastService;
 @inject PointService pointService;
 
@@ -87,7 +87,6 @@
     public int diceCount { get; set; }
     [SupplyParameterFromForm]
     private InputModel Input { get; set; } = new();
-
     private sealed class InputModel
     {
         // [Range(1, int.MaxValue, ErrorMessage = "Only positive numbers are allowed!")]
@@ -100,10 +99,17 @@
     private int diceTotal = 0;
     // private string resultMessage = string.Empty;
     private bool WinOrLose;
-    private Point currentPoint = new()!;
+    private Point? currentPoint;
     protected override async Task OnInitializedAsync()
     {
-        currentPoint = await pointService.SetCurrentUser() ?? new();
+        currentPoint = await pointService.SetCurrentUser();
+        if(currentPoint == null){
+            currentPoint = await sessionStorage.GetItemAsync<Point>("Current");
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await sessionStorage.SetItemAsync("Current", currentPoint);
     }
 
     protected async Task RollDice(int count)
@@ -186,7 +192,6 @@
                 }
                 break;
         }
-
         if (WinOrLose)
         {
             await pointService.AddPointsAsync(Input.BetAmount, currentPoint);

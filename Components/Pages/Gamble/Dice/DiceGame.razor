@@ -1,12 +1,9 @@
-﻿
-
-<div class="card mb-3">
+﻿<div class="card mb-3">
     <div class="card-body text-center">
 
         <p class="fs-5 fw-semibold mb-3">
             @GetModeMessage(GameMode)
-        </p>
-        
+        </p>      
         @if (GameMode is 1 or 2 or 3)
         {
             diceCount = 1;
@@ -23,17 +20,14 @@
                 </select>
             </div>
         }
-
     </div>
 </div>
 
 <DiceRoll diceSrc=@diceSrc diceCount=@diceCount GameMode=@GameMode />
 
-
 @code {
     [Parameter]
     public int GameMode { get; set; }
-
     private int diceCount = 1;
     private List<string> diceSrc = new List<string> { "Dice/dice_1.png" };
     private string GetModeMessage(int mode) => mode switch
@@ -45,5 +39,4 @@
         5 => "High or Low Sum Bet Mode Selected",
         _ => ""
     };
-
 }
