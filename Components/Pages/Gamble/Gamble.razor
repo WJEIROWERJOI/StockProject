@@ -2,6 +2,7 @@
 
 @using StockProject.Data.Services
 
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject IToastService toastService
 @inject IModalService modalService
 @inject ICurrentUserService currentUserService
@@ -16,17 +17,17 @@ Welcome to the Gamble Page!
 <br />
 <br />
 
-@if(currentPoint == null)
+@if (currentPoint == null)
 {
     <p>you dont have Point entity</p>
 }
 else
 {
-<p>@currentPoint!.UserId</p>
-<p>@currentPoint.UserName</p>
-<p>@currentPoint.Money</p>
-<p>@currentPoint.CreatedAt.AddHours(9).ToString("yyyy-MM-dd HH:mm:ss")</p>
-<p>@currentPoint.UpdatedAt.AddHours(9).ToString("yyyy-MM-dd HH:mm:ss")</p>
+    <p>@currentPoint!.UserId</p>
+    <p>@currentPoint.UserName</p>
+    <p>@currentPoint.Money</p>
+    <p>@currentPoint.CreatedAt.AddHours(9).ToString("yyyy-MM-dd HH:mm:ss")</p>
+    <p>@currentPoint.UpdatedAt.AddHours(9).ToString("yyyy-MM-dd HH:mm:ss")</p>
 }
 
 
@@ -44,18 +45,32 @@ else
         currentPoint = await pointService.SetCurrentUser();
         if (currentPoint == null)
         {
-             var modal = modalService.Show<InitialGambleModal>("You dont have Point Entity so you need to create it!");
+            var modal = modalService.Show<InitialGambleModal>("You dont have Point Entity so you need to create it!");
             var result = await modal.Result;
-            if(!result.Cancelled)
+            if (!result.Cancelled)
             {
                 currentPoint = await pointService.InitialCreate();
                 toastService.ShowSuccess("Initial Point Entity Created Successfully!");
             }
-            else{
+            else
+            {
+                @* currentPoint = new Point(); *@
                 toastService.ShowError("Initial Point Entity Creation Cancelled!");
             }
-
         }
-    }
 
+    }
+    @* protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (currentPoint != null)
+            {
+                await sessionStorage.SetItemAsync("UserId", currentPoint.UserId);
+                await sessionStorage.SetItemAsync("UserName", currentPoint.UserName);
+                await sessionStorage.SetItemAsync("Money", currentPoint.Money);
+            }
+            StateHasChanged(); // UI 갱신
+        }
+    } *@
 }

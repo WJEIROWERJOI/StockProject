@@ -1,4 +1,6 @@
-﻿using Blazored.Modal;
+﻿using Blazored.LocalStorage;
+using Blazored.Modal;
+using Blazored.SessionStorage;
 using Blazored.Toast;
 using Blazored.Toast.Services;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -13,7 +15,9 @@ public static class ServiceExtensions
     public static IServiceCollection AddAppServices(this IServiceCollection services)
     {
 
-
+        services.AddBlazoredSessionStorage();
+        services.AddBlazoredLocalStorage();
+        
         services.AddScoped<PointRepository>();
         services.AddScoped<PointService>();
 
@@ -24,7 +28,7 @@ public static class ServiceExtensions
 
         services.AddScoped<BoardRepository>();
         services.AddScoped<BoardService>();
-        
+
         services.AddScoped<StockCategoryService>();
         services.AddScoped<StockTransactionRepository>();
         services.AddScoped<StockCategoryRepository>();
@@ -39,7 +43,7 @@ public static class ServiceExtensions
         services.AddRazorComponents()
             .AddInteractiveServerComponents();
         services.AddCascadingAuthenticationState();
-        
+
         //var repositoryTypes = typeof(StockRepository).Assembly.GetTypes()
         //.Where(t => t.Name.EndsWith("Repository"));
         //foreach (var type in repositoryTypes)

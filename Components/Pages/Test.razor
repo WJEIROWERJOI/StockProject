@@ -1,0 +1,26 @@
+﻿@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@page "/Test"
+
+<button @onclick="Session">Session</button>
+<button @onclick="Local">Local</button>
+
+@code {
+    async Task Session()
+    {
+        await sessionStorage.SetItemAsync("UserId", "abc123");
+        string userId = await sessionStorage.GetItemAsync<string>("UserId");
+        Console.WriteLine(userId);
+        await sessionStorage.RemoveItemAsync("UserId");
+        await sessionStorage.ClearAsync();
+    }
+    async Task Local()
+    {
+        await localStorage.SetItemAsync("UserId", "asdf");
+        string userIdValue = await localStorage.GetItemAsync<string>("UserId") ?? string.Empty;
+        Console.WriteLine(userIdValue);
+        await localStorage.RemoveItemAsync("UserId");
+        await localStorage.ClearAsync();
+    }
+
+}

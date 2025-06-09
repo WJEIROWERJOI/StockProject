@@ -2,9 +2,9 @@
 @inject IModalService modalService
 
 <button class="btn btn-primary" @onclick="CategorySelect">Change Game</button>
-<hr class="mb-5"/>
+<hr class="mb-5" />
 
-<DiceGame GameMode=@GameMode/>
+<DiceGame GameMode=@GameMode />
 
 @code {
     private int GameMode { get; set; } = 1;
@@ -13,7 +13,7 @@
         var parameter = new ModalParameters();
         parameter.Add(nameof(CategoryModal.GameMode), GameMode);
 
-        var modal = modalService.Show<CategoryModal>("Select Dice Betting Mode",parameter);
+        var modal = modalService.Show<CategoryModal>("Select Dice Betting Mode", parameter);
         var result = await modal.Result;
 
         if (!result.Cancelled)
@@ -22,4 +22,10 @@
             StateHasChanged();
         }
     }
+    @* protected override async Task OnAfterRenderAsync()
+    {
+
+    } *@
+
+
 }
