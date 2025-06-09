@@ -1,9 +1,4 @@
 ﻿@page "/Gamble/Dice"
-
-@using StockProject.Data.Services
-@using System.ComponentModel.DataAnnotations
-@inject ICurrentUserService currentUserService
-@inject PointService pointService
 @inject IModalService modalService
 
 <button class="btn btn-primary" @onclick="CategorySelect">Change Game</button>
@@ -27,10 +22,4 @@
             StateHasChanged();
         }
     }
-    protected override async Task OnInitializedAsync()
-    {
-        await pointService.SetCurrentUser();
-    }
-
- 
 }

@@ -1,0 +1,16 @@
+﻿<div>
+   
+    <p class="text-danger">Your points have dropped to zero. Would you like to reset them?</p>
+
+    <button @onclick="Close" class="btn btn-primary mt-3">OK</button>
+    <button @onclick="Cancel" class="btn btn-secondary mt-3">Cancel</button>
+
+</div>
+
+@code {
+    [Parameter]
+    public int GameMode { get; set; }
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    async Task Close() => await BlazoredModal.CloseAsync(ModalResult.Ok(GameMode));
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+}

@@ -1,5 +1,6 @@
 ﻿using StockProject.Data.Entities;
 using StockProject.Data.Repositories;
+using System.Data.SqlTypes;
 
 namespace StockProject.Data.Services
 {
@@ -12,21 +13,80 @@ namespace StockProject.Data.Services
             _pointRepository = pointRepository;
             _currentUserService = currentUserService;
         }
+
+        public event Action? OnPointUpdated;
+
         //c
         public async Task CreatePoint(Point point)
         {
             await _pointRepository.CreatePoint(point);
         }
-        //r
-        public async Task<Point?> GetPointLayOutAsync()
+
+        //public async Task CalculatePointsAsync(char c,int bet, Point point)
+        //{
+        //    if (c == '+')
+        //    {
+        //        point.Money += bet;
+        //    }
+        //    else if (c == '-')
+        //    {
+        //        point.Money -= bet;
+        //    }
+        //    else if (c == "multiple")
+        //    {
+        //        point.Money *= bet;
+        //    }
+        //    else if (c == "divide")
+        //    {
+        //        if (bet != 0)
+        //        {
+        //            point.Money /= bet;
+        //        }
+        //        else
+        //        {
+        //            throw new DivideByZeroException("Cannot divide by zero.");
+        //        }
+        //    }
+        //    point.UpdatedAt = DateTime.UtcNow;
+        //    await _pointRepository.UpdatePoint(point);
+        //}
+
+        //
+        public async Task AddPointsAsync(int bet, Point point)
         {
-            if (_currentUserService == null || !_currentUserService.IsSignedIn())
-            {
-                return new Point();
-            }
-            return await _pointRepository.FindPointByUserIdAsync(_currentUserService.UserId!);
+            //point.Money += bet;
+            point.Money += 5;
+            point.UpdatedAt = DateTime.UtcNow;
+            await _pointRepository.UpdatePoint(point);
+            OnPointUpdated?.Invoke();
+
         }
-        
+        public async Task SubtractPointsAsync(int bet, Point point)
+        {
+            //point.Money -= bet;
+            point.Money -= 200;
+            point.UpdatedAt = DateTime.UtcNow;
+            await _pointRepository.UpdatePoint(point);
+            OnPointUpdated?.Invoke();
+        }
+        public async Task MultiplePointsAsync(int bet, Point point)
+        {
+            point.Money *= bet;
+            point.UpdatedAt = DateTime.UtcNow;
+            await _pointRepository.UpdatePoint(point);
+            OnPointUpdated?.Invoke();
+        }
+        public async Task DividePointsAsync(int bet, Point point)
+        {
+            point.Money /= bet;
+            point.UpdatedAt = DateTime.UtcNow;
+            await _pointRepository.UpdatePoint(point);
+            OnPointUpdated?.Invoke();
+        }
+
+
+        //r
+
         public async Task<Point?> GetPointByIdAsync(int id)
         {
             return await _pointRepository.FindPointByIdAsync(id);

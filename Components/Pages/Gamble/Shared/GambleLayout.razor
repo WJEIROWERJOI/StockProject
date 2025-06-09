@@ -1,4 +1,6 @@
-﻿@using StockProject.Data.Services
+﻿
+@inject IModalService modalService
+@using StockProject.Data.Services
 @inherits LayoutComponentBase
 @layout StockProject.Components.Layout.MainLayout
 
@@ -41,6 +43,24 @@
     Point? point;
     protected override async Task OnInitializedAsync()
     {
-        point = await pointService.GetPointLayOutAsync();
+        point = await pointService.SetCurrentUser();
+        pointService.OnPointUpdated += HandlePointUpdated;
+    }
+    private async void HandlePointUpdated()
+    {
+
+        point = await pointService.SetCurrentUser();
+        if (point!.Money <= 0)
+        {
+            var modal = modalService.Show<GambleResetModal>($"Out of Points – Reset?");
+            var result = await modal.Result;
+
+            if (!result.Cancelled)
+            {
+                await pointService.ResetPoint();
+                StateHasChanged();
+            }
+        }
+        StateHasChanged();
     }
 }

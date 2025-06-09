@@ -1,9 +1,13 @@
-﻿@inject IToastService toastService;
+﻿@using StockProject.Data.Services
+
+@inject IToastService toastService;
+@inject PointService pointService;
 
 @foreach (var src in diceSrc.Take(6))
 {
     <img src="@src" class="dice-image" />
-}<br/>
+}
+<br />
 @if (GameMode is 4 or 5)
 {
     <span class="me-1">@diceTotal</span>
@@ -12,7 +16,7 @@
         <span class="me-1">@i.Replace("Dice/dice_", "").Replace(".png", "")</span>
     }
 }
-<br/>
+<br />
 <EditForm Model="Input" OnValidSubmit="() => RollDice(diceCount)">
     @if (GameMode is 1)
     {
@@ -42,7 +46,7 @@
         </select>
     }
 
-   
+
     <label class="form-label mt-3">Bet Amount</label>
     <InputNumber @bind-Value="Input.BetAmount" class="form-control" />
     <button class="btn btn-primary" type="submit">Roll Dice</button>
@@ -75,7 +79,15 @@
     private int diceTotal = 0;
     // private string resultMessage = string.Empty;
     private bool WinOrLose;
-    
+
+    private Point currentPoint = new()!;
+    protected override async Task OnInitializedAsync()
+    {
+        currentPoint = await pointService.SetCurrentUser() ?? new();
+    }
+
+
+
     protected async Task RollDice(int count)
     {
         WinOrLose = false;
@@ -86,10 +98,10 @@
         StateHasChanged();
 
         await Task.Delay(500);
-        
+
         diceTotal = 0;
         Random random = new Random();
-        
+
         diceSrc.Clear();
         for (int i = 0; i < count; i++)
         {
@@ -104,11 +116,11 @@
                 if (diceTotal % 2 == Input.Odd % 2)
                 {
                     WinOrLose = true;
-                    @* await pointService.AddPointsAsync(Input.BetAmount); *@
+                    // await pointService.AddPointsAsync(Input.BetAmount,currentPoint);
                 }
                 else
                 {
-                    @* await pointService.SubtractPointsAsync(Input.BetAmount); *@
+                    // await pointService.SubtractPointsAsync(Input.BetAmount,currentPoint);
                 }
 
                 break;
@@ -116,57 +128,57 @@
                 if (diceTotal == Input.TargetNumber)
                 {
                     WinOrLose = true;
-                    @* await pointService.AddPointsAsync(Input.BetAmount); *@
+                    // await pointService.AddPointsAsync(Input.BetAmount, currentPoint);
                 }
                 else
                 {
-                    @* await pointService.SubtractPointsAsync(Input.BetAmount); *@
+                    // await pointService.SubtractPointsAsync(Input.BetAmount, currentPoint);
                 }
                 break;
             case 3:
                 if ((Input.Odd == 1 && diceTotal > Input.TargetNumber) || (Input.Odd == 2 && diceTotal < Input.TargetNumber))
                 {
                     WinOrLose = true;
-                    @* await pointService.AddPointsAsync(Input.BetAmount); *@
+                    // await pointService.AddPointsAsync(Input.BetAmount, currentPoint);
                 }
                 else
                 {
-                    @* await pointService.SubtractPointsAsync(Input.BetAmount); *@
+                    // await pointService.SubtractPointsAsync(Input.BetAmount, currentPoint);
                 }
                 break;
             case 4:
                 if (diceTotal == Input.TargetNumber)
                 {
                     WinOrLose = true;
-                    @* await pointService.AddPointsAsync(Input.BetAmount); *@
+                    // await pointService.AddPointsAsync(Input.BetAmount, currentPoint);
                 }
                 else
                 {
-                    @* await pointService.SubtractPointsAsync(Input.BetAmount); *@
+                    // await pointService.SubtractPointsAsync(Input.BetAmount, currentPoint);
                 }
                 break;
             case 5:
                 if ((Input.Odd == 1 && diceTotal > Input.TargetNumber) || (Input.Odd == 2 && diceTotal < Input.TargetNumber))
                 {
                     WinOrLose = true;
-                    @* await pointService.AddPointsAsync(Input.BetAmount); *@
+                    // await pointService.AddPointsAsync(Input.BetAmount, currentPoint);
                 }
                 else
                 {
-                    
-                    @* await pointService.SubtractPointsAsync(Input.BetAmount); *@
+                    // await pointService.SubtractPointsAsync(Input.BetAmount, currentPoint);
                 }
                 break;
         }
 
 
-
         if (WinOrLose)
         {
+            await pointService.AddPointsAsync(Input.BetAmount, currentPoint);
             toastService.ShowSuccess($"You rolled {diceTotal}. You win!");
         }
         else
         {
+            await pointService.SubtractPointsAsync(Input.BetAmount, currentPoint);
             toastService.ShowError($"You rolled {diceTotal}. You lose!");
         }
 
