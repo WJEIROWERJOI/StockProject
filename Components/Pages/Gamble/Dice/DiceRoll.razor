@@ -122,7 +122,6 @@
                 {
                     // await pointService.SubtractPointsAsync(Input.BetAmount,currentPoint);
                 }
-
                 break;
             case 2:
                 if (diceTotal == Input.TargetNumber)
@@ -170,7 +169,6 @@
                 break;
         }
 
-
         if (WinOrLose)
         {
             await pointService.AddPointsAsync(Input.BetAmount, currentPoint);
@@ -181,7 +179,7 @@
             await pointService.SubtractPointsAsync(Input.BetAmount, currentPoint);
             toastService.ShowError($"You rolled {diceTotal}. You lose!");
         }
-
         StateHasChanged();
     }
+
 }
