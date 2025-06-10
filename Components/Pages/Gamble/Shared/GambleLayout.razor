@@ -1,9 +1,10 @@
-﻿
-@inject IModalService modalService
+﻿@inject IModalService modalService
 @using StockProject.Data.Services
 @inherits LayoutComponentBase
 @layout StockProject.Components.Layout.MainLayout
 
+@inject ICurrentUserService currentUserService
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject NavigationManager nav
 @inject PointService pointService
 
@@ -13,28 +14,34 @@
         <div class="col-md-9">
             @Body
         </div>
-        
+
         <div class="col-md-3 border mt-3 p-3">
             <h5 class="text-primary">Current</h5>
 
-            <ul class="list-group">
-                @* <li class="list-group-item">
-            <strong>Hello:</strong> @point?.UserId
-        </li> *@
-                <li class="list-group-item">
-                    <strong>UserName:</strong> @point?.UserName
-                </li>
-                <li class="list-group-item">
-                    <strong>Money:</strong> @point?.Money
-                </li>
-                <li class="list-group-item">
-                    <strong>CreatedAt:</strong> @point?.CreatedAt.AddHours(9).ToString("yy-MM-dd HH:mm")
-                </li>
-                <li class="list-group-item">
-                    <strong>LastUpdatedAt:</strong> @point?.UpdatedAt.AddHours(9).ToString("yyMMdd HH:mm:ss")
-                </li>
-            </ul>
-            <button class="btn btn-primary mt-3">Button</button>
+            @if (point == null)
+            {
+                <p>Loading...</p>
+            }
+            else
+            {
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <strong>UserName:</strong> @point?.UserName
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Money:</strong> @point?.Money
+                    </li>
+                    <li class="list-group-item">
+                        <strong>CreatedAt:</strong> @point?.CreatedAt.AddHours(9).ToString("yy-MM-dd HH:mm")
+                    </li>
+                    <li class="list-group-item">
+                        <strong>LastUpdatedAt:</strong> @point?.UpdatedAt.AddHours(9).ToString("yyMMdd HH:mm:ss")
+                    </li>
+                </ul>
+
+            }
+            @* <button class="btn btn-primary mt-3" @onclick="ResetPoint">Reset Point</button> *@
+
         </div>
 
     </div>
@@ -42,32 +49,50 @@
 
 @code {
     Point? point;
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        point = await pointService.SetCurrentUser();
-        if(point?.Id == null){
-            
-        }
         pointService.OnPointUpdated += HandlePointUpdated;
     }
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            HandlePointUpdated();
+        }
+    }
+
     private async void HandlePointUpdated()
     {
-
-        @* point = await pointService.SetCurrentUser(); *@
-        if (point!.Money <= 0)
-        {
-            var modal = modalService.Show<GambleResetModal>($"Out of Points – Reset?");
+        point = await sessionStorage.GetItemAsync<Point>("Current");
+        
+        @* if (point!.Money <= 0 && currentUserService.IsSignedIn())
+        { *@
+             @* var modal = modalService.Show<GambleResetModal>($"Out of Points,Reset?");
             var result = await modal.Result;
 
             if (!result.Cancelled)
             {
-                await pointService.ResetPoint();
-                @* StateHasChanged(); *@
+                point = await pointService.ResetPoint();
             }
             else{
                 nav.NavigateTo("/Gamble");
-            }
-        }
+            }*@
+        @* } *@
+        @* await sessionStorage.SetItemAsync("Current",point); *@
         StateHasChanged();
     }
+
+    @* private async Task ResetPoint(){
+        if(currentUserService.IsSignedIn()){
+        point = await pointService.ResetPoint();
+        }
+        else{
+        point!.Money = 100;
+        point.UpdatedAt = DateTime.UtcNow;
+        }
+        await sessionStorage.SetItemAsync("Current",point);
+        StateHasChanged();
+    } *@
+
+
 }

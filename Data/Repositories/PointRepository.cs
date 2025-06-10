@@ -31,7 +31,7 @@ public class PointRepository
     //u
     public async Task UpdatePoint(Point point)
     {
-        //_context.Points.Update(point);
+        // _context.Points.Update(point);
         await _context.SaveChangesAsync();
     }
     //d

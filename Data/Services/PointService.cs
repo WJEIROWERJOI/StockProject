@@ -15,7 +15,10 @@ namespace StockProject.Data.Services
         }
 
         public event Action? OnPointUpdated;
-
+        public void CallPoint()
+        {
+            OnPointUpdated?.Invoke();
+        }
         //c
         public async Task CreatePoint(Point point)
         {
@@ -54,34 +57,42 @@ namespace StockProject.Data.Services
         //
         public async Task AddPointsAsync(int bet, Point point)
         {
-            //point.Money += bet;
-            point.Money += 5;
+            point.Money += 100;
             point.UpdatedAt = DateTime.UtcNow;
-            await _pointRepository.UpdatePoint(point);
-            OnPointUpdated?.Invoke();
+            if (_currentUserService.IsSignedIn())
+            {
+                Point? newpoint = await _pointRepository.FindPointByIdAsync(point.Id);
+                newpoint!.Money = point.Money;
+                newpoint.UpdatedAt = point.UpdatedAt;
+                await _pointRepository.UpdatePoint(newpoint);
+            }
 
         }
         public async Task SubtractPointsAsync(int bet, Point point)
         {
-            //point.Money -= bet;
             point.Money -= 200;
             point.UpdatedAt = DateTime.UtcNow;
-            await _pointRepository.UpdatePoint(point);
-            OnPointUpdated?.Invoke();
+            if (_currentUserService.IsSignedIn())
+            {
+                Point? newpoint = await _pointRepository.FindPointByIdAsync(point.Id);
+                newpoint!.Money = point.Money;
+                newpoint.UpdatedAt = point.UpdatedAt;
+                await _pointRepository.UpdatePoint(newpoint);
+            }
         }
         public async Task MultiplePointsAsync(int bet, Point point)
         {
             point.Money *= bet;
             point.UpdatedAt = DateTime.UtcNow;
             await _pointRepository.UpdatePoint(point);
-            OnPointUpdated?.Invoke();
+            // OnPointUpdated?.Invoke();
         }
         public async Task DividePointsAsync(int bet, Point point)
         {
             point.Money /= bet;
             point.UpdatedAt = DateTime.UtcNow;
             await _pointRepository.UpdatePoint(point);
-            OnPointUpdated?.Invoke();
+            // OnPointUpdated?.Invoke();
         }
 
 
@@ -96,21 +107,34 @@ namespace StockProject.Data.Services
             return await _pointRepository.FindPointByUserIdAsync(userId);
         }
 
-        public async Task<Point?> SetCurrentUser()
+
+        public async Task<Point?> ResetPoint()
         {
-            if (_currentUserService == null || !_currentUserService.IsSignedIn())
-            {
-                return new Point();
-            }
-            return await _pointRepository.FindPointByUserIdAsync(_currentUserService.UserId!);
+            Point? newPoint = await _pointRepository.FindPointByUserIdAsync(_currentUserService.UserId!);
+            newPoint!.UpdatedAt = DateTime.UtcNow;
+            newPoint.Money = 100;
+            await _pointRepository.UpdatePoint(newPoint);
+            return newPoint;
         }
 
-        public async Task<Point?> InitialCreate()
+
+
+        public async Task<Point?> SetCurrentUser()
         {
+            var currentPoint = await _pointRepository.FindPointByUserIdAsync(_currentUserService.UserId!);
+            //비로그인
             if (_currentUserService == null || !_currentUserService.IsSignedIn())
             {
                 return null;
             }
+            //로그인인
+            else
+            {
+                return currentPoint;
+            }
+        }
+        public async Task<Point?> InitialCreate()
+        {
             var currentPoint = await _pointRepository.FindPointByUserIdAsync(_currentUserService.UserId!);
             if (currentPoint != null)
             {
@@ -128,33 +152,13 @@ namespace StockProject.Data.Services
 
             return newPoint;
         }
-        public async Task<Point?> ResetPoint()
-        {
-            if (_currentUserService == null || !_currentUserService.IsSignedIn())
-            {
-                return null;
-            }
-            var currentPoint = await _pointRepository.FindPointByUserIdAsync(_currentUserService.UserId!);
-            if (currentPoint != null)
-            {
-                currentPoint.Money = 100;
-                currentPoint.UpdatedAt = DateTime.UtcNow;
-                await _pointRepository.UpdatePoint(currentPoint);
-            }
-            else
-            {
-                currentPoint = new Point
-                {
-                    UserId = _currentUserService.UserId!,
-                    UserName = _currentUserService.UserName ?? "Temp",
-                    Money = 100,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
-                await _pointRepository.CreatePoint(currentPoint);
-            }
-            return currentPoint;
-        }
+
+
+
+
+
+
+
 
         //u
         public async Task UpdatePoint(Point point)

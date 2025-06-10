@@ -1,13 +1,11 @@
 ﻿@page "/Gamble"
-
 @using StockProject.Data.Services
-
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject IToastService toastService
 @inject IModalService modalService
 @inject ICurrentUserService currentUserService
 @inject PointService pointService
-@inject NavigationManager nav
+
 <PageTitle>InitialGamble</PageTitle>
 
 <h2>Gamble</h2>
@@ -45,31 +43,39 @@ else
         currentPoint = await pointService.SetCurrentUser();
         if (currentPoint == null)
         {
-            var modal = modalService.Show<InitialGambleModal>("You dont have Point Entity so you need to create it!");
-            var result = await modal.Result;
-            if (!result.Cancelled)
+            if (currentUserService.IsSignedIn())
             {
-                currentPoint = await pointService.InitialCreate();
-                toastService.ShowSuccess("Initial Point Entity Created Successfully!");
-            }
-            else
-            {
-                toastService.ShowError("Initial Point Entity Creation Cancelled!");
+                var modal = modalService.Show<InitialGambleModal>("No Entity");
+                var result = await modal.Result;
+                if (!result.Cancelled)
+                {
+                    currentPoint = await pointService.InitialCreate();
+                }
             }
         }
-
-    }
-    @* protected override async Task OnAfterRenderAsync(bool firstRender)
+    }//여기서 currentPoint가 Null 인 경우는
+     //1. 로그인 -> Entity 안만듬
+     //2. 비로그인
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            if (currentPoint != null)
+            if (currentPoint == null)
             {
-                await sessionStorage.SetItemAsync("UserId", currentPoint.UserId);
-                await sessionStorage.SetItemAsync("UserName", currentPoint.UserName);
-                await sessionStorage.SetItemAsync("Money", currentPoint.Money);
+                currentPoint = await sessionStorage.GetItemAsync<Point>("Current");
+                if (currentPoint == null)
+                {
+                    currentPoint = new();
+                }
+                else if (currentPoint.UserId != currentUserService.UserId)
+                {
+                    currentPoint = new();
+                }
             }
-            StateHasChanged(); // UI 갱신
+            await sessionStorage.SetItemAsync("Current", currentPoint);
         }
-    } *@
+        @* return; *@
+    }
+    //null 인 경우 -> currentPoint 가
+
 }
