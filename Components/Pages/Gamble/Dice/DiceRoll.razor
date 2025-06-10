@@ -113,7 +113,7 @@
         {
             if (currentPoint == null)
             {
-                currentPoint = await sessionStorage.GetItemAsync<Point>("Current");
+                currentPoint = await sessionStorage.GetItemAsync<Point>("Current") ?? new Point();
                 if (currentPoint.UserId != currentUserService.UserId)
                 {
                     currentPoint = new();

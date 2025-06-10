@@ -53,9 +53,7 @@ else
                 }
             }
         }
-    }//여기서 currentPoint가 Null 인 경우는
-     //1. 로그인 -> Entity 안만듬
-     //2. 비로그인
+    }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -74,8 +72,6 @@ else
             }
             await sessionStorage.SetItemAsync("Current", currentPoint);
         }
-        @* return; *@
     }
-    //null 인 경우 -> currentPoint 가
-
+    
 }

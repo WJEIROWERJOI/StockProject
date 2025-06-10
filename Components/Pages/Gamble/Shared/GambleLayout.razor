@@ -40,8 +40,7 @@
                 </ul>
 
             }
-            @* <button class="btn btn-primary mt-3" @onclick="ResetPoint">Reset Point</button> *@
-
+        
         </div>
 
     </div>
@@ -64,35 +63,24 @@
     private async void HandlePointUpdated()
     {
         point = await sessionStorage.GetItemAsync<Point>("Current");
-        
-        @* if (point!.Money <= 0 && currentUserService.IsSignedIn())
-        { *@
-             @* var modal = modalService.Show<GambleResetModal>($"Out of Points,Reset?");
+        if(point == null){ return; }
+        if (point!.Money <= 0 && currentUserService.IsSignedIn())
+        { 
+            var modal = modalService.Show<GambleResetModal>($"Out of Points,Reset?");
             var result = await modal.Result;
 
             if (!result.Cancelled)
             {
-                point = await pointService.ResetPoint();
+                await pointService.ResetPoint();
             }
             else{
-                nav.NavigateTo("/Gamble");
-            }*@
-        @* } *@
-        @* await sessionStorage.SetItemAsync("Current",point); *@
+                // nav.NavigateTo("/Gamble");
+            }
+        }
+        
         StateHasChanged();
     }
 
-    @* private async Task ResetPoint(){
-        if(currentUserService.IsSignedIn()){
-        point = await pointService.ResetPoint();
-        }
-        else{
-        point!.Money = 100;
-        point.UpdatedAt = DateTime.UtcNow;
-        }
-        await sessionStorage.SetItemAsync("Current",point);
-        StateHasChanged();
-    } *@
-
+    
 
 }
