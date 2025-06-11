@@ -66,16 +66,16 @@
         if(point == null){ return; }
         if (point!.Money <= 0 && currentUserService.IsSignedIn())
         { 
-            var modal = modalService.Show<GambleResetModal>($"Out of Points,Reset?");
-            var result = await modal.Result;
+            // var modal = modalService.Show<GambleResetModal>($"Out of Points,Reset?");
+            // var result = await modal.Result;
 
-            if (!result.Cancelled)
-            {
-                await pointService.ResetPoint();
-            }
-            else{
-                // nav.NavigateTo("/Gamble");
-            }
+            // if (!result.Cancelled)
+            // {
+            //     point = await pointService.ResetPoint();
+            // }
+            // else{
+            //     nav.NavigateTo("/Gamble");
+            // }
         }
         
         StateHasChanged();
