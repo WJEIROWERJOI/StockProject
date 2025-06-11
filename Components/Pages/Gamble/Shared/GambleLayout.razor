@@ -75,7 +75,8 @@
                 nav.NavigateTo("/");
             }
             await sessionStorage.SetItemAsync("Current",point);
-            nav.Refresh(forceReload:true);
+            @* nav.Refresh(forceReload:true); *@
+            nav.Refresh();
         }
         StateHasChanged();
     }

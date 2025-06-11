@@ -30,9 +30,10 @@ namespace StockProject.Data.Services
 
 
 
-        public async Task AddPointsAsync(int bet, Point point)
+        public async Task AddPointsAsync(int bet,int percent, Point point)
         {
-            // point.Money += 5;
+            // point.Money += percent*bet;
+            point.Money += 5;
             point.UpdatedAt = DateTime.UtcNow;
             if (_currentUserService.IsSignedIn())
             {
@@ -40,9 +41,10 @@ namespace StockProject.Data.Services
             }
 
         }
-        public async Task SubtractPointsAsync(int bet, Point point)
+        public async Task SubtractPointsAsync(int bet,int percent, Point point)
         {
-            point.Money -= 50;
+            // point.Money -= percent*bet;
+            point.Money -= 5;
             point.UpdatedAt = DateTime.UtcNow;
             if (_currentUserService.IsSignedIn())
             {
