@@ -10,7 +10,6 @@
 
 <div>
     <div class="row">
-
         <div class="col-md-9">
             @Body
         </div>
@@ -40,7 +39,7 @@
                 </ul>
 
             }
-        
+
         </div>
 
     </div>
@@ -52,35 +51,32 @@
     {
         pointService.OnPointUpdated += HandlePointUpdated;
     }
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            HandlePointUpdated();
+            point = await sessionStorage.GetItemAsync<Point>("Current");
         }
     }
-
     private async void HandlePointUpdated()
     {
         point = await sessionStorage.GetItemAsync<Point>("Current");
-        if(point == null){ return; }
-        if (point!.Money <= 0 && currentUserService.IsSignedIn())
-        { 
-            // var modal = modalService.Show<GambleResetModal>($"Out of Points,Reset?");
-            // var result = await modal.Result;
 
-            // if (!result.Cancelled)
-            // {
-            //     point = await pointService.ResetPoint();
-            // }
-            // else{
-            //     nav.NavigateTo("/Gamble");
-            // }
+        if (point.Money <= 0)
+        {
+            var modal = modalService.Show<GambleResetModal>("you gone, reset?");
+            var result = await modal.Result;
+            if (!result.Cancelled)
+            {
+                point = await pointService.ResetPoint() ?? new Point();               
+            }
+            else
+            {
+                nav.NavigateTo("/");
+            }
+            await sessionStorage.SetItemAsync("Current",point);
+            nav.Refresh(forceReload:true);
         }
-        
         StateHasChanged();
     }
-
-    
-
 }

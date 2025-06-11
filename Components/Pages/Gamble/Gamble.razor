@@ -17,7 +17,7 @@ Welcome to the Gamble Page!
 
 @if (currentPoint == null)
 {
-    <p>you dont have Point entity</p>
+    <p>Loading...</p>
 }
 else
 {
@@ -33,7 +33,6 @@ else
 
 <div class="column">
     <a class="btn btn-primary" href="/Gamble/Dice">Dice</a>
-    @* <a class="btn btn-primary" href="/Gamble/Slot">Slot</a> *@
 </div>
 
 @code {
@@ -41,37 +40,30 @@ else
     protected override async Task OnInitializedAsync()
     {
         currentPoint = await pointService.SetCurrentUser();
-        if (currentPoint == null)
+        if (currentUserService.IsSignedIn() && currentPoint == null)
         {
-            if (currentUserService.IsSignedIn())
-            {
-                var modal = modalService.Show<InitialGambleModal>("No Entity");
-                var result = await modal.Result;
-                if (!result.Cancelled)
-                {
-                    currentPoint = await pointService.InitialCreate();
-                }
-            }
+            currentPoint = await pointService.InitialCreate();
         }
     }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            //비로그인한 상태라면!
             if (currentPoint == null)
             {
-                currentPoint = await sessionStorage.GetItemAsync<Point>("Current");
-                if (currentPoint == null)
+                //세션에 있는지 검사 후 생성
+                currentPoint = await sessionStorage.GetItemAsync<Point>("Current") ?? new Point();
+                //하지만 예전에 쓰던 거라면
+                if (!string.IsNullOrWhiteSpace(currentPoint.UserId))
                 {
-                    currentPoint = new();
-                }
-                else if (currentPoint.UserId != currentUserService.UserId)
-                {
-                    currentPoint = new();
+                    currentPoint = new Point();
                 }
             }
-            await sessionStorage.SetItemAsync("Current", currentPoint);
+            await sessionStorage.SetItemAsync("Current",currentPoint);
+            pointService.CallPoint();
         }
     }
-    
+
 }
