@@ -17,7 +17,8 @@ public static class ServiceExtensions
 
         services.AddBlazoredSessionStorage();
         services.AddBlazoredLocalStorage();
-        
+
+        services.AddScoped<TypingService>();
         services.AddScoped<PointRepository>();
         services.AddScoped<PointService>();
 

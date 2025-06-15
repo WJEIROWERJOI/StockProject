@@ -1,0 +1,27 @@
+﻿@page "/Gamble/Typing"
+@using StockProject.Data.Services
+
+@inject TypingService typingService
+
+<h3>Typing</h3>
+
+<InputText @bind-Value=@word></InputText>
+<button type="submit" @onclick="()=>SearchWord(word!)">submit</button>
+
+@if(definition is not null){
+<p>@definition</p>
+}
+
+@code {
+    [SupplyParameterFromForm]
+    string? word { get; set; }
+    string? definition;
+
+    async Task<string> SearchWord(string str)
+    {
+        definition = await TypingService.SearchWord(word);
+        TypingService.GetWordDefinition(definition);
+        return definition;
+    }
+
+}

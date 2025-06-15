@@ -29,6 +29,10 @@ public static class Seeding
                                     new Board {
                                                     Title = "Dice",
                                                     Url = "/Gamble/Dice"
+                                               },
+                                    new Board {
+                                                    Title = "Typing",
+                                                    Url = "/Gamble/Typing"
                                                }
                                           } }
             };
