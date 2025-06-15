@@ -6,22 +6,24 @@
 <h3>Typing</h3>
 
 <InputText @bind-Value=@word></InputText>
-<button type="submit" @onclick="()=>SearchWord(word!)">submit</button>
+<button type="submit" @onclick="() => SearchWord(word!)">submit</button>
 
-@if(definition is not null){
-<p>@definition</p>
+@if (definitions is not null)
+{
+    foreach (var str in definitions)
+    {
+        <p>@str</p>
+    }
 }
 
 @code {
     [SupplyParameterFromForm]
     string? word { get; set; }
-    string? definition;
+    List<string?> definitions = new();
 
-    async Task<string> SearchWord(string str)
+    async Task SearchWord(string str)
     {
-        definition = await TypingService.SearchWord(word);
-        TypingService.GetWordDefinition(definition);
-        return definition;
+        definitions = TypingService.GetWordDefinition(await TypingService.SearchWord(word));
     }
 
 }

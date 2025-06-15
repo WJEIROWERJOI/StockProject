@@ -16,14 +16,14 @@ namespace StockProject.Data.Services
             return await response.Content.ReadAsStringAsync();
         }
 
-        public static string GetWordDefinition(string xml)
+        public static List<string> GetWordDefinition(string xml)
         {
             // XmlDocument 객체 생성 및 XML 파일 로드
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(xml);
 
             XmlNodeList itemNodes = xmlDoc.GetElementsByTagName("item");
-
+            List<string> results = new();
             foreach (XmlNode item in itemNodes)
             {
                 string word = item["word"]?.InnerText ?? "";
@@ -34,14 +34,27 @@ namespace StockProject.Data.Services
                 string example = senseNode?["example"]?.InnerText ?? "";
 
                 Console.WriteLine($"{pos} : {word} -> {definition}");
-
-
+                results.Add(definition);
             }
 
-            return xml;
+            return results;
         }
 
+        public string GenerateRandomWord()
+        {
+            Random random = new Random();
 
+            int length = random.Next(2, 4);
+            string str = string.Empty;
+
+            for(int i = 0; i < length; i++)
+            {
+                int code = random.Next(0xAC00, 0xD7A4);
+                str.Append((char)code);
+            }
+
+            return str;
+        }
 
     }
 
