@@ -1,0 +1,57 @@
+﻿@inject StudentService studentService
+
+<div class="form-group">
+
+    <EditForm Model="input" OnValidSubmit="Close">
+        <div class="form-floating mb-3">
+            <InputText @bind-Value="input.Name" class="form-control" placeholder="학생이름" />
+            <label>학생이름</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <InputText @bind-Value="input.Description" class="form-control" placeholder="Description" />
+            <label>학생 설명</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <select class="form-select" @bind="input.StudentGroup">
+                @foreach (StudentGroup group in Enum.GetValues(typeof(StudentGroup)))
+                {
+                    <option value="@group">@group</option>
+                }
+            </select>
+            <label>학생 그룹</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">OK</button>
+        <button @onclick="Cancel" class="btn btn-secondary mt-3">Cancel</button>
+    </EditForm>
+
+
+
+    @* <button @onclick="Close" class="btn btn-primary mt-3">OK</button> *@
+
+</div>
+
+
+@code {
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
+    [SupplyParameterFromForm]
+    InputModel input { get; set; } = new();
+    
+    protected sealed class InputModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public StudentGroup StudentGroup { get; set; }
+    }
+
+    async Task Close()
+    {
+        await studentService.CreateStudent(input.Name, input.Description, input.StudentGroup);
+        await BlazoredModal.CloseAsync(ModalResult.Ok(true));
+    }
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+}
+

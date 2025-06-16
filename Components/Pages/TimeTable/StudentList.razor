@@ -1,0 +1,100 @@
+﻿@page "/TimeTable/Student"
+
+@inject IToastService toastService
+@inject IModalService modalService
+@inject StudentService studentService
+
+<PageTitle>StudentList</PageTitle>
+<h3>StudentList</h3>
+<hr />
+
+<button class="btn btn-primary" type="button" @onclick="StudentCreateModal">학생 등록</button>
+<br />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">학생이름</th>
+            <th scope="col">설명</th>
+            <th scope="col">반</th>
+            <th scope="col">불가시간</th>
+            <th scope="col">버튼</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var student in students)
+        {
+            <tr>
+
+                <td>@student.Name</td>
+                <td>@student.Description</td>
+                <td>@student.StudentGroup.ToString()</td>
+                <td>
+                    @foreach (var t in student.unableDateTime)
+                    {
+
+                        <span>@t.DayOfWeek.ToString(), @($"{t.StartTime:hh\\:mm} - {t.EndTime:hh\\:mm}")</span> <button class="btn btn-primary-sm" @onclick="()=>DeleteTime(t.id)">X</button>
+                        <br />
+                    }
+                </td>
+                <td>
+                    <button class="btn btn-primary small" @onclick="() => ManageStudentModal(student.id)">시간 추가</button>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+@code {
+    List<Student> students = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        students = await studentService.GetAllStudentsAsync();
+    }
+
+    async Task DeleteTime(int id)
+    {
+        if(await studentService.DeleteStudentTimeAsync(id))
+        {
+            toastService.ShowSuccess("성공적으로 삭제!");
+        }else
+        {
+            toastService.ShowError("?!?");
+        }
+    }
+
+    async Task StudentCreateModal()
+    {
+        var modal = modalService.Show<StudentCreateModal>("Create Student");
+        var result = await modal.Result;
+        if (!result.Cancelled)
+        {
+            if (result.Data is bool success)
+            {
+                toastService.ShowSuccess("학생 생성!");
+            }
+        }
+    }
+    async Task ManageStudentModal(int id)
+    {
+        var parameter = new ModalParameters();
+        parameter.Add(nameof(StudentManageModal.StudentId), id);
+
+        var modal = modalService.Show<StudentManageModal>("Manage Student", parameter);
+        var result = await modal.Result;
+        if (!result.Cancelled)
+        {
+            if (result.Data is bool success)
+            {
+                toastService.ShowSuccess("학생 관리!");
+            }
+        }
+
+
+
+    }
+}
+

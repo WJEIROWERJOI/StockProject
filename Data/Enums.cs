@@ -11,3 +11,13 @@ public enum UserRole
     Staff = 2
 }
 
+public enum StudentGroup
+{
+    High1 = 4,
+    High2 = 5,
+    High3 = 6,
+    Middle1 = 1,
+    Middle2 = 2,
+    Middle3 = 3,
+    Others = 0
+}

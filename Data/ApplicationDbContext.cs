@@ -11,6 +11,8 @@ namespace StockProject.Data
         public DbSet<StockCategory> StockCategories { get; set; }
         public DbSet<StockTransaction> StockTransactions { get; set; }
         public DbSet<Board> Boards { get; set; }
+        public DbSet<Student> Students { get; set; }
+        public DbSet<StudentTime> StudentTimes { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -20,7 +22,8 @@ namespace StockProject.Data
             builder.Entity<StockTransaction>().ToTable("StockTransactions");
             builder.Entity<Board>().ToTable("Boards");
             builder.Entity<Point>().ToTable("Points");
-
+            builder.Entity<Student>().ToTable("Students");
+            builder.Entity<StudentTime>().ToTable("StudentTimes");
 
 
         }
