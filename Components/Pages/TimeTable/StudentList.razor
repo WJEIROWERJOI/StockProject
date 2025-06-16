@@ -3,13 +3,66 @@
 @inject IToastService toastService
 @inject IModalService modalService
 @inject StudentService studentService
-
+@inject NavigationManager nav
 <PageTitle>StudentList</PageTitle>
 <h3>StudentList</h3>
 <hr />
 
 <button class="btn btn-primary" type="button" @onclick="StudentCreateModal">학생 등록</button>
 <br />
+
+<div style="display:flex;justify-content: flex-end;">
+    <div class="input-group" style="max-width: fit-content;">
+
+
+        <select @bind=@searchTopic class="form-select form-select-sm max-width:50px;">
+            <option value="Name">Name</option>
+            @* <option value="Email">Email</option> *@
+            <option value="StudentGroup">StudentGroup</option>
+        </select>
+
+        @if (searchTopic == "StudentGroup")
+        {
+            <select @bind="@searchContent" class="form-select form-select-sm">
+                @foreach (var group in Enum.GetValues(typeof(StudentGroup)))
+                {
+                    <option value="@group">@group</option>
+                }
+            </select>
+        }
+        else
+        {
+            <InputText @bind-Value="@searchContent" class="form-control" />
+        }
+
+        <button type="button" @onclick="StartSearch" class="btn btn-secondary">검색</button>
+        <button @onclick="CancelSearch" class="btn btn-secondary border-start-1">취소</button>
+
+    </div>
+</div>
+
+@code{
+    [SupplyParameterFromQuery]
+    public string? searchTopic { get; set; }
+    [SupplyParameterFromQuery]
+    public string? searchContent { get; set; }
+
+
+    private void StartSearch()
+    {
+        nav.NavigateTo($"/TimeTable/Student?searchTopic={searchTopic}&searchContent={searchContent}", forceLoad: true);
+    }
+
+    private void CancelSearch()
+    {
+        searchContent = "";
+        // searchTopic = "";
+        nav.NavigateTo("/Student/List?");
+    }
+}
+
+
+
 
 <table class="table">
     <thead>
@@ -33,13 +86,16 @@
                 <td>
                     @foreach (var t in student.unableDateTime)
                     {
-
-                        <span>@t.DayOfWeek.ToString(), @($"{t.StartTime:hh\\:mm} - {t.EndTime:hh\\:mm}")</span> <button class="btn btn-primary-sm" @onclick="()=>DeleteTime(t.id)">X</button>
+                        @* <span>@t.Student.Description,@t.StudentId,@t.Student.Id</span> *@
+                        <div class="d-flex justify-content-md-between">
+                        <span>@t.DayOfWeek.ToString(), @($"{t.StartTime:hh\\:mm} - {t.EndTime:hh\\:mm}")</span> 
+                        <button class="btn btn-outline-danger btn-sm" @onclick="()=>DeleteTime(t.Id)">X</button>
                         <br />
+                        </div>
                     }
                 </td>
                 <td>
-                    <button class="btn btn-primary small" @onclick="() => ManageStudentModal(student.id)">시간 추가</button>
+                    <button class="btn btn-primary btn-sm" @onclick="() => ManageStudentModal(student.Id)">시간 추가</button>
                 </td>
             </tr>
         }
@@ -53,6 +109,7 @@
     protected override async Task OnInitializedAsync()
     {
         students = await studentService.GetAllStudentsAsync();
+        // students = await studentService.GetSearchContentAsync(searchTopic,searchContent);
     }
 
     async Task DeleteTime(int id)
@@ -74,8 +131,11 @@
         {
             if (result.Data is bool success)
             {
+                // students = await studentService.GetAllStudentsAsync();
+                // 다시 받아 오는거 필요
                 toastService.ShowSuccess("학생 생성!");
             }
+            
         }
     }
     async Task ManageStudentModal(int id)
@@ -96,5 +156,13 @@
 
 
     }
+
+
+
+
+
+
+
+
 }
 

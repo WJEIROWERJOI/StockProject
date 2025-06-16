@@ -46,10 +46,8 @@ namespace StockProject.Data.Services
                 StartTime = _StartTime,
                 EndTime = _EndTime
             };
-
+            //student.unableDateTime.Add(studentTime);
             await _studentRepository.CreateStudentTime(studentTime);
-
-            student.unableDateTime.Add(studentTime);
         }
 
 

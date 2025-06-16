@@ -23,7 +23,6 @@
     </div>
     <hr />
     
-    
     <div class="form-floating mb-3">
         <InputDate @bind-Value="input.SpecificDate" class="form-control" />
         <label>특정 날짜</label>
@@ -31,13 +30,12 @@
 
     <button type="submit" class="btn btn-primary mt-3">OK</button>
     <button @onclick="Cancel" class="btn btn-secondary mt-3">Cancel</button>
-
 </EditForm>
 
-
-
 @code {
-    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
+    [CascadingParameter]
+    BlazoredModalInstance BlazoredModal { get; set; } = default!;
 
     [Parameter]
     public int StudentId { get; set; }

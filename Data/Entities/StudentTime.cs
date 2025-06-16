@@ -6,7 +6,7 @@ namespace StockProject.Data.Entities
     public class StudentTime
     {
         [Key]
-        public int id { get; set; }
+        public int Id { get; set; }
         [ForeignKey("Student")]
         public int StudentId { get; set; }
         public required Student Student { get; set; }

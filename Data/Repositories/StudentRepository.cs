@@ -37,13 +37,13 @@ namespace StockProject.Data.Repositories
             return await _context.Students
                 //.AsTracking()
                 .Include(x=>x.unableDateTime)
-                .FirstOrDefaultAsync(s => s.id == id);
+                .FirstOrDefaultAsync(s => s.Id == id);
         }
         public async Task<StudentTime?> GetStudentTimeAsync(int id)
         {
             return await _context.StudentTimes
                 .Include(s => s.Student)
-                .FirstOrDefaultAsync(x => x.id == id);
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
         //u
         public async Task UpdateStudent()

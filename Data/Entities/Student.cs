@@ -5,7 +5,7 @@ namespace StockProject.Data.Entities
     public class Student
     {
         [Key]
-        public int id { get; set; }
+        public int Id { get; set; }
         public required string Name { get; set; }
         public string Description { get; set; } = string.Empty;
         public StudentGroup StudentGroup { get; set; } = StudentGroup.Others;
