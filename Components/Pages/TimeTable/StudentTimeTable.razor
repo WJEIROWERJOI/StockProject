@@ -1,55 +1,27 @@
 ﻿@page "/TimeTable/Time"
-@using BlazorScheduler
-@using System.Drawing
 
-<h3>기본 스케쥴</h3>
-
-<Scheduler>
-    <Appointments>
-        <Appointment Start="@DateTime.Today.AddHours(9)"
-                     End="@DateTime.Today.AddHours(10)"
-                     Color="LightBlue"
-                     >
-            수학 수업 - 철수
-        </Appointment>
-        <Appointment Start="@DateTime.Today.AddDays(1).AddHours(14)"
-                     End="@DateTime.Today.AddDays(1).AddHours(15)"
-                     Color="LightPink"
-                     >
-            영어 수업 - 영희
-        </Appointment>
-    </Appointments>
-</Scheduler>
-
-@code {
-    // 간단한 일정 데이터
-    private List<ScheduleItem> Appointments = new()
-    {
-        new ScheduleItem
+<table class="table table-bordered text-center">
+    <thead>
+        <tr>
+            <th>시간</th>
+            @foreach (var day in Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>().Skip(1)) // 월~일
+            {
+                <th>@day</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < 48; i++) // 30분 간격
         {
-            Title = "수학 수업 - 철수",
-            Start = DateTime.Today.AddHours(9),
-            End = DateTime.Today.AddHours(10),
-            Color = Color.LightSkyBlue,
-            IsAllDay = false
-        },
-        new ScheduleItem
-        {
-            Title = "영어 과외 - 영희",
-            Start = DateTime.Today.AddDays(1).AddHours(14),
-            End = DateTime.Today.AddDays(1).AddHours(15),
-            Color = Color.LightPink,
-            IsAllDay = false
+            var timeSlot = TimeSpan.FromMinutes(i * 30); // 00:00 → 00:30 → 01:00...
+            <tr>
+                <td>@($"{timeSlot:hh\\:mm}")</td> <!-- 시간 표시 -->
+                @foreach (var day in Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>().Skip(1))
+                {
+                    <td></td> <!-- 빈칸 (여기에 일정 데이터 넣을 수 있음) -->
+                }
+            </tr>
         }
-    };
-
-    // 이게 실제 appointment 모델 역할
-    public class ScheduleItem
-    {
-        public string Title { get; set; } = string.Empty;
-        public DateTime Start { get; set; }
-        public DateTime End { get; set; }
-        public Color Color { get; set; } = Color.LightGray;
-        public bool IsAllDay { get; set; }
-    }
-}
+    </tbody>
+</table>
+qweqwe
