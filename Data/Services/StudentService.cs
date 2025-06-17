@@ -17,11 +17,15 @@ namespace StockProject.Data.Services
         {
             return await _studentRepository.GetAllStudentAsync();
         }
-
-        //CreateModal 에서 씀
-        public async Task CreateStudent(string _name, string _description, StudentGroup _studentGroup)
+        public async Task<List<StudentClass>> GetAllClassAsync()
         {
-            Student student = new Student() { Name = _name, Description = _description, StudentGroup = _studentGroup };
+            return await _studentRepository.GetAllClassAsync();
+        }
+        //CreateModal 에서 씀
+        public async Task CreateStudent(string _name, string _description, StudentGrade _StudentGrade, int _ClassId)
+        {
+            StudentClass? _Class = await _studentRepository.GetClassAsync(_ClassId);
+            Student student = new Student() { Name = _name, Description = _description, StudentGrade = _StudentGrade, Class = _Class };
             try
             {
                 await _studentRepository.CreateStudent(student);
@@ -31,11 +35,29 @@ namespace StockProject.Data.Services
                 Console.WriteLine(ex);
             }
         }
+        public async Task CreateClass(string _name, string _description)
+        {
+            if (await _studentRepository.NameExistAsync(_name))
+            {
+                throw new Exception($"Stock '{_name}' already exists.");
+            }
+
+            StudentClass klass = new() { Name = _name, Description = _description };
+
+            try
+            {
+                await _studentRepository.CreateClass(klass);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
         //ManageModal 에서 씀
-        public async Task AddTimeSlot(int _StudentId, DayOfWeek _DayOfWeek, TimeSpan _StartTime, TimeSpan _EndTime)
+        public async Task AddTimeSlot(int _StudentId, DayOfWeek _DayOfWeek, TimeSpan _StartTime, TimeSpan _EndTime, string _Description)
         {
             Student? student = await _studentRepository.GetStudentAsync(_StudentId);
-            if (student == null)
+            if (student is null)
                 throw new InvalidOperationException("Student not found");
 
             StudentTime studentTime = new StudentTime()
@@ -44,23 +66,29 @@ namespace StockProject.Data.Services
                 Student = student,
                 DayOfWeek = _DayOfWeek,
                 StartTime = _StartTime,
-                EndTime = _EndTime
+                EndTime = _EndTime,
+                Description = _Description
             };
             //student.unableDateTime.Add(studentTime);
-            await _studentRepository.CreateStudentTime(studentTime);
+            await _studentRepository.CreateTime(studentTime);
         }
-
-
-        public async Task<bool> DeleteStudentTimeAsync(int id)
+        public async Task<bool> AddStudentToClass(int classId, int studentId)
         {
-           StudentTime? studentTime = await _studentRepository.GetStudentTimeAsync(id);
-            if(studentTime is null)
+            var klass = await _studentRepository.GetClassAsync(classId);
+            var student = await _studentRepository.GetStudentAsync(studentId);
+            if (klass is null || student is null)
             {
-                throw new InvalidOperationException("StudentTime not found");
+                return false;
             }
+            if (!klass.Students.Contains(student))
+            {
+                return false;
+            }
+
             try
             {
-                await _studentRepository.DeleteStudentTimeAsync(studentTime);
+                klass.Students.Add(student);
+                await _studentRepository.SaveAsync();
                 return true;
             }
             catch (Exception ex)
@@ -70,9 +98,103 @@ namespace StockProject.Data.Services
             }
         }
 
+        public async Task<bool> DeleteTimeAsync(int id)
+        {
+            StudentTime? studentTime = await _studentRepository.GetTimeAsync(id);
+            if (studentTime is null)
+                throw new InvalidOperationException("StudentTime not found");
 
+            try
+            {
+                await _studentRepository.DeleteTimeAsync(studentTime);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
 
+        public async Task<bool> DeleteStudentAsync(int id)
+        {
+            Student? student = await _studentRepository.GetStudentAsync(id);
+            if (student is null)
+                throw new InvalidOperationException("Student not found");
+
+            try
+            {
+                await _studentRepository.DeleteStudentAsync(student);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
+
+        }
+        public async Task<bool> DeleteClassAsync(int id)
+        {
+            StudentClass? klass = await _studentRepository.GetClassAsync(id);
+            if (klass is null)
+                throw new InvalidOperationException("Student not found");
+
+            try
+            {
+                await _studentRepository.DeleteClassAsync(klass);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
+
+        }
+        public async Task<bool> RemoveStudentFromClass(int classId, int studentId)
+        {
+            var klass = await _studentRepository.GetClassAsync(classId);
+            var student = await _studentRepository.GetStudentAsync(studentId);
+            if (klass is null || student is null)
+            {
+                return false;
+            }
+            if (student.Class is not null)
+            {
+                return false;
+            }
+
+            try
+            {
+                klass.Students.Remove(student);
+                await _studentRepository.SaveAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
     }
+
+    //public async Task<List<Student>> GetSearchContentAsync(string searchTopic, string searchContent)
+    //{
+    //    return await _studentRepository.GetSearchContentAsync(searchTopic, searchContent);
+    //}
+
+
+
+
+
+
+
+
+
+
 
 
 }
+
+

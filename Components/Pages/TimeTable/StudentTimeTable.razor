@@ -3,25 +3,28 @@
 <table class="table table-bordered text-center">
     <thead>
         <tr>
-            <th>시간</th>
-            @foreach (var day in Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>().Skip(1)) // 월~일
+            <th>요일</th>
+            @for (int i = 18; i <= 48; i++) // 30분 간격
             {
-                <th>@day</th>
+                var timeSlot = TimeSpan.FromMinutes(i * 30);
+                var displayTime = timeSlot.Hours == 0 ? "24:00" : $"{timeSlot:hh\\:mm}"; // 
+                <th>@displayTime</th> <!-- 시간 표시 -->
             }
         </tr>
     </thead>
     <tbody>
-        @for (int i = 0; i < 48; i++) // 30분 간격
+        @foreach (var day in Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>().Skip(1)) // 월~일
         {
-            var timeSlot = TimeSpan.FromMinutes(i * 30); // 00:00 → 00:30 → 01:00...
             <tr>
-                <td>@($"{timeSlot:hh\\:mm}")</td> <!-- 시간 표시 -->
-                @foreach (var day in Enum.GetValues(typeof(DayOfWeek)).Cast<DayOfWeek>().Skip(1))
-                {
-                    <td></td> <!-- 빈칸 (여기에 일정 데이터 넣을 수 있음) -->
-                }
+                <td>@day.ToString().Substring(0, 3)</td>
             </tr>
         }
     </tbody>
 </table>
-qweqwe
+
+
+
+@code{
+
+
+}

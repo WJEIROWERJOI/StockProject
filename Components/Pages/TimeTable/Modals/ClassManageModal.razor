@@ -1,0 +1,41 @@
+﻿@inject StudentService studentService
+
+<EditForm Model="input" OnValidSubmit="Close">
+    <select class="form-control">
+        @foreach (var student in students)
+        {
+            <option value="@student.Id">@student.Name</option>
+        }
+    </select>
+    <button type="submit" class="btn btn-primary mt-3">OK</button>
+    <button @onclick="Cancel" class="btn btn-secondary mt-3">Cancel</button>
+</EditForm>
+
+@code {
+    [CascadingParameter]
+    BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [Parameter]
+    public int ClassId { get; set; }
+    [SupplyParameterFromForm]
+    private int input { get; set; }
+    List<Student> students = new();
+    protected override async Task OnInitializedAsync()
+    {
+        students = await studentService.GetAllStudentsAsync();
+    }
+
+    async Task Close()
+    {
+        await studentService.AddStudentToClass(ClassId, input);        
+        await BlazoredModal.CloseAsync(ModalResult.Ok(true));
+    }
+
+
+
+
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+
+
+
+
+}

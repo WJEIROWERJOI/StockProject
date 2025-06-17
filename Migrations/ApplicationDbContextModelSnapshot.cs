@@ -315,12 +315,36 @@ namespace StockProject.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("StudentGroup")
+                    b.Property<int?>("StudentClass")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("StudentGrade")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("StudentClass");
+
                     b.ToTable("Students", (string)null);
+                });
+
+            modelBuilder.Entity("StockProject.Data.Entities.StudentClass", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StudentClasses", (string)null);
                 });
 
             modelBuilder.Entity("StockProject.Data.Entities.StudentTime", b =>
@@ -331,6 +355,10 @@ namespace StockProject.Migrations
 
                     b.Property<int>("DayOfWeek")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<TimeSpan>("EndTime")
                         .HasColumnType("TEXT");
@@ -499,6 +527,16 @@ namespace StockProject.Migrations
                         .HasForeignKey("StockEntityId");
                 });
 
+            modelBuilder.Entity("StockProject.Data.Entities.Student", b =>
+                {
+                    b.HasOne("StockProject.Data.Entities.StudentClass", "Class")
+                        .WithMany("Students")
+                        .HasForeignKey("StudentClass")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Class");
+                });
+
             modelBuilder.Entity("StockProject.Data.Entities.StudentTime", b =>
                 {
                     b.HasOne("StockProject.Data.Entities.Student", "Student")
@@ -528,6 +566,11 @@ namespace StockProject.Migrations
             modelBuilder.Entity("StockProject.Data.Entities.Student", b =>
                 {
                     b.Navigation("unableDateTime");
+                });
+
+            modelBuilder.Entity("StockProject.Data.Entities.StudentClass", b =>
+                {
+                    b.Navigation("Students");
                 });
 #pragma warning restore 612, 618
         }

@@ -10,6 +10,7 @@ namespace StockProject.Data.Entities
         [ForeignKey("Student")]
         public int StudentId { get; set; }
         public required Student Student { get; set; }
+        public string Description { get; set; } = string.Empty;
         public DayOfWeek DayOfWeek { get; set; }
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }

@@ -9,6 +9,16 @@ public static class Seeding
     {
         var logService = new LogService();
 
+        if (!context.StudentClasses.Any())
+        {
+            List<StudentClass> classes = new List<StudentClass>
+            {
+                new StudentClass {Name="1A",Description="엘리트들"}
+            };
+            context.StudentClasses.AddRange(classes);
+        }
+
+
         if (!context.Boards.Any())
         {
             List<Board> brds = new List<Board> {

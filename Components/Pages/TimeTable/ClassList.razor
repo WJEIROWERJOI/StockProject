@@ -1,0 +1,133 @@
+﻿@page "/TimeTable/Student/Class"
+
+@inject StudentService studentService
+@inject IToastService toastService
+@inject IModalService modalService
+
+<PageTitle>ClassList</PageTitle>
+<h3>ClassList</h3>
+<hr />
+
+@* <div class="d-flex justify-content-end"></div> *@
+    <button @onclick="ClassCreateModal" class="btn btn-primary">추가</button>
+
+@code {
+    [CascadingParameter]
+    public IModalService Modal { get; set; } = default!;
+
+    private async Task ClassCreateModal()
+    {
+        var modal = Modal.Show<ClassCreateModal>("Create Class");
+        var result = await modal.Result;
+        if (!result.Cancelled)
+        {
+            if (result.Data is bool success)
+            {
+                // students = await studentService.GetAllStudentsAsync();
+                // 다시 받아 오는거 필요
+                toastService.ShowSuccess("클래스 생성!");
+            }
+            else
+            {
+                toastService.ShowError("클래스 생성?");
+            }
+        }
+    }
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">아이디키값</th>
+            <th scope="col">이름</th>
+            <th scope="col">설명</th>
+            <th scope="col">소속 학생</th>
+            <th scope="col">버튼</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var clas in classes)
+        {
+            <tr>
+                
+                    <td>@clas.Id</td>
+
+                    <td>@clas.Name</td>
+                    <td>@clas.Description</td>
+                    <td>
+                    @foreach(var t in clas.Students)
+                    {
+                        <div class="d-flex justify-content-md-between">
+                            <span>@t.Name</span>
+                            <button class="btn btn-outline-danger btn-sm" @onclick="() => RemoveStudentFromClass(clas.Id,t.Id)">X</button>
+                            <br />
+                        </div>
+                    }
+                    </td>
+                <td>
+                    <button class="btn btn-primary btn-sm" @onclick="() => ManageClassModal(clas.Id)">학생 추가</button>
+                    <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteClass(clas.Id)">X</button>
+                </td>
+                
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+@code {
+
+    List<StudentClass> classes = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        classes = await studentService.GetAllClassAsync();
+    }
+
+    async Task DeleteClass(int id)
+    {
+        if (await studentService.DeleteClassAsync(id))
+        {
+            toastService.ShowSuccess("클래스 삭제!");
+            StateHasChanged();
+        }
+        else
+        {
+            toastService.ShowError("클래스 삭제?");
+        }
+    }
+    async Task RemoveStudentFromClass(int classId,int studentId)
+    {
+        if (await studentService.RemoveStudentFromClass(classId, studentId))
+        {
+            toastService.ShowSuccess("학생 제거!");
+        }
+        else
+        {
+            toastService.ShowError("학생 제거?");
+        }
+    
+    }
+    async Task ManageClassModal(int id)
+    {
+        var parameter = new ModalParameters();
+        parameter.Add(nameof(ClassManageModal.ClassId), id);
+
+        var modal = modalService.Show<ClassManageModal>("Manage Class", parameter);
+        var result = await modal.Result;
+        if (!result.Cancelled)
+        {
+            if (result.Data is bool success)
+            {
+                toastService.ShowSuccess("클래스 관리!");
+            }
+            else
+            {
+                toastService.ShowError("클래스 관리?");
+            }
+        }
+    }
+    
+
+}

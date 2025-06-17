@@ -3,6 +3,11 @@
 <EditForm Model="input" OnValidSubmit="Close">
     
     <div class="form-floating mb-3">
+        <InputText type="text" @bind-Value="input.Description" class="form-control" />
+        <label>설명</label>
+    </div>
+
+    <div class="form-floating mb-3">
         <select class="form-select" @bind="input.DayOfWeek">
             @foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
             {
@@ -48,7 +53,8 @@
         [Required(ErrorMessage = "No Blank")] 
         public string? StartTime { get; set; }
         [Required(ErrorMessage = "No Blank")]
-        public string? EndTime { get; set; }
+        public string? EndTime { get; set; }//나중에 required 및 ? 제거
+        public string? Description { get; set; } 
         // public bool IsValid => TimeSpan.TryParse(StartTime, out var start) && TimeSpan.TryParse(EndTime, out var end) && start < end;
         public DateTime? SpecificDate { get; set; }
     }
@@ -57,7 +63,7 @@
     {
         TimeSpan.TryParse(input.StartTime, out var startTime);
         TimeSpan.TryParse(input.EndTime, out var endTime);
-        await studentService.AddTimeSlot(StudentId, input.DayOfWeek, startTime, endTime);
+        await studentService.AddTimeSlot(StudentId, input.DayOfWeek, startTime, endTime,input.Description);
         await BlazoredModal.CloseAsync(ModalResult.Ok(true));
     }
 

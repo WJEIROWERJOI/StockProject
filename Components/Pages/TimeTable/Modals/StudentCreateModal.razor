@@ -1,0 +1,73 @@
+﻿@inject StudentService studentService
+
+<div class="form-group">
+
+    <EditForm Model="input" OnValidSubmit="Close">
+
+        <div class="form-floating mb-3">
+            <InputText @bind-Value="input.Name" class="form-control" placeholder="학생이름" />
+            <label>학생이름</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <InputText @bind-Value="input.Description" class="form-control" placeholder="Description" />
+            <label>학생 설명</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <select class="form-select" @bind="input.StudentGrade">
+                @foreach (StudentGrade group in Enum.GetValues(typeof(StudentGrade)))
+                {
+                    <option value="@group">@group</option>
+                }
+            </select>
+            <label>학년</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <select class="form-select" @bind="input.ClassId">
+                @foreach (var cla in studentClasses)
+                {
+                    <option value="@cla.Id">@cla.Name</option>
+                }
+            </select>
+            <label>학생 반</label>
+        </div>
+
+
+
+        <button type="submit" class="btn btn-primary mt-3">OK</button>
+        <button @onclick="Cancel" class="btn btn-secondary mt-3">Cancel</button>
+    </EditForm>
+
+</div>
+
+
+@code {
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
+    [SupplyParameterFromForm]
+    InputModel input { get; set; } = new();
+
+    List<StudentClass> studentClasses = new();
+    protected override async Task OnInitializedAsync()
+    {
+        studentClasses = await studentService.GetAllClassAsync();
+    }
+
+    protected sealed class InputModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public StudentGrade StudentGrade { get; set; }
+        public int ClassId { get; set; }
+    }
+
+    async Task Close()
+    {
+        await studentService.CreateStudent(input.Name, input.Description, input.StudentGrade, input.ClassId);
+        await BlazoredModal.CloseAsync(ModalResult.Ok(true));
+    }
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+}
+

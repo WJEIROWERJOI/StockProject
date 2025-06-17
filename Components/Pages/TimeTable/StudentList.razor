@@ -1,5 +1,6 @@
 ﻿@page "/TimeTable/Student"
 
+
 @inject IToastService toastService
 @inject IModalService modalService
 @inject StudentService studentService
@@ -17,14 +18,13 @@
 
         <select @bind=@searchTopic class="form-select form-select-sm max-width:50px;">
             <option value="Name">Name</option>
-            @* <option value="Email">Email</option> *@
-            <option value="StudentGroup">StudentGroup</option>
+            <option value="StudentGrade">StudentGrade</option>
         </select>
 
-        @if (searchTopic == "StudentGroup")
+        @if (searchTopic == "StudentGrade")
         {
             <select @bind="@searchContent" class="form-select form-select-sm">
-                @foreach (var group in Enum.GetValues(typeof(StudentGroup)))
+                @foreach (var group in Enum.GetValues(typeof(StudentGrade)))
                 {
                     <option value="@group">@group</option>
                 }
@@ -41,7 +41,7 @@
     </div>
 </div>
 
-@code{
+@code {
     [SupplyParameterFromQuery]
     public string? searchTopic { get; set; }
     [SupplyParameterFromQuery]
@@ -69,6 +69,7 @@
         <tr>
             <th scope="col">학생이름</th>
             <th scope="col">설명</th>
+            <th scope="col">학년</th>
             <th scope="col">반</th>
             <th scope="col">불가시간</th>
             <th scope="col">버튼</th>
@@ -82,20 +83,25 @@
 
                 <td>@student.Name</td>
                 <td>@student.Description</td>
-                <td>@student.StudentGroup.ToString()</td>
+                <td>@student.StudentGrade.ToString()</td>
+                <td>@student.Class?.Name</td>
+
                 <td>
+
                     @foreach (var t in student.unableDateTime)
                     {
                         @* <span>@t.Student.Description,@t.StudentId,@t.Student.Id</span> *@
                         <div class="d-flex justify-content-md-between">
-                        <span>@t.DayOfWeek.ToString(), @($"{t.StartTime:hh\\:mm} - {t.EndTime:hh\\:mm}")</span> 
-                        <button class="btn btn-outline-danger btn-sm" @onclick="()=>DeleteTime(t.Id)">X</button>
-                        <br />
+                            <span>@t.Description, @t.DayOfWeek.ToString().Substring(0,3), @($"{t.StartTime:hh\\:mm} - {t.EndTime:hh\\:mm}")</span>
+                            <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteTime(t.Id)">X</button>
+                            <br />
                         </div>
                     }
+
                 </td>
                 <td>
                     <button class="btn btn-primary btn-sm" @onclick="() => ManageStudentModal(student.Id)">시간 추가</button>
+                    <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteStudent(student.Id)">X</button>
                 </td>
             </tr>
         }
@@ -105,21 +111,35 @@
 
 @code {
     List<Student> students = new();
-
     protected override async Task OnInitializedAsync()
     {
         students = await studentService.GetAllStudentsAsync();
-        // students = await studentService.GetSearchContentAsync(searchTopic,searchContent);
     }
+
+    // protected override async Task OnParametersSetAsync()
+    // {
+    //     if (string.IsNullOrWhiteSpace(searchTopic) || string.IsNullOrWhiteSpace(searchContent))
+    //     {
+    //         students = new List<Student>(); 기본값 설정
+    //         return;
+    //     }
+    //     else
+    //     {
+    //         students = await studentService.GetSearchContentAsync(searchTopic, searchContent);
+    //     }
+    // }
+
+
 
     async Task DeleteTime(int id)
     {
-        if(await studentService.DeleteStudentTimeAsync(id))
+        if (await studentService.DeleteTimeAsync(id))
         {
-            toastService.ShowSuccess("성공적으로 삭제!");
-        }else
+            toastService.ShowSuccess("시간 삭제 성공!");
+        }
+        else
         {
-            toastService.ShowError("?!?");
+            toastService.ShowError("시간 삭제 실패!");
         }
     }
 
@@ -135,7 +155,7 @@
                 // 다시 받아 오는거 필요
                 toastService.ShowSuccess("학생 생성!");
             }
-            
+
         }
     }
     async Task ManageStudentModal(int id)
@@ -152,17 +172,19 @@
                 toastService.ShowSuccess("학생 관리!");
             }
         }
-
-
-
     }
-
-
-
-
-
-
-
+    async Task DeleteStudent(int id)
+    {
+        if (await studentService.DeleteStudentAsync(id))
+        {
+            toastService.ShowSuccess("학생 삭제 성공!");
+            StateHasChanged();
+        }
+        else
+        {
+            toastService.ShowError("학생 삭제 실패!");
+        }
+    }
 
 }
 

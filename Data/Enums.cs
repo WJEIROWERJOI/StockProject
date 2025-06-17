@@ -11,7 +11,7 @@ public enum UserRole
     Staff = 2
 }
 
-public enum StudentGroup
+public enum StudentGrade
 {
     High1 = 4,
     High2 = 5,
