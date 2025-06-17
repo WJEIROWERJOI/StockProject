@@ -13,12 +13,12 @@
     </div>
 
     <div class="form-floating mb-3">
-        <InputText type="time" @bind-Value="input.StartTime" class="form-control" />
+        <InputText type="time" step="1800" @bind-Value="input.StartTime" class="form-control" />
         <label>시작 시간</label>
     </div>
 
     <div class="form-floating mb-3">
-        <InputText type="time" @bind-Value="input.EndTime" class="form-control" />
+        <InputText type="time" step="1800" @bind-Value="input.EndTime" class="form-control" />
         <label>종료 시간</label>
     </div>
     <hr />
@@ -27,7 +27,6 @@
         <InputDate @bind-Value="input.SpecificDate" class="form-control" />
         <label>특정 날짜</label>
     </div>
-
     <button type="submit" class="btn btn-primary mt-3">OK</button>
     <button @onclick="Cancel" class="btn btn-secondary mt-3">Cancel</button>
 </EditForm>
