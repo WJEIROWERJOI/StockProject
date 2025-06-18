@@ -1,4 +1,4 @@
-﻿@page "/TimeTable/Time"
+﻿@page "/TimeTable/Time1"
 
 @inject StudentService studentService
 @inject NavigationManager nav
@@ -9,7 +9,13 @@
         text-align: center;
     }
 </style>
-
+<button type="button" @onclick="ChangeMode">ChangeMode</button>
+@code{
+    bool isMode;
+    private void ChangeMode(){
+        isMode=!isMode;
+    }
+}
 <div style="display:flex;">
     <div class="input-group" style="max-width: fit-content;">
 
