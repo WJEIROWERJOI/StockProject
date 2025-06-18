@@ -37,22 +37,40 @@ namespace StockProject.Data.Repositories
         public async Task<List<Student>> GetAllStudentAsync()
         {
             return await _context.Students
-                .Include(y=>y.Class)
-                .Include(x=>x.unableDateTime)
+                .Include(y => y.Class)
+                .Include(x => x.unableDateTime)
                 .ToListAsync();
         }
         public async Task<List<StudentClass>> GetAllClassAsync()
         {
             return await _context.StudentClasses
-                .Include(x=>x.Students)
+                .Include(x => x.Students)
                 .ToListAsync();
+        }
+        public async Task<List<StudentTime>> GetAllTimesAsync()
+        {
+            return await _context.StudentTimes
+            .Include(x => x.Student)
+            .ToListAsync();
+        }
+        public async Task<List<StudentTime>> GetTimesByStudentNameAsync(string str)
+        {
+            return await _context.StudentTimes
+            .Where(x => x.Student.Name.ToLower() == str.ToLower())
+            .ToListAsync();
+        }
+        public async Task<List<StudentTime>> GetTimesByStudentClassAsync(int id)
+        {
+            return await _context.StudentTimes
+            .Where(x => x.Student.Class.Id == id)
+            .ToListAsync();
         }
 
         public async Task<Student?> GetStudentAsync(int id)
         {
             return await _context.Students
                 .Include(y => y.Class)
-                .Include(x=>x.unableDateTime)
+                .Include(x => x.unableDateTime)
                 .FirstOrDefaultAsync(s => s.Id == id);
         }
         public async Task<StudentTime?> GetTimeAsync(int id)
@@ -64,8 +82,8 @@ namespace StockProject.Data.Repositories
         public async Task<StudentClass?> GetClassAsync(int id)
         {
             return await _context.StudentClasses
-                .Include(s=>s.Students)
-                .FirstOrDefaultAsync(x=>x.Id == id);
+                .Include(s => s.Students)
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
         //public async Task<List<Student>> GetSearchContentAsync(string searchTopic, string searchContent)
         //{

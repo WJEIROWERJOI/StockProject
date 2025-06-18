@@ -9,6 +9,6 @@ namespace StockProject.Data.Entities
         public string Name { get; set; } = string.Empty;
         public List<Student> Students { get; set; } = new();
         public string Description { get; set; } = string.Empty;
-
+        //public TimeSpan StartTime, TimeSpan EndTime 같은거 필요
     }
 }

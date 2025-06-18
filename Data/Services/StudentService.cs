@@ -21,6 +21,26 @@ namespace StockProject.Data.Services
         {
             return await _studentRepository.GetAllClassAsync();
         }
+        public async Task<List<StudentTime>> GetAllTimesAsync()
+        {
+            return await _studentRepository.GetAllTimesAsync();
+        }
+        public async Task<List<StudentTime>> GetTimesByStudentNameAsync(string str)
+        {
+            return await _studentRepository.GetTimesByStudentNameAsync(str);
+        }
+        public async Task<List<StudentTime>> GetTimesByStudentClassAsync(string id)
+        {
+            _ = int.TryParse(id, out int classId);
+            return await _studentRepository.GetTimesByStudentClassAsync(classId);
+        }
+
+
+
+
+
+
+
         //CreateModal 에서 씀
         public async Task CreateStudent(string _name, string _description, StudentGrade _StudentGrade, int _ClassId)
         {
