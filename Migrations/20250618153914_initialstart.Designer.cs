@@ -11,8 +11,8 @@ using StockProject.Data;
 namespace StockProject.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250618025208_InitialStarts")]
-    partial class InitialStarts
+    [Migration("20250618153914_initialstart")]
+    partial class initialstart
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -356,6 +356,9 @@ namespace StockProject.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("ClassId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("DayOfWeek")
                         .HasColumnType("INTEGER");
 
@@ -372,10 +375,12 @@ namespace StockProject.Migrations
                     b.Property<TimeSpan>("StartTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("StudentId")
+                    b.Property<int?>("StudentId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClassId");
 
                     b.HasIndex("StudentId");
 
@@ -542,13 +547,17 @@ namespace StockProject.Migrations
 
             modelBuilder.Entity("StockProject.Data.Entities.StudentTime", b =>
                 {
+                    b.HasOne("StockProject.Data.Entities.StudentClass", "StudentClass")
+                        .WithMany("ClassTimes")
+                        .HasForeignKey("ClassId");
+
                     b.HasOne("StockProject.Data.Entities.Student", "Student")
                         .WithMany("unableDateTime")
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("StudentId");
 
                     b.Navigation("Student");
+
+                    b.Navigation("StudentClass");
                 });
 
             modelBuilder.Entity("StockProject.Data.Entities.Board", b =>
@@ -573,6 +582,8 @@ namespace StockProject.Migrations
 
             modelBuilder.Entity("StockProject.Data.Entities.StudentClass", b =>
                 {
+                    b.Navigation("ClassTimes");
+
                     b.Navigation("Students");
                 });
 #pragma warning restore 612, 618

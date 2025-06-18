@@ -63,7 +63,7 @@
     {
         TimeSpan.TryParse(input.StartTime, out var startTime);
         TimeSpan.TryParse(input.EndTime, out var endTime);
-        await studentService.AddTimeSlot(StudentId, input.DayOfWeek, startTime, endTime,input.Description);
+        await studentService.AddTimeToStudent(StudentId, input.DayOfWeek, startTime, endTime,input.Description);
         await BlazoredModal.CloseAsync(ModalResult.Ok(true));
     }
 

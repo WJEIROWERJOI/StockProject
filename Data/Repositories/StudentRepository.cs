@@ -44,15 +44,35 @@ namespace StockProject.Data.Repositories
         public async Task<List<StudentClass>> GetAllClassAsync()
         {
             return await _context.StudentClasses
+                .Include(y => y.ClassTimes)
                 .Include(x => x.Students)
                 .ToListAsync();
         }
         public async Task<List<StudentTime>> GetAllTimesAsync()
         {
             return await _context.StudentTimes
+                .Include(y => y.StudentClass)
             .Include(x => x.Student)
             .ToListAsync();
         }
+        public async Task<List<StudentTime>> GetOnlyTimesWithClassAsync()
+        {
+
+            return await _context.StudentTimes
+    .Include(x => x.StudentClass)
+            .Include(x => x.Student)
+.Where(x => x.StudentId == null && x.ClassId != null)
+                .ToListAsync();
+        }
+        public async Task<List<StudentTime>> GetOnlyTimesWithStudentAsync()
+        {
+            return await _context.StudentTimes
+    .Include(x => x.StudentClass)
+            .Include(x => x.Student)
+.Where(x => x.StudentId != null && x.ClassId == null)
+                .ToListAsync();
+        }
+
         public async Task<List<StudentTime>> GetTimesByStudentNameAsync(string str)
         {
             return await _context.StudentTimes

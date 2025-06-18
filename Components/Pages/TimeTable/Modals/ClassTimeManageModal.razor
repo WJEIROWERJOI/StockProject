@@ -1,0 +1,78 @@
+﻿@inject StudentService studentService
+<div class="form-group">
+    <EditForm Model="input" OnValidSubmit="Close">
+
+        <div class="form-floating mb-3">
+            <InputText type="text" @bind-Value="input.Description" class="form-control" />
+            <label>설명</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <select class="form-select" @bind="input.DayOfWeek">
+                @foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
+                {
+                    <option value="@day">@day</option>
+                }
+            </select>
+            <label>요일 선택</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <InputText type="time" step="1800" @bind-Value="input.StartTime" class="form-control" />
+            <label>시작 시간</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <InputText type="time" step="1800" @bind-Value="input.EndTime" class="form-control" />
+            <label>종료 시간</label>
+        </div>
+        <hr />
+
+        <div class="form-floating mb-3">
+            <InputDate @bind-Value="input.SpecificDate" class="form-control" />
+            <label>특정 날짜</label>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">OK</button>
+        <button @onclick="Cancel" class="btn btn-secondary mt-3">Cancel</button>
+    </EditForm>
+</div>
+
+@code {
+    [CascadingParameter]
+    BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [Parameter]
+    public int ClassId { get; set; }
+
+    [SupplyParameterFromForm]
+    private InputModel input { get; set; } = new();
+    protected sealed class InputModel
+    {
+        [Required(ErrorMessage = "No Blank")]
+        public DayOfWeek DayOfWeek { get; set; }
+        [Required(ErrorMessage = "No Blank")]
+        public string? StartTime { get; set; }
+        [Required(ErrorMessage = "No Blank")]
+        public string? EndTime { get; set; }//나중에 required 및 ? 제거
+        public string? Description { get; set; }
+        // public bool IsValid => TimeSpan.TryParse(StartTime, out var start) && TimeSpan.TryParse(EndTime, out var end) && start < end;
+        public DateTime? SpecificDate { get; set; }
+    }
+
+
+    List<Student> students = new();
+    protected override async Task OnInitializedAsync()
+    {
+        students = await studentService.GetAllStudentsAsync();
+    }
+
+    async Task Close()
+    {
+        TimeSpan.TryParse(input.StartTime, out var startTime);
+        TimeSpan.TryParse(input.EndTime, out var endTime);
+        await studentService.AddTimeToClass(ClassId, input.DayOfWeek, startTime, endTime, input.Description);
+        await BlazoredModal.CloseAsync(ModalResult.Ok(true));
+    }
+
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+
+}

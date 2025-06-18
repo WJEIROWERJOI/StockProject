@@ -14,6 +14,7 @@ namespace StockProject.Data.Entities
         public List<StudentTime> unableDateTime { get; set; } = new();
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime LastUpdatedAt { get; set; } = DateTime.UtcNow;
+
         [ForeignKey("StudentClass")]
         [DeleteBehavior(DeleteBehavior.SetNull)]
         public StudentClass? Class { get; set; }

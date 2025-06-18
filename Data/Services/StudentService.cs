@@ -35,8 +35,15 @@ namespace StockProject.Data.Services
             return await _studentRepository.GetTimesByStudentClassAsync(classId);
         }
 
-
-
+        //times = await studentService.GetOnlyTimesClassAsync();
+        public async Task<List<StudentTime>> GetOnlyTimesWithClassAsync()
+        {
+            return await _studentRepository.GetOnlyTimesWithClassAsync();
+        }
+        public async Task<List<StudentTime>> GetOnlyTimesWithStudentAsync()
+        {
+            return await _studentRepository.GetOnlyTimesWithStudentAsync();
+        }
 
 
 
@@ -74,7 +81,7 @@ namespace StockProject.Data.Services
             }
         }
         //ManageModal 에서 씀
-        public async Task AddTimeSlot(int _StudentId, DayOfWeek _DayOfWeek, TimeSpan _StartTime, TimeSpan _EndTime, string _Description)
+        public async Task AddTimeToStudent(int _StudentId, DayOfWeek _DayOfWeek, TimeSpan _StartTime, TimeSpan _EndTime, string _Description)
         {
             Student? student = await _studentRepository.GetStudentAsync(_StudentId);
             if (student is null)
@@ -84,6 +91,24 @@ namespace StockProject.Data.Services
             {
                 StudentId = _StudentId,
                 Student = student,
+                DayOfWeek = _DayOfWeek,
+                StartTime = _StartTime,
+                EndTime = _EndTime,
+                Description = _Description
+            };
+            //student.unableDateTime.Add(studentTime);
+            await _studentRepository.CreateTime(studentTime);
+        }
+        public async Task AddTimeToClass(int _ClassId, DayOfWeek _DayOfWeek, TimeSpan _StartTime, TimeSpan _EndTime, string _Description)
+        {
+            StudentClass? klass = await _studentRepository.GetClassAsync(_ClassId);
+            if (klass is null)
+                throw new InvalidOperationException("Student not found");
+
+            StudentTime studentTime = new StudentTime()
+            {
+                ClassId = _ClassId,
+                StudentClass = klass,
                 DayOfWeek = _DayOfWeek,
                 StartTime = _StartTime,
                 EndTime = _EndTime,

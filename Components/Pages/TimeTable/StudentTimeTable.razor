@@ -42,7 +42,6 @@
     [SupplyParameterFromQuery]
     public string? searchContent { get; set; }
 
-
     private void StartSearch()
     {
         nav.NavigateTo($"/TimeTable/Time?searchTopic={searchTopic}&searchContent={searchContent}", forceLoad: true);
@@ -56,24 +55,24 @@
     {
         if (String.IsNullOrWhiteSpace(searchTopic))
         {
-            times = await studentService.GetAllTimesAsync();
+            studenttimes = await studentService.GetOnlyTimesWithStudentAsync();
         }
         else if (searchTopic is "Name")
         {
-            times = await studentService.GetTimesByStudentNameAsync(searchContent!);
+            studenttimes = await studentService.GetTimesByStudentNameAsync(searchContent!);
         }
         else if (searchTopic is "StudentClass")
         {
-            times = await studentService.GetTimesByStudentClassAsync(searchContent!);
+            studenttimes = await studentService.GetTimesByStudentClassAsync(searchContent!);
         }
 
     }
 }
 
-@foreach (var toto in times)
+@* @foreach (var toto in times)
 {
-    <span>@toto.Student.Name,</span>
-}
+    <span>@toto.Student?.Name,</span>
+} *@
 
 
 <table class="table table-bordered text-center">
@@ -93,7 +92,7 @@
                 <th>@time.ToString(@"hh\:mm")</th>
                 @foreach (var day in Enum.GetValues<DayOfWeek>())
                 {
-                    var cellItems = times
+                    var cellItems = studenttimes
                     .Where(t => t.DayOfWeek == day && t.StartTime <= time && t.EndTime > time)
                     .ToList();
 
@@ -104,7 +103,15 @@
                             {
                                 <div style="margin-bottom: 5px;">
                                     <strong>@t.Description</strong><br />
-                                    <span class="text-muted small">@t.Student.Name</span>
+                                    @if (t.Student is not null)
+                                    {
+                                        <span class="text-muted small">@t.Student.Name</span>
+                                    }
+                                    else if (t.StudentClass is not null)
+                                    {
+                                        <span class="text-muted small">@t.StudentClass.Name</span>
+                                    }
+
                                 </div>
                             }
                         }
@@ -121,21 +128,34 @@
 
 
 @code {
-    @code {
-        private int GetRowSpan(StudentTime time)
-        {
-            return (int)(time.EndTime.TotalMinutes - time.StartTime.TotalMinutes) / 30; // 30분 단위
-        }
+
+    private int GetRowSpan(StudentTime time)
+    {
+        return (int)(time.EndTime.TotalMinutes - time.StartTime.TotalMinutes) / 30; // 30분 단위
     }
 
-    List<StudentTime> times = new();
+    List<StudentTime> studenttimes = new();
+    List<StudentTime> classtimes = new();
     List<StudentClass> classes = new();
     //public List<StudentTime> unableDateTime { get; set; } = new();
     //List<StudentClass> unableDateTime = new();
     protected override async Task OnInitializedAsync()
     {
-        times = await studentService.GetAllTimesAsync();
+        studenttimes = await studentService.GetOnlyTimesWithStudentAsync();
+        classtimes = await studentService.GetOnlyTimesWithClassAsync();
         classes = await studentService.GetAllClassAsync();
+        foreach(var hello in studenttimes)
+        {
+            Console.WriteLine($"{hello.Description} studenttime");
+        }
+        foreach (var hello in classtimes)
+        {
+            Console.WriteLine($"{hello.Description} classtime");
+        }
+        foreach (var hello in classes)
+        {
+            Console.WriteLine($"{hello.Description} classes");
+        }
     }
 
 

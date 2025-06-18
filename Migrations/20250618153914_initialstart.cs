@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace StockProject.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialStarts : Migration
+    public partial class initialstart : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -304,7 +304,8 @@ namespace StockProject.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    StudentId = table.Column<int>(type: "INTEGER", nullable: false),
+                    StudentId = table.Column<int>(type: "INTEGER", nullable: true),
+                    ClassId = table.Column<int>(type: "INTEGER", nullable: true),
                     Description = table.Column<string>(type: "TEXT", nullable: false),
                     DayOfWeek = table.Column<int>(type: "INTEGER", nullable: false),
                     StartTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
@@ -315,11 +316,15 @@ namespace StockProject.Migrations
                 {
                     table.PrimaryKey("PK_StudentTimes", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_StudentTimes_StudentClasses_ClassId",
+                        column: x => x.ClassId,
+                        principalTable: "StudentClasses",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_StudentTimes_Students_StudentId",
                         column: x => x.StudentId,
                         principalTable: "Students",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -378,6 +383,11 @@ namespace StockProject.Migrations
                 name: "IX_Students_StudentClass",
                 table: "Students",
                 column: "StudentClass");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StudentTimes_ClassId",
+                table: "StudentTimes",
+                column: "ClassId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentTimes_StudentId",

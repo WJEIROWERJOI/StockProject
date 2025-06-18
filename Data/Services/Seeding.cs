@@ -17,6 +17,18 @@ public static class Seeding
             };
             context.StudentClasses.AddRange(classes);
         }
+        if (!context.Students.Any())
+        {
+            List<Student> students = new()
+            {
+                new Student{Name = "홍길동",Description="길동사 장남",StudentGrade=StudentGrade.Others },
+                new Student{Name = "길똥이",Description="길똥이에용",StudentGrade=StudentGrade.High1 }
+            };
+        }
+        //if (!context.StudentTimes.Any())
+        //{
+
+        //}
 
 
         if (!context.Boards.Any())
