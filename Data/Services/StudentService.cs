@@ -80,19 +80,22 @@ namespace StockProject.Data.Services
             {
                 return false;
             }
-            if (!klass.Students.Contains(student))
+            if (klass.Students.Contains(student))
             {
                 return false;
             }
 
             try
             {
+
                 klass.Students.Add(student);
+                student.Class = klass;
                 await _studentRepository.SaveAsync();
                 return true;
             }
             catch (Exception ex)
             {
+
                 Console.WriteLine(ex);
                 return false;
             }
@@ -152,29 +155,23 @@ namespace StockProject.Data.Services
             }
 
         }
-        public async Task<bool> RemoveStudentFromClass(int classId, int studentId)
+        public async Task<Result<bool>> RemoveStudentFromClass(int classId, int studentId)
         {
             var klass = await _studentRepository.GetClassAsync(classId);
             var student = await _studentRepository.GetStudentAsync(studentId);
             if (klass is null || student is null)
             {
-                return false;
+                return Result<bool>.Failure("No object");
             }
-            if (student.Class is not null)
-            {
-                return false;
-            }
-
             try
             {
                 klass.Students.Remove(student);
                 await _studentRepository.SaveAsync();
-                return true;
+                return Result<bool>.Success(true,"Success");
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
-                return false;
+                return Result<bool>.Failure(ex.Message);
             }
         }
     }

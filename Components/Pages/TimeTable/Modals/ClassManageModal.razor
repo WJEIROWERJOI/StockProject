@@ -1,15 +1,16 @@
 ﻿@inject StudentService studentService
-
-<EditForm Model="input" OnValidSubmit="Close">
-    <select class="form-control">
-        @foreach (var student in students)
-        {
-            <option value="@student.Id">@student.Name</option>
-        }
-    </select>
-    <button type="submit" class="btn btn-primary mt-3">OK</button>
-    <button @onclick="Cancel" class="btn btn-secondary mt-3">Cancel</button>
-</EditForm>
+<div class="form-group">
+    <EditForm Model="input" OnValidSubmit="Close">
+        <select class="form-control" @bind=@input>
+            @foreach (var student in students)
+            {
+                <option value=@student.Id>@($"{student.Name}({student.Id})")</option>
+            }
+        </select>
+        <button type="submit" class="btn btn-primary mt-3">OK</button>
+        <button type="button" @onclick="Cancel" class="btn btn-secondary mt-3">Cancel</button>
+    </EditForm>
+</div>
 
 @code {
     [CascadingParameter]
@@ -26,16 +27,18 @@
 
     async Task Close()
     {
-        await studentService.AddStudentToClass(ClassId, input);        
-        await BlazoredModal.CloseAsync(ModalResult.Ok(true));
+        var result = await studentService.AddStudentToClass(ClassId, input);
+        if (result)
+        {
+            await BlazoredModal.CloseAsync(ModalResult.Ok(true));
+        }
+        else
+        {
+            await Cancel();
+        }
+
     }
 
-
-
-
     async Task Cancel() => await BlazoredModal.CancelAsync();
-
-
-
 
 }

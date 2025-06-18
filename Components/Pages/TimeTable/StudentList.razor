@@ -91,7 +91,8 @@
                     @foreach (var t in student.unableDateTime)
                     {
                         @* <span>@t.Student.Description,@t.StudentId,@t.Student.Id</span> *@
-                        <div class="d-flex justify-content-md-between">
+                        <div>
+                        @* <div class="d-flex justify-content-md-between"> *@
                             <span>@t.Description, @t.DayOfWeek.ToString().Substring(0,3), @($"{t.StartTime:hh\\:mm} - {t.EndTime:hh\\:mm}")</span>
                             <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteTime(t.Id)">X</button>
                             <br />

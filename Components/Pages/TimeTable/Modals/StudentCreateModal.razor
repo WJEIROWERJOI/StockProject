@@ -37,7 +37,7 @@
 
 
         <button type="submit" class="btn btn-primary mt-3">OK</button>
-        <button @onclick="Cancel" class="btn btn-secondary mt-3">Cancel</button>
+        <button type="button" @onclick="Cancel" class="btn btn-secondary mt-3">Cancel</button>
     </EditForm>
 
 </div>
@@ -68,6 +68,7 @@
         await studentService.CreateStudent(input.Name, input.Description, input.StudentGrade, input.ClassId);
         await BlazoredModal.CloseAsync(ModalResult.Ok(true));
     }
+
     async Task Cancel() => await BlazoredModal.CancelAsync();
 }
 
