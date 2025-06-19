@@ -50,7 +50,7 @@
 
     private void StartSearch()
     {
-        nav.NavigateTo($"/TimeTable/Time?searchTopic={searchTopic}&searchContent={searchContent}", forceLoad: true);
+        nav.NavigateTo($"/TimeTable/Time?searchTopic=\"{searchTopic}\"&searchContent={searchContent}");
     }
 
     private void CancelSearch()
@@ -76,8 +76,8 @@
 }
 
 
-<table class="table table-borderless align-middle text-center">
-    <thead class="table-lighter">
+<table class="table table-bordered align-content-center text-md-center">
+    <thead>
         <tr>
             <th>시간＼요일</th>
             @foreach (var day in Enum.GetValues<DayOfWeek>())

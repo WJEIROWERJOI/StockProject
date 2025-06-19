@@ -11,6 +11,7 @@ namespace StockProject.Data.Entities
         public required string Name { get; set; }
         public string Description { get; set; } = string.Empty;
         public StudentGrade StudentGrade { get; set; } = StudentGrade.Others;
+        [DeleteBehavior(DeleteBehavior.Cascade)]
         public List<StudentTime> unableDateTime { get; set; } = new();
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime LastUpdatedAt { get; set; } = DateTime.UtcNow;
