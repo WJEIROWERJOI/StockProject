@@ -16,7 +16,7 @@ namespace StockProject.Data.Entities
         public DateTime LastUpdatedAt { get; set; } = DateTime.UtcNow;
 
         [ForeignKey("StudentClass")]
-        [DeleteBehavior(DeleteBehavior.SetNull)]
+        public int? ClassId { get; set; }
         public StudentClass? Class { get; set; }
     }
 }

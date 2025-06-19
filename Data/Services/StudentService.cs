@@ -13,13 +13,68 @@ namespace StockProject.Data.Services
             _studentRepository = studentRepository;
         }
 
+        //object 들
+        public async Task<Result<Student>> GetStudentAsync(int id)
+        {
+            try
+            {
+                var student = await _studentRepository.GetStudentAsync(id);
+                if (student == null)
+                {
+                    return Result<Student>.Fail($"No object by {id}");
+                }
+                return Result<Student>.Ok(student);
+            }
+            catch (Exception ex)
+            {
+                return Result<Student>.Fail($"{ex.Message}");
+            }
+        }
+
+
+
+        //List 들
+
+
         public async Task<List<Student>> GetAllStudentsAsync()
         {
             return await _studentRepository.GetAllStudentAsync();
         }
+        public async Task<Result<List<Student>>> GetAllStudentsAsync1()
+        {
+            try
+            {
+                var students = await _studentRepository.GetAllStudentAsync();
+                if (students == null || students.Count == 0)
+                {
+                    return Result<List<Student>>.Fail("등록된 학생이 없습니다.");
+                }
+                return Result<List<Student>>.Ok(students);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<Student>>.Fail(ex.Message);
+            }
+        }
         public async Task<List<StudentClass>> GetAllClassAsync()
         {
             return await _studentRepository.GetAllClassAsync();
+        }
+        public async Task<Result<List<StudentClass>>> GetAllClassAsync1()
+        {
+            try
+            {
+                var classes = await _studentRepository.GetAllClassAsync();
+                if (classes == null || classes.Count == 0)
+                {
+                    return Result<List<StudentClass>>.Fail("No or Zero class");
+                }
+                return Result<List<StudentClass>>.Ok(classes);
+            }
+            catch (Exception ex)
+            {
+                return Result<List<StudentClass>>.Fail(ex.Message);
+            }
         }
         public async Task<List<StudentTime>> GetAllTimesAsync()
         {
@@ -34,8 +89,6 @@ namespace StockProject.Data.Services
             _ = int.TryParse(id, out int classId);
             return await _studentRepository.GetTimesByStudentClassAsync(classId);
         }
-
-        //times = await studentService.GetOnlyTimesClassAsync();
         public async Task<List<StudentTime>> GetOnlyTimesWithClassAsync()
         {
             return await _studentRepository.GetOnlyTimesWithClassAsync();
@@ -45,23 +98,46 @@ namespace StockProject.Data.Services
             return await _studentRepository.GetOnlyTimesWithStudentAsync();
         }
 
-
+        //update
+        public async Task UpdateAsync()
+        {
+            await _studentRepository.SaveAsync();
+        }
 
 
         //CreateModal 에서 씀
-        public async Task CreateStudent(string _name, string _description, StudentGrade _StudentGrade, int _ClassId)
+        public async Task CreateStudent(string _name, string _description, StudentGrade _StudentGrade, int? _ClassId)
         {
-            StudentClass? _Class = await _studentRepository.GetClassAsync(_ClassId);
-            Student student = new Student() { Name = _name, Description = _description, StudentGrade = _StudentGrade, Class = _Class };
+            StudentClass? _Class = null;
+            if (_ClassId != null)
+            {
+                _Class = await _studentRepository.GetClassAsync(_ClassId.Value);
+                //if (_Class == null)
+                //{
+                //    // ❗ 존재하지 않는 ClassId 입력된 경우, 예외 또는 로그 처리
+                //    Console.WriteLine($"❌ 잘못된 ClassId: {_ClassId.Value}");
+                //    throw new InvalidOperationException($"ClassId {_ClassId.Value}는 존재하지 않습니다.");
+                //}
+            }
+
+            Student student = new Student()
+            {
+                Name = _name,
+                Description = _description,
+                StudentGrade = _StudentGrade,
+                ClassId = _ClassId,
+                Class = _Class
+            };
             try
             {
-                await _studentRepository.CreateStudent(student);
+                await _studentRepository.CreateAsync(student);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
             }
         }
+
         public async Task CreateClass(string _name, string _description)
         {
             if (await _studentRepository.NameExistAsync(_name))
@@ -73,7 +149,7 @@ namespace StockProject.Data.Services
 
             try
             {
-                await _studentRepository.CreateClass(klass);
+                await _studentRepository.CreateAsync(klass);
             }
             catch (Exception ex)
             {
@@ -97,7 +173,7 @@ namespace StockProject.Data.Services
                 Description = _Description
             };
             //student.unableDateTime.Add(studentTime);
-            await _studentRepository.CreateTime(studentTime);
+            await _studentRepository.CreateAsync(studentTime);
         }
         public async Task AddTimeToClass(int _ClassId, DayOfWeek _DayOfWeek, TimeSpan _StartTime, TimeSpan _EndTime, string _Description)
         {
@@ -115,7 +191,7 @@ namespace StockProject.Data.Services
                 Description = _Description
             };
             //student.unableDateTime.Add(studentTime);
-            await _studentRepository.CreateTime(studentTime);
+            await _studentRepository.CreateAsync(studentTime);
         }
         public async Task<bool> AddStudentToClass(int classId, int studentId)
         {
@@ -154,7 +230,7 @@ namespace StockProject.Data.Services
 
             try
             {
-                await _studentRepository.DeleteTimeAsync(studentTime);
+                await _studentRepository.DeleteAsync(studentTime);
                 return true;
             }
             catch (Exception ex)
@@ -172,7 +248,7 @@ namespace StockProject.Data.Services
 
             try
             {
-                await _studentRepository.DeleteStudentAsync(student);
+                await _studentRepository.DeleteAsync(student);
                 return true;
             }
             catch (Exception ex)
@@ -190,7 +266,7 @@ namespace StockProject.Data.Services
 
             try
             {
-                await _studentRepository.DeleteClassAsync(klass);
+                await _studentRepository.DeleteAsync(klass);
                 return true;
             }
             catch (Exception ex)
@@ -206,17 +282,17 @@ namespace StockProject.Data.Services
             var student = await _studentRepository.GetStudentAsync(studentId);
             if (klass is null || student is null)
             {
-                return Result<bool>.Failure("No object");
+                return Result<bool>.Fail("No object");
             }
             try
             {
                 klass.Students.Remove(student);
                 await _studentRepository.SaveAsync();
-                return Result<bool>.Success(true,"Success");
+                return Result<bool>.Ok(true, "Success");
             }
             catch (Exception ex)
             {
-                return Result<bool>.Failure(ex.Message);
+                return Result<bool>.Fail(ex.Message);
             }
         }
     }

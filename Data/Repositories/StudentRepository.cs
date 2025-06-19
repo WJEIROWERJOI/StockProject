@@ -12,84 +12,75 @@ namespace StockProject.Data.Repositories
             _context = context;
         }
 
-
         //c
-        public async Task CreateStudent(Student student)
+        public async Task CreateAsync<T>(T entity) where T : class
         {
-            await _context.Students.AddAsync(student);
+            await _context.AddAsync(entity);
             await _context.SaveChangesAsync();
         }
-        public async Task CreateTime(StudentTime time)
-        {
-            await _context.StudentTimes.AddAsync(time);
-            await _context.SaveChangesAsync();
-        }
-        public async Task CreateClass(StudentClass clas)
-        {
-            await _context.StudentClasses.AddAsync(clas);
-            await _context.SaveChangesAsync();
-        }
+
+        //r
         public async Task<bool> NameExistAsync(string str)
         {
-            return await _context.StudentClasses.AnyAsync(p => p.Name.ToLower() == str.ToLower());
+            return await _context.StudentClasses
+                .AnyAsync(p => p.Name.ToLower() == str.ToLower());
         }
-        //r
         public async Task<List<Student>> GetAllStudentAsync()
         {
             return await _context.Students
-                .Include(y => y.Class)
+                .Include(x => x.Class)
                 .Include(x => x.unableDateTime)
                 .ToListAsync();
         }
         public async Task<List<StudentClass>> GetAllClassAsync()
         {
             return await _context.StudentClasses
-                .Include(y => y.ClassTimes)
+                .Include(x => x.ClassTimes)
                 .Include(x => x.Students)
                 .ToListAsync();
         }
         public async Task<List<StudentTime>> GetAllTimesAsync()
         {
             return await _context.StudentTimes
-                .Include(y => y.StudentClass)
-            .Include(x => x.Student)
-            .ToListAsync();
+                .Include(x => x.StudentClass)
+                .Include(x => x.Student)
+                .ToListAsync();
         }
         public async Task<List<StudentTime>> GetOnlyTimesWithClassAsync()
         {
 
             return await _context.StudentTimes
-    .Include(x => x.StudentClass)
-            .Include(x => x.Student)
-.Where(x => x.StudentId == null && x.ClassId != null)
+                .Include(x => x.StudentClass)
+                .Include(x => x.Student)
+                .Where(x => x.StudentId == null && x.ClassId != null)
                 .ToListAsync();
         }
         public async Task<List<StudentTime>> GetOnlyTimesWithStudentAsync()
         {
             return await _context.StudentTimes
-    .Include(x => x.StudentClass)
-            .Include(x => x.Student)
-.Where(x => x.StudentId != null && x.ClassId == null)
+                .Include(x => x.StudentClass)
+                .Include(x => x.Student)
+                .Where(x => x.StudentId != null && x.ClassId == null)
                 .ToListAsync();
         }
 
         public async Task<List<StudentTime>> GetTimesByStudentNameAsync(string str)
         {
             return await _context.StudentTimes
-            .Where(x => x.Student.Name.ToLower() == str.ToLower())
-            .ToListAsync();
+                .Where(x => x.Student != null && x.Student.Name.ToLower() == str.ToLower())
+                .ToListAsync();
         }
         public async Task<List<StudentTime>> GetTimesByStudentClassAsync(int id)
         {
             return await _context.StudentTimes
-            .Where(x => x.Student.Class.Id == id)
-            .ToListAsync();
+                .Where(x => x.ClassId != null && x.ClassId == id)
+                .ToListAsync();
         }
 
         public async Task<Student?> GetStudentAsync(int id)
         {
             return await _context.Students
-                .Include(y => y.Class)
+                .Include(x => x.Class)
                 .Include(x => x.unableDateTime)
                 .FirstOrDefaultAsync(s => s.Id == id);
         }
@@ -105,37 +96,19 @@ namespace StockProject.Data.Repositories
                 .Include(s => s.Students)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
-        //public async Task<List<Student>> GetSearchContentAsync(string searchTopic, string searchContent)
-        //{
-        //    return await _context.Students
-        //        .Include(y => y.StudentClass)
-        //        .Include(x => x.unableDateTime)
-        //        .Where(p => EF.Property<string>(p, searchTopic) == searchContent)
-        //        .ToListAsync();
-        //}
+
         //u
         public async Task SaveAsync()
         {
             await _context.SaveChangesAsync();
         }
+
         //d
-        public async Task DeleteStudentAsync(Student student)
+        public async Task DeleteAsync<T>(T entity) where T : class
         {
-            _context.Students.Remove(student);
+            _context.Remove(entity);
             await _context.SaveChangesAsync();
         }
-
-        public async Task DeleteTimeAsync(StudentTime studentTime)
-        {
-            _context.StudentTimes.Remove(studentTime);
-            await _context.SaveChangesAsync();
-        }
-        public async Task DeleteClassAsync(StudentClass studentClass)
-        {
-            _context.StudentClasses.Remove(studentClass);
-            await _context.SaveChangesAsync();
-        }
-
 
     }
 }

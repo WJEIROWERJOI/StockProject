@@ -1,0 +1,168 @@
+﻿@inject StudentService studentService
+@inject IToastService toastService
+@inject IModalService modalService
+
+
+
+@code{
+    async Task DeleteStudent(int id)
+    {
+        if (await studentService.DeleteStudentAsync(id))
+        {
+            toastService.ShowSuccess("학생 삭제 성공!");
+            StateHasChanged();
+        }
+        else
+        {
+            toastService.ShowError("학생 삭제 실패!");
+        }
+    }
+
+    async Task ManageStudentModal(int id)
+    {
+        var parameter = new ModalParameters();
+        parameter.Add(nameof(StudentManageModal.StudentId), id);
+
+        var modal = modalService.Show<StudentManageModal>("Manage Student", parameter);
+        var result = await modal.Result;
+        if (!result.Cancelled)
+        {
+            if (result.Data is bool success)
+            {
+                toastService.ShowSuccess("시간 관리!");
+            }
+        }
+    }
+    async Task DeleteTime(int id)
+    {
+        if (await studentService.DeleteTimeAsync(id))
+        {
+            toastService.ShowSuccess("시간 삭제 성공!");
+        }
+        else
+        {
+            toastService.ShowError("시간 삭제 실패!");
+        }
+    }
+}
+
+
+@if (student is null)
+{
+    <p>cannot find student</p>
+}
+else
+{
+    <EditForm Model="student" OnValidSubmit="Close">
+
+        <div class="form-floating mb-3">
+            <input value=@student.Id class="form-control" disabled/>
+            <label>ID</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <InputText @bind-Value=@student.Name class="form-control" />
+            <label>Name</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <InputText @bind-Value=@student.Description class="form-control" />
+            <label>Description</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <InputSelect @bind-Value="student.StudentGrade" class="form-select">
+                @foreach (var grade in Enum.GetValues(typeof(StudentGrade)))
+                {
+                    <option value="@grade">@grade</option>
+                }
+            </InputSelect>
+            <label>StudentGrade</label>
+        </div>
+        <div class="form-floating mb-3">
+            <InputSelect @bind-Value=@student.ClassId class="form-select">
+                <option value="">미정</option>
+                @foreach(var klass in classes)
+                {
+                    <option value=@klass.Id>@($"{klass.Name}({klass.Id})")</option>
+                }
+                </InputSelect>
+            <label>StudentClass</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input class="form-control" value="@student.CreatedAt.AddHours(9).ToString("yyyy-MM-dd HH:mm")" disabled />
+            <label>CreatedAt</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input class="form-control" value="@student.LastUpdatedAt.AddHours(9).ToString("yyyy-MM-dd HH:mm")" disabled />
+            <label>LastUpdatedAt</label>
+        </div>
+
+        <hr/>
+        <div class="mb-3">
+            <label class="form-label"><strong>StudentTime</strong></label>
+
+            @if (student.unableDateTime.Any())
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var t in student.unableDateTime)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center p-2">
+                            <span>
+                                <strong>@t.Description</strong> ·
+                                @t.DayOfWeek.ToString().Substring(0, 3) ·
+                                @($"{t.StartTime:hh\\:mm} - {t.EndTime:hh\\:mm}")
+                            </span>
+                            <button type="button" class="btn btn-outline-danger btn-sm" @onclick="() => DeleteTime(t.Id)">X</button>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p class="text-muted small ms-2">등록된 시간이 없습니다.</p>
+            }
+
+            <button type="button" class="btn btn-primary btn-sm" @onclick="() => ManageStudentModal(student.Id)">시간 추가</button>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">OK</button>
+        <button type="button" @onclick="Cancel" class="btn btn-secondary mt-3">Cancel</button>
+        @* <button type="button" class="btn btn-outline-danger mt-3" @onclick="() => DeleteStudent(student.Id)">X</button> *@
+    </EditForm>
+}
+
+@code {
+
+    [CascadingParameter]
+    BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [Parameter]
+    public Student? student { get; set; }
+    List<StudentClass> classes = new();
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await studentService.GetAllClassAsync1();
+        if (result.Success && result.Data is not null)
+        {
+            classes = result.Data;
+        }
+        else
+        {
+            toastService.ShowError(result.Message!);
+        }
+
+    }
+
+    async Task Close()
+    {
+        student!.Class = classes.FirstOrDefault(c => c.Id == student.ClassId);
+        await studentService.UpdateAsync();
+        await BlazoredModal.CloseAsync(ModalResult.Ok(true));
+    }
+
+
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+
+}

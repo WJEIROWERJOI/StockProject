@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace StockProject.Migrations
 {
     /// <inheritdoc />
-    public partial class initialstart : Migration
+    public partial class AddClassIdToStudent : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -260,17 +260,16 @@ namespace StockProject.Migrations
                     StudentGrade = table.Column<int>(type: "INTEGER", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     LastUpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    StudentClass = table.Column<int>(type: "INTEGER", nullable: true)
+                    ClassId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Students", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Students_StudentClasses_StudentClass",
-                        column: x => x.StudentClass,
+                        name: "FK_Students_StudentClasses_ClassId",
+                        column: x => x.ClassId,
                         principalTable: "StudentClasses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -380,9 +379,9 @@ namespace StockProject.Migrations
                 column: "StockEntityId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Students_StudentClass",
+                name: "IX_Students_ClassId",
                 table: "Students",
-                column: "StudentClass");
+                column: "ClassId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentTimes_ClassId",

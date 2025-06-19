@@ -11,8 +11,8 @@ using StockProject.Data;
 namespace StockProject.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250618153914_initialstart")]
-    partial class initialstart
+    [Migration("20250619144116_AddClassIdToStudent")]
+    partial class AddClassIdToStudent
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -304,6 +304,9 @@ namespace StockProject.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("ClassId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
@@ -318,15 +321,12 @@ namespace StockProject.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("StudentClass")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("StudentGrade")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudentClass");
+                    b.HasIndex("ClassId");
 
                     b.ToTable("Students", (string)null);
                 });
@@ -539,8 +539,7 @@ namespace StockProject.Migrations
                 {
                     b.HasOne("StockProject.Data.Entities.StudentClass", "Class")
                         .WithMany("Students")
-                        .HasForeignKey("StudentClass")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("ClassId");
 
                     b.Navigation("Class");
                 });

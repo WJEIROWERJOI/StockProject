@@ -15,22 +15,23 @@
         </div>
 
         <div class="form-floating mb-3">
-            <select class="form-select" @bind="input.StudentGrade">
+            <InputSelect class="form-select" @bind-Value=@input.StudentGrade>
                 @foreach (StudentGrade group in Enum.GetValues(typeof(StudentGrade)))
                 {
                     <option value="@group">@group</option>
                 }
-            </select>
+            </InputSelect>
             <label>학년</label>
         </div>
 
         <div class="form-floating mb-3">
-            <select class="form-select" @bind="input.ClassId">
+            <InputSelect TValue=int? class="form-select" @bind-Value=@input.ClassId>
+                <option value="">미정</option> 
                 @foreach (var cla in studentClasses)
                 {
                     <option value="@cla.Id">@cla.Name</option>
                 }
-            </select>
+            </InputSelect>
             <label>학생 반</label>
         </div>
 
@@ -60,7 +61,7 @@
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public StudentGrade StudentGrade { get; set; }
-        public int ClassId { get; set; }
+        public int? ClassId { get; set; }
     }
 
     async Task Close()

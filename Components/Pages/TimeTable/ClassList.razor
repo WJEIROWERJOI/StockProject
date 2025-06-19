@@ -116,7 +116,7 @@
     async Task RemoveStudentFromClass(int classId,int studentId)
     {
         var result = await studentService.RemoveStudentFromClass(classId, studentId);
-        if (result.IsSuccess)
+        if (result.Success)
         {
             toastService.ShowSuccess(result.Message!);
         }
