@@ -27,7 +27,7 @@ namespace StockProject.Data.Services
             try
             {
                 var student = await _studentRepository.GetStudentAsync(id);
-                if (student == null)
+                if (student is null)
                 {
                     throw new Exception($"No Object by {id}");
                 }
@@ -46,9 +46,9 @@ namespace StockProject.Data.Services
             try
             {
                 var students = await _studentRepository.GetAllStudentAsync();
-                if (students == null || students.Count == 0)
+                if (students is null)
                 {
-                    throw new Exception($"No Object or Zero");
+                    throw new Exception($"object is null");
                 }
                 return Result<List<Student>>.Ok(students);
             }
@@ -63,9 +63,9 @@ namespace StockProject.Data.Services
             try
             {
                 var classes = await _studentRepository.GetAllClassAsync();
-                if (classes == null || classes.Count == 0)
+                if (classes is null)
                 {
-                    throw new Exception($"No Object or Zero");
+                    throw new Exception($"object null");
                 }
                 return Result<List<StudentClass>>.Ok(classes);
             }
@@ -80,9 +80,9 @@ namespace StockProject.Data.Services
             try
             {
                 var times = await _studentRepository.GetAllTimesAsync();
-                if (times == null || times.Count == 0)
+                if (times is null)
                 {
-                    throw new Exception($"No Object or Zero");
+                    throw new Exception($"object null");
                 }
                 return Result<List<StudentTime>>.Ok(times);
             }
@@ -90,6 +90,24 @@ namespace StockProject.Data.Services
             {
                 await _logService.LogErrorAsync(ex.Message);
                 return Result<List<StudentTime>>.Fail(ex.Message);
+            }
+        }
+        public async Task<Result<List<Student>>> SearchStudentsAsync(string searchTopic, string searchContent)
+        {
+            try
+            {
+                var students = await _studentRepository.SearchStudentsAsync(searchTopic, searchContent);
+                //if (!students.Any())이건 널검사가 안됭 (비어있는것만 확인)
+                if (students is null)
+                {
+                    throw new Exception($"object null");
+                }
+                return Result<List<Student>>.Ok(students);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogErrorAsync(ex.Message);
+                return Result<List<Student>>.Fail(ex.Message);
             }
         }
         public async Task<List<StudentTime>> GetTimesByStudentNameAsync(string str)
@@ -315,8 +333,8 @@ namespace StockProject.Data.Services
             try
             {
                 StudentClass? klass = await _studentRepository.GetClassAsync(id);
-            if (klass is null)
-                throw new InvalidOperationException("Student not found");
+                if (klass is null)
+                    throw new InvalidOperationException("Student not found");
 
                 await _studentRepository.DeleteAsync(klass);
                 return Result.Ok();

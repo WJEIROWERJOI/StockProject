@@ -1,6 +1,5 @@
 ﻿@page "/TimeTable/Student"
 
-
 @inject IToastService toastService
 @inject IModalService modalService
 @inject StudentService studentService
@@ -13,32 +12,41 @@
 <button class="btn btn-primary" type="button" @onclick="StudentCreateModal">학생 등록</button>
 <br />
 
-@* <div style="display:flex;justify-content: flex-end;"> *@
 <div stlye="display:flex; justify-content:flex-start;" class="mt-3">
-    <div class="input-group" style="max-width: fit-content;">
-
-
-        <select @bind=@searchTopic class="form-select form-select-sm">
+    <div class="input-group" style="width: max-content;">
+        <InputSelect @bind-Value="@searchTopic" class="form-select form-select-sm">
+            <option value="">-</option>
             <option value="Name">Name</option>
             <option value="StudentGrade">StudentGrade</option>
-        </select>
-
+            <option value="ClassId">StudentClass</option>
+        </InputSelect>
         @if (searchTopic is "StudentGrade")
         {
-            <select @bind="@searchContent" class="form-select form-select-sm">
+            <InputSelect @bind-Value="@searchContent" class="form-select form-select-sm">
+                <option value="">-</option>
                 @foreach (var group in Enum.GetValues(typeof(StudentGrade)))
                 {
                     <option value="@group">@group</option>
                 }
-            </select>
+            </InputSelect>
+        }
+        else if (searchTopic is "ClassId")
+        {
+            <InputSelect @bind-Value="@searchContent" class="form-select form-select-sm">
+                <option value="">-</option>
+                @foreach (var item in classes)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
+            </InputSelect>
         }
         else
         {
-            <InputText @bind-Value="@searchContent" class="form-control" />
+            <InputText @bind-Value="@searchContent" class="form-control form-control-sm" />
         }
 
-        <button type="button" @onclick="StartSearch" class="btn btn-secondary">검색</button>
-        <button @onclick="CancelSearch" class="btn btn-secondary border-start-1">취소</button>
+        <button type="submit" @onclick="StartSearch" class="btn btn-secondary">검색</button>
+        <button type="button" @onclick="CancelSearch" class="btn btn-secondary border-start-1">취소</button>
 
     </div>
 </div>
@@ -48,18 +56,54 @@
     public string? searchTopic { get; set; }
     [SupplyParameterFromQuery]
     public string? searchContent { get; set; }
+    async Task InitialDatabring()
+    {
+        Result<List<Student>> result;
+        if (string.IsNullOrWhiteSpace(searchTopic) || string.IsNullOrWhiteSpace(searchContent))
+        {
+            result = await studentService.GetAllStudentsAsync();
+        }
+        else
+        {
+            result = await studentService.SearchStudentsAsync(searchTopic, searchContent);
+        }
 
+        if (result.Success && result.Data is not null)
+        {
+            students = result.Data.OrderByDescending(s => s.CreatedAt).ToList();
+        }
+        else
+        {
+            toastService.ShowError(result.Message!);
+        }
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        await InitialDatabring();
+    }
+    List<Student> students = new();
+    List<StudentClass> classes = new();
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await studentService.GetAllClassAsync();
+        if (result.Success && result.Data is not null)
+        {
+            classes = result.Data;
+        }
+        else
+        {
+            toastService.ShowError(result.Message!);
+        }
+    }
 
     private void StartSearch()
     {
-        ///TimeTable/Student
         nav.NavigateTo($"/TimeTable/Student?searchTopic={searchTopic}&searchContent={searchContent}", forceLoad: true);
     }
 
     private void CancelSearch()
     {
         searchContent = "";
-        // searchTopic = "";
         nav.NavigateTo($"/TimeTable/Student?");
     }
 }
@@ -93,7 +137,8 @@ else
                         <td>@student.Class?.Name</td>
                         <td>@student.Description</td>
                         <td>
-                            <button class="btn btn-outline-danger btn-sm" @onclick:stopPropagation @onclick="() => DeleteStudent(student.Id)">삭제</button>
+                            <button class="btn btn-outline-danger btn-sm" @onclick:stopPropagation
+                                @onclick="() => DeleteStudent(student.Id)">삭제</button>
                         </td>
                     </tr>
                 }
@@ -104,19 +149,7 @@ else
 }
 
 @code {
-    List<Student> students = new();
-    protected override async Task OnInitializedAsync()
-    {
-        var result = await studentService.GetAllStudentsAsync();
-        if (result.Success && result.Data is not null)
-        {
-            students = result.Data;
-        }
-        else
-        {
-            toastService.ShowError(result.Message!);
-        }
-    }
+
     async Task StudentCreateModal()
     {
         var modal = modalService.Show<StudentCreateModal>("Create Student");
@@ -125,8 +158,7 @@ else
         {
             if (result.Data is bool success)
             {
-                // students = await studentService.GetAllStudentsAsync();
-                // 다시 받아 오는거 필요
+                await InitialDatabring();                 
                 toastService.ShowSuccess("학생 생성!");
             }
 
@@ -146,7 +178,6 @@ else
                 toastService.ShowSuccess("학생 관리!");
             }
         }
-
     }
     async Task DeleteStudent(int id)
     {
@@ -156,8 +187,9 @@ else
         {
             if (result.Data is bool success)
             {
-                if((await studentService.DeleteStudentAsync(id)).Success)
+                if ((await studentService.DeleteStudentAsync(id)).Success)
                 {
+                    await InitialDatabring();
                     toastService.ShowSuccess("삭제 성공!");
                 }
                 else
@@ -165,12 +197,16 @@ else
                     toastService.ShowError("삭제 실패!");
                 }
             }
+            else
+            {
+                toastService.ShowInfo("삭제 취소!");
+            }
         }
         else
         {
             toastService.ShowInfo("삭제 취소!");
         }
+
     }
 
 }
-

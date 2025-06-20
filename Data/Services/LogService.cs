@@ -29,7 +29,12 @@
             var logEntry = $"\"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\",\"Error\",\"{safeMessage}\"{Environment.NewLine}";
             await File.AppendAllTextAsync(_logFilePath, logEntry);
         }
-
+        public async Task LogWarningAsync(string message)
+        {
+            var safeMessage = message.Replace("\"", "\"\""); // " → ""
+            var logEntry = $"\"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\",\"Warning\",\"{safeMessage}\"{Environment.NewLine}";
+            await File.AppendAllTextAsync(_logFilePath, logEntry);
+        }
 
 
     }
