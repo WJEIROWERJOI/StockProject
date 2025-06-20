@@ -25,6 +25,8 @@ namespace StockProject.Data.Repositories
             return await _context.StudentClasses
                 .AnyAsync(p => p.Name.ToLower() == str.ToLower());
         }
+
+        // 다 가져오기
         public async Task<List<Student>> GetAllStudentAsync()
         {
             return await _context.Students
@@ -46,6 +48,7 @@ namespace StockProject.Data.Repositories
                 .Include(x => x.Student)
                 .ToListAsync();
         }
+        // 조건으로 가져오기
         public async Task<List<StudentTime>> GetOnlyTimesWithClassAsync()
         {
 
@@ -77,6 +80,7 @@ namespace StockProject.Data.Repositories
                 .ToListAsync();
         }
 
+        //하나 가져오기
         public async Task<Student?> GetStudentAsync(int id)
         {
             return await _context.Students
@@ -87,13 +91,15 @@ namespace StockProject.Data.Repositories
         public async Task<StudentTime?> GetTimeAsync(int id)
         {
             return await _context.StudentTimes
-                .Include(s => s.Student)
+                .Include(x=>x.StudentClass)
+                .Include(x => x.Student)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
         public async Task<StudentClass?> GetClassAsync(int id)
         {
             return await _context.StudentClasses
-                .Include(s => s.Students)
+                .Include(x => x.ClassTimes)
+                .Include(x => x.Students)
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 

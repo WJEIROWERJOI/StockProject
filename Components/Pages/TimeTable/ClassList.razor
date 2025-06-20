@@ -98,12 +98,21 @@
 
     protected override async Task OnInitializedAsync()
     {
-        classes = await studentService.GetAllClassAsync();
+        var result = await studentService.GetAllClassAsync();
+        if (result.Success && result.Data is not null)
+        {
+            classes = result.Data;
+        }
+        else
+        {
+            toastService.ShowError(result.Message!);
+        }
     }
 
     async Task DeleteClass(int id)
     {
-        if (await studentService.DeleteClassAsync(id))
+        var result = await studentService.DeleteClassAsync(id);
+        if (result.Success)
         {
             toastService.ShowSuccess("클래스 삭제!");
             StateHasChanged();

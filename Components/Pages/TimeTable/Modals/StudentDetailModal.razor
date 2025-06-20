@@ -2,51 +2,6 @@
 @inject IToastService toastService
 @inject IModalService modalService
 
-
-
-@code{
-    async Task DeleteStudent(int id)
-    {
-        if (await studentService.DeleteStudentAsync(id))
-        {
-            toastService.ShowSuccess("학생 삭제 성공!");
-            StateHasChanged();
-        }
-        else
-        {
-            toastService.ShowError("학생 삭제 실패!");
-        }
-    }
-
-    async Task ManageStudentModal(int id)
-    {
-        var parameter = new ModalParameters();
-        parameter.Add(nameof(StudentManageModal.StudentId), id);
-
-        var modal = modalService.Show<StudentManageModal>("Manage Student", parameter);
-        var result = await modal.Result;
-        if (!result.Cancelled)
-        {
-            if (result.Data is bool success)
-            {
-                toastService.ShowSuccess("시간 관리!");
-            }
-        }
-    }
-    async Task DeleteTime(int id)
-    {
-        if (await studentService.DeleteTimeAsync(id))
-        {
-            toastService.ShowSuccess("시간 삭제 성공!");
-        }
-        else
-        {
-            toastService.ShowError("시간 삭제 실패!");
-        }
-    }
-}
-
-
 @if (student is null)
 {
     <p>cannot find student</p>
@@ -56,7 +11,7 @@ else
     <EditForm Model="student" OnValidSubmit="Close">
 
         <div class="form-floating mb-3">
-            <input value=@student.Id class="form-control" disabled/>
+            <input value=@student.Id class="form-control" disabled />
             <label>ID</label>
         </div>
 
@@ -82,11 +37,11 @@ else
         <div class="form-floating mb-3">
             <InputSelect @bind-Value=@student.ClassId class="form-select">
                 <option value="">미정</option>
-                @foreach(var klass in classes)
+                @foreach (var klass in classes)
                 {
                     <option value=@klass.Id>@($"{klass.Name}({klass.Id})")</option>
                 }
-                </InputSelect>
+            </InputSelect>
             <label>StudentClass</label>
         </div>
 
@@ -100,7 +55,7 @@ else
             <label>LastUpdatedAt</label>
         </div>
 
-        <hr/>
+        <hr />
         <div class="mb-3">
             <label class="form-label"><strong>StudentTime</strong></label>
 
@@ -130,7 +85,7 @@ else
 
         <button type="submit" class="btn btn-primary mt-3">OK</button>
         <button type="button" @onclick="Cancel" class="btn btn-secondary mt-3">Cancel</button>
-        @* <button type="button" class="btn btn-outline-danger mt-3" @onclick="() => DeleteStudent(student.Id)">X</button> *@
+        <button type="button" class="btn btn-outline-danger mt-3" @onclick="() => DeleteStudent(student.Id)">X</button>
     </EditForm>
 }
 
@@ -138,12 +93,15 @@ else
 
     [CascadingParameter]
     BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
     [Parameter]
     public Student? student { get; set; }
+
     List<StudentClass> classes = new();
+
     protected override async Task OnInitializedAsync()
     {
-        var result = await studentService.GetAllClassAsync1();
+        var result = await studentService.GetAllClassAsync();
         if (result.Success && result.Data is not null)
         {
             classes = result.Data;
@@ -164,5 +122,56 @@ else
 
 
     async Task Cancel() => await BlazoredModal.CancelAsync();
+
+
+    async Task DeleteStudent(int id)
+    {
+        var modal = modalService.Show<ConfirmModal>("Delete?!");
+        var result = await modal.Result;
+        if (!result.Cancelled)
+        {
+            if ((await studentService.DeleteStudentAsync(id)).Success)
+            {
+                toastService.ShowSuccess("학생 삭제 성공!");
+
+            }
+            else
+            {
+                toastService.ShowError("학생 삭제 실패!");
+            }
+            await Cancel();
+        }
+
+    }
+
+    async Task ManageStudentModal(int id)
+    {
+        var parameter = new ModalParameters();
+        parameter.Add(nameof(StudentManageModal.StudentId), id);
+
+        var modal = modalService.Show<StudentManageModal>("Manage Student", parameter);
+        var result = await modal.Result;
+        if (!result.Cancelled)
+        {
+            if (result.Data is bool success)
+            {
+                toastService.ShowSuccess("시간 관리!");
+            }
+        }
+    }
+
+    async Task DeleteTime(int id)
+    {
+        var result = await studentService.DeleteTimeAsync(id);
+        if (result.Success)
+        {
+            toastService.ShowSuccess("시간 삭제 성공!");
+        }
+        else
+        {
+            toastService.ShowError("시간 삭제 실패!");
+        }
+    }
+
 
 }

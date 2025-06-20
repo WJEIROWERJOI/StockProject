@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace StockProject.Migrations
 {
     /// <inheritdoc />
-    public partial class AddClassIdToStudent : Migration
+    public partial class InitialStarts : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -318,12 +318,14 @@ namespace StockProject.Migrations
                         name: "FK_StudentTimes_StudentClasses_ClassId",
                         column: x => x.ClassId,
                         principalTable: "StudentClasses",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_StudentTimes_Students_StudentId",
                         column: x => x.StudentId,
                         principalTable: "Students",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

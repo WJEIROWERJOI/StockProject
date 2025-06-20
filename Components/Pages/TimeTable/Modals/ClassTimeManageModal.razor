@@ -1,4 +1,5 @@
 ﻿@inject StudentService studentService
+@inject IToastService toastService
 <div class="form-group">
     <EditForm Model="input" OnValidSubmit="Close">
 
@@ -62,7 +63,15 @@
     List<Student> students = new();
     protected override async Task OnInitializedAsync()
     {
-        students = await studentService.GetAllStudentsAsync();
+        var result = await studentService.GetAllStudentsAsync();
+        if (result.Success && result.Data is not null)
+        {
+            students = result.Data;
+        }
+        else
+        {
+            toastService.ShowError(result.Message!);
+        }
     }
 
     async Task Close()

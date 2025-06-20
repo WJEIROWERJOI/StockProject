@@ -10,12 +10,6 @@
     }
 </style>
 
-@* <div class="form-check form-switch">
-    <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
-    <label class="form-check-label" for="flexSwitchCheckDefault"></label>
-</div> *@
-
-@* 검색창 *@
 <div style="display:flex;">
     <div class="input-group" style="max-width: fit-content;">
 
@@ -50,9 +44,8 @@
 
     private void StartSearch()
     {
-        nav.NavigateTo($"/TimeTable/Time?searchTopic=\"{searchTopic}\"&searchContent={searchContent}");
+        nav.NavigateTo($"/TimeTable/Time?searchTopic={searchTopic}&searchContent={searchContent}");
     }
-
     private void CancelSearch()
     {
         nav.NavigateTo("/TimeTable/Time?");
@@ -150,10 +143,18 @@
     //List<StudentClass> unableDateTime = new();
     protected override async Task OnInitializedAsync()
     {
-        studenttimes = await studentService.GetOnlyTimesWithStudentAsync();
+        // studenttimes = await studentService.GetOnlyTimesWithStudentAsync();
         classtimes = await studentService.GetOnlyTimesWithClassAsync();
         // showtimes = studenttimes.Concat(classtimes).ToList();
-        classes = await studentService.GetAllClassAsync();
+        var result = await studentService.GetAllClassAsync();
+        if (result.Success && result.Data is not null)
+        {
+            classes = result.Data;
+        }
+        else
+        {
+            // toastService.ShowError(result.Message!);
+        }
     }
 
 

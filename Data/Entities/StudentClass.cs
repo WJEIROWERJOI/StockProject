@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace StockProject.Data.Entities
 {
@@ -9,6 +10,7 @@ namespace StockProject.Data.Entities
         public string Name { get; set; } = string.Empty;
         public List<Student> Students { get; set; } = new();
         public string Description { get; set; } = string.Empty;
-        public List<StudentTime> ClassTimes { get; set; } = new();//이걸 통해서 시간을 지정 가능
+        [DeleteBehavior(DeleteBehavior.Cascade)]
+        public List<StudentTime> ClassTimes { get; set; } = new();
     }
 }

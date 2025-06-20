@@ -1,4 +1,5 @@
 ﻿@inject StudentService studentService
+@inject IToastService toastService
 <div class="form-group">
     <EditForm Model="input" OnValidSubmit="Close">
         <select class="form-control" @bind=@input>
@@ -20,15 +21,26 @@
     [SupplyParameterFromForm]
     private int input { get; set; }
     List<Student> students = new();
+
     protected override async Task OnInitializedAsync()
     {
-        students = await studentService.GetAllStudentsAsync();
+        var result = await studentService.GetAllStudentsAsync();
+        if (result.Success && result.Data is not null)
+        {
+            students = result.Data;
+        }
+        else
+        {
+            toastService.ShowError(result.Message!);
+        }
+
+    
     }
 
     async Task Close()
     {
         var result = await studentService.AddStudentToClass(ClassId, input);
-        if (result)
+        if (result.Success)
         {
             await BlazoredModal.CloseAsync(ModalResult.Ok(true));
         }

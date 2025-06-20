@@ -11,8 +11,8 @@ using StockProject.Data;
 namespace StockProject.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250619144116_AddClassIdToStudent")]
-    partial class AddClassIdToStudent
+    [Migration("20250620051119_InitialStarts")]
+    partial class InitialStarts
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -548,11 +548,13 @@ namespace StockProject.Migrations
                 {
                     b.HasOne("StockProject.Data.Entities.StudentClass", "StudentClass")
                         .WithMany("ClassTimes")
-                        .HasForeignKey("ClassId");
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("StockProject.Data.Entities.Student", "Student")
                         .WithMany("unableDateTime")
-                        .HasForeignKey("StudentId");
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Student");
 

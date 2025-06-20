@@ -545,11 +545,13 @@ namespace StockProject.Migrations
                 {
                     b.HasOne("StockProject.Data.Entities.StudentClass", "StudentClass")
                         .WithMany("ClassTimes")
-                        .HasForeignKey("ClassId");
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("StockProject.Data.Entities.Student", "Student")
                         .WithMany("unableDateTime")
-                        .HasForeignKey("StudentId");
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Student");
 

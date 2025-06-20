@@ -27,7 +27,7 @@
         <div class="form-floating mb-3">
             <InputSelect TValue=int? class="form-select" @bind-Value=@input.ClassId>
                 <option value="">미정</option> 
-                @foreach (var cla in studentClasses)
+                @foreach (var cla in classes)
                 {
                     <option value="@cla.Id">@cla.Name</option>
                 }
@@ -50,10 +50,14 @@
     [SupplyParameterFromForm]
     InputModel input { get; set; } = new();
 
-    List<StudentClass> studentClasses = new();
+    List<StudentClass> classes = new();
     protected override async Task OnInitializedAsync()
     {
-        studentClasses = await studentService.GetAllClassAsync();
+        var result = await studentService.GetAllClassAsync();
+        if (result.Success && result.Data is not null)
+        {
+            classes = result.Data;
+        }
     }
 
     protected sealed class InputModel
