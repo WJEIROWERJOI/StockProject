@@ -13,7 +13,7 @@ namespace StockProject.Data.Entities
         [ForeignKey("StudentClass")]
         public int? ClassId { get; set; }//class와 연결된거 -> 둘다 null 일 수 있찌만 그렇게 하면 안되용~
         public StudentClass? StudentClass { get; set; }
-        public string Description { get; set; } = string.Empty;
+        public string? Description { get; set; }
         public DayOfWeek DayOfWeek { get; set; }
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }

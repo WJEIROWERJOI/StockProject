@@ -1,7 +1,7 @@
 ﻿@inject StudentService studentService
 
 <EditForm Model="input" OnValidSubmit="Close">
-    
+    @* <DataAnnotationsValidator/> *@
     <div class="form-floating mb-3">
         <InputText type="text" @bind-Value="input.Description" class="form-control" />
         <label>설명</label>

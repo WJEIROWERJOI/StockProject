@@ -4,7 +4,6 @@
 @inject IModalService modalService
 @inject StudentService studentService
 @inject NavigationManager nav
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 
 
 <PageTitle>StudentList</PageTitle>
@@ -140,7 +139,9 @@ else
                         <td>@student.Description</td>
                         <td>
                             <button class="btn btn-outline-danger btn-sm" @onclick:stopPropagation
-                                @onclick="() => DeleteStudent(student.Id)">삭제</button>
+                                    @onclick="() => DeleteStudent(student.Id)">
+                                삭제
+                            </button>
                         </td>
                     </tr>
                 }
@@ -168,13 +169,11 @@ else
     }
     async Task DetailStudentModal(Student student)
     {
-        @* await sessionStorage.SetItemAsync("Student",JsonSerializer.Serialize(student)); *@
-
-
         var parameter = new ModalParameters();
         parameter.Add(nameof(StudentDetailModal.student), student);
-
-        var modal = modalService.Show<StudentDetailModal>("Detail Student", parameter);
+            var options = new ModalOptions { HideCloseButton = true, DisableBackgroundCancel = true };
+            // Modal.Show<Confirm>("Background Cancel Disabled", options);
+        var modal = modalService.Show<StudentDetailModal>("Detail Student", parameter,options);
         var result = await modal.Result;
         if (!result.Cancelled)
         {
@@ -183,11 +182,6 @@ else
                 toastService.ShowSuccess("학생 관리!");
             }
         }
-        else
-        {
-            @* student = await sessionStorage.GetItemAsync<Student>("Student"); *@
-        }
-        await sessionStorage.RemoveItemAsync("Student");
     }
     async Task DeleteStudent(int id)
     {

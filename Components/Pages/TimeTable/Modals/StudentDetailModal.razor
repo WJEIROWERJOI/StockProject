@@ -96,7 +96,7 @@ else
 
     [Parameter]
     public Student? student { get; set; }
-    @* private Student? exstudent {get;set;} *@
+    private Student? exstudent = new() { Name = "Temp" };
     List<StudentClass> classes = new();
 
     protected override async Task OnInitializedAsync()
@@ -113,6 +113,17 @@ else
 
     }
 
+    protected override void OnParametersSet()
+    {
+
+        exstudent!.Name = student!.Name;
+        exstudent.Description = student.Description;
+        exstudent.StudentGrade = student.StudentGrade;
+        exstudent.ClassId = student.ClassId;
+        exstudent.Class = student.Class;
+
+    }
+
     async Task Close()
     {
         student!.Class = classes.FirstOrDefault(c => c.Id == student.ClassId);
@@ -121,10 +132,19 @@ else
     }
 
 
-    async Task Cancel() => await BlazoredModal.CancelAsync();
+    async Task Cancel()
+    {
+
+        student!.Name = exstudent!.Name;
+        student.Description = exstudent.Description;
+        student.StudentGrade = exstudent.StudentGrade;
+        student.ClassId = exstudent.ClassId;
+        student.Class = exstudent.Class;
+
+        await BlazoredModal.CancelAsync();
+    }
 
 
-    
 
     async Task ManageStudentModal(int id)
     {
