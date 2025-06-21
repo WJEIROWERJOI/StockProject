@@ -1,7 +1,11 @@
 ﻿@page "/TimeTable/Time"
-
 @inject StudentService studentService
 @inject NavigationManager nav
+@inject IToastService toastService
+@inject IModalService modalService
+<PageTitle>TimeList</PageTitle>
+<h3>🕐TimeList</h3>
+<hr />
 
 <style>
     td {
@@ -10,31 +14,57 @@
     }
 </style>
 
-<div style="display:flex;">
-    <div class="input-group" style="max-width: fit-content;">
 
-        <InputSelect TValue="string" @bind-Value=@searchTopic class="form-select">
+@* <div class="form-check form-switch">
+    <InputCheckbox @bind-Value="ShowCT" @onclick="() => ShowCT = !ShowCT" class="form-check-input" role="switch"
+        type="checkbox" />
+    <label>수업시간 제외 @ShowCT</label>
+</div>
+
+@code {
+    private bool ShowCT;
+} *@
+
+<div stlye="display:flex; justify-content:flex-start;" class="m-3">
+    <div class="input-group" style="width: max-content;">
+        <InputSelect @bind-Value="@searchTopic" class="form-select form-select-sm">
+            <option value="">-</option>
             <option value="Name">Name</option>
-            <option value="StudentClass">StudentClass</option>
+            <option value="StudentGrade">StudentGrade</option>
+            <option value="ClassId">StudentClass</option>
         </InputSelect>
-        @if (searchTopic is "StudentClass")
+        @if (searchTopic is "StudentGrade")
         {
-            <InputSelect TValue="string" @bind-Value=@searchContent class="form-select">
-                @foreach (var klass in classes)
+            <InputSelect @bind-Value="@searchContent" class="form-select form-select-sm">
+                <option value="">-</option>
+                @foreach (var group in Enum.GetValues(typeof(StudentGrade)))
                 {
-                    <option value=@klass.Id>@klass.Name</option>
+                    <option value="@group">@group</option>
+                }
+            </InputSelect>
+        }
+        else if (searchTopic is "ClassId")
+        {
+            <InputSelect @bind-Value="@searchContent" class="form-select form-select-sm">
+                <option value="">-</option>
+                @foreach (var item in classes)
+                {
+                    <option value="@item.Id">@item.Name</option>
                 }
             </InputSelect>
         }
         else
         {
-            <InputText @bind-Value="@searchContent" class="form-control" />
+            <InputText @bind-Value="@searchContent" class="form-control form-control-sm" />
         }
+
         <button type="button" @onclick="StartSearch" class="btn btn-secondary">검색</button>
-        <button @onclick="CancelSearch" class="btn btn-secondary border-start-1">취소</button>
+        <button type="button" @onclick="CancelSearch" class="btn btn-secondary border-start-1">취소</button>
 
     </div>
 </div>
+
+
 
 @code {
     [SupplyParameterFromQuery]
@@ -44,108 +74,102 @@
 
     private void StartSearch()
     {
-        nav.NavigateTo($"/TimeTable/Time?searchTopic={searchTopic}&searchContent={searchContent}");
+        nav.NavigateTo($"/TimeTable/Time?searchTopic={searchTopic}&searchContent={searchContent}", forceLoad: true);
     }
     private void CancelSearch()
     {
         nav.NavigateTo("/TimeTable/Time?");
     }
-    protected override async Task OnParametersSetAsync()
-    {
-        if (String.IsNullOrWhiteSpace(searchTopic))
-        {
-            studenttimes = await studentService.GetOnlyTimesWithStudentAsync();
-        }
-        else if (searchTopic is "Name")
-        {
-            studenttimes = await studentService.GetTimesByStudentNameAsync(searchContent!);
-        }
-        else if (searchTopic is "StudentClass")
-        {
-            studenttimes = await studentService.GetTimesByStudentClassAsync(searchContent!);
-        }
-
-    }
 }
 
-
-<table class="table table-bordered align-content-center text-md-center">
-    <thead>
-        <tr>
-            <th>시간＼요일</th>
-            @foreach (var day in Enum.GetValues<DayOfWeek>())
-            {
-                <th style="@(day == DayOfWeek.Sunday ? "color:orangered" : null)">
-                    @day
-                </th>
-            }
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var time in Enumerable.Range(9 * 2, 30).Select(i => TimeSpan.FromMinutes(i * 30)))
-        {
+<div class="d-flex justify-content-center">
+    <table class="table table-bordered"
+        style="border-color:darkgrey; text-align:center; vertical-align:middle; min-width:75%;max-width:max-content;">
+        <thead style="background-color:rgb(225, 199, 255);">
             <tr>
-                <th>@time.ToString(@"hh\:mm")</th>
+                <th>시간＼요일</th>
                 @foreach (var day in Enum.GetValues<DayOfWeek>())
                 {
-                    var cellItems = studenttimes
-                    .Concat(classtimes)
-                    .Where(t => t.DayOfWeek == day && t.StartTime <= time && t.EndTime > time)
-                    .ToList();
-
-
-                    @if (cellItems.Any())
-                    {
-                        <td style="text-align: center; vertical-align: middle; background-color:darkgrey">
-                            @foreach (var t in cellItems)
-                            {
-                                <div style="margin-bottom: 5px;">
-                                    <strong>@t.Description</strong><br />
-                                    @if (t.Student is not null)
-                                    {
-                                        <span class="text-muted small">@t.Student.Name</span>
-                                    }
-                                    else if (t.StudentClass is not null)
-                                    {
-                                        <span class="text-muted small">@t.StudentClass.Name</span>
-                                    }
-
-                                </div>
-                            }
-                        </td>
-                    }
-                    else
-                    {
-                        <td style="text-align: center; vertical-align: middle;">
-                            <em class="text-muted">-</em>
-                        </td>
-                    }
-
+                    <th style="@(day == DayOfWeek.Sunday ? "color:orangered" : null)">
+                        @day.ToString().Substring(0, 3)
+                    </th>
                 }
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var time in Enumerable.Range(9 * 2, 31).Select(i => TimeSpan.FromMinutes(i * 30)))
+            {
+                <tr>
+                    <th style="background-color:rgb(225, 199, 255);">@time.ToString(@"hh\:mm")</th>
+                    @foreach (var day in Enum.GetValues<DayOfWeek>())
+                    {
+                        var cellItems = studenttimes
+                        @* .Concat(classtimes) *@
+                        .Where(t => t.DayOfWeek == day && t.StartTime <= time && t.EndTime >= time)
+                        .ToList();
 
+                        @if (cellItems.Any())
+                        {
+                            <td style="background-color:rgb(230, 230, 230)" @ondblclick="() => ShowDetail(cellItems)">
+                                @foreach (var t in cellItems)
+                                {
+                                    <div>
+                                        @if (t.Student is not null)
+                                        {
+                                            <span class="small">
+                                                @t.Student.Name
+                                                <span class="text-muted small">@t.Description</span>
+                                            </span>
+                                        }
+                                        else if (t.StudentClass is not null)
+                                        {
+                                            <span class="small" style="color:red;">
+                                                @t.StudentClass.Description
+                                                <span class="text-muted small">@t.Description</span>
+                                            </span>
+                                        }
+                                    </div>
+                                }
+                            </td>
+                        }
+                        else
+                        {
+                            <td style="text-align: center; vertical-align: middle;">
+                                <em class="text-muted">-</em>
+                            </td>
+                        }
 
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 @code {
 
-    private int GetRowSpan(StudentTime time)
+    async Task ShowDetail(List<StudentTime> times)
     {
-        return (int)(time.EndTime.TotalMinutes - time.StartTime.TotalMinutes) / 30; // 30분 단위
+        var parameter = new ModalParameters();
+        parameter.Add(nameof(TimeDetailModal.times), times);
+
+        var modal = modalService.Show<TimeDetailModal>($"{times[0].DayOfWeek.ToString().Substring(0,3)},{times[0].StartTime.ToString(@"hh\:mm")}", parameter);
+        var result = await modal.Result;
+        if (!result.Cancelled)
+        {
+            @* toastService.ShowSuccess(""); *@
+        }
+        else
+        {
+            @* toastService.ShowError(""); *@
+        }
     }
 
+
+
     List<StudentTime> studenttimes = new();
-    List<StudentTime> classtimes = new();
     List<StudentClass> classes = new();
-    // List<StudentTime> showtimes = new();
-    //public List<StudentTime> unableDateTime { get; set; } = new();
-    //List<StudentClass> unableDateTime = new();
     protected override async Task OnInitializedAsync()
     {
-        // studenttimes = await studentService.GetOnlyTimesWithStudentAsync();
-        classtimes = await studentService.GetOnlyTimesWithClassAsync();
-        // showtimes = studenttimes.Concat(classtimes).ToList();
         var result = await studentService.GetAllClassAsync();
         if (result.Success && result.Data is not null)
         {
@@ -153,9 +177,42 @@
         }
         else
         {
-            // toastService.ShowError(result.Message!);
+            toastService.ShowError(result.Message!);
+
         }
     }
+    protected override async Task OnParametersSetAsync()
+    {
+        await InitialDatabring();
+    }
+
+    @* private int GetRowSpan(StudentTime time)
+    {
+        return (int)(time.EndTime.TotalMinutes - time.StartTime.TotalMinutes) / 30; // 30분 단위
+    } *@
+    private async Task InitialDatabring()
+    {
+        Result<List<StudentTime>> result;
+        if (string.IsNullOrWhiteSpace(searchTopic) || string.IsNullOrWhiteSpace(searchContent))
+        {
+            result = await studentService.GetAllTimesAsync();
+        }
+        else
+        {
+            result = await studentService.SearchTimesAsync(searchTopic, searchContent);
+        }
+
+        if (result.Success && result.Data is not null)
+        {
+            studenttimes = result.Data;
+        }
+        else
+        {
+            toastService.ShowError(result.Message!);
+        }
+    }
+
+
 
 
 }

@@ -5,98 +5,102 @@
 @inject IModalService modalService
 
 <PageTitle>ClassList</PageTitle>
-<h3>ClassList</h3>
+<h3>🏫ClassList</h3>
 <hr />
 
-@* <div class="d-flex justify-content-end"></div> *@
-    <button @onclick="ClassCreateModal" class="btn btn-primary">추가</button>
+<button @onclick="ClassCreateModal" class="btn btn-primary mb-3">추가</button>
 
 @code {
-    [CascadingParameter]
-    public IModalService Modal { get; set; } = default!;
-
     private async Task ClassCreateModal()
     {
-        var modal = Modal.Show<ClassCreateModal>("Create Class");
+        var modal = modalService.Show<ClassCreateModal>("Create Class");
         var result = await modal.Result;
         if (!result.Cancelled)
         {
             if (result.Data is bool success)
             {
-                // students = await studentService.GetAllStudentsAsync();
-                // 다시 받아 오는거 필요
                 toastService.ShowSuccess("클래스 생성!");
+                await InitialDatabring();
             }
             else
             {
-                toastService.ShowError("클래스 생성?");
+                toastService.ShowError("클래스 생성 실패!");
             }
         }
     }
 }
-
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">아이디키값</th>
-            <th scope="col">이름</th>
-            <th scope="col">설명</th>
-            <th scope="col">수업 시간</th>
-            <th scope="col">소속 학생</th>
-            <th scope="col">버튼</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var clas in classes)
-        {
+<div class="d-flex justify-content-center">
+    <table class="table table-bordered align-middle align-items-center" style="min-width:fit-content; max-width:75%">
+        <thead class="table-light text-center">
             <tr>
-                
-                    <td>@clas.Id</td>
+                <th scope="col">Key</th>
+                <th scope="col">이름</th>
+                <th scope="col">설명</th>
+                <th scope="col">수업 시간</th>
+                <th scope="col">소속 학생</th>
+                <th scope="col">버튼</th>
+            </tr>
+        </thead>
+        <tbody class="text-center">
+            @foreach (var clas in classes.OrderByDescending(x => x.Id))
+            {
+                <tr>
+
+                    <td class="table-light">@clas.Id</td>
 
                     <td>@clas.Name</td>
                     <td>@clas.Description</td>
 
-                <td>
-                    @foreach(var tame in clas.ClassTimes)
-                    {
-                        <div>
-                            @* <div class="d-flex justify-content-md-between"> *@
-                            <span>@tame.Description, @tame.DayOfWeek.ToString().Substring(0, 3), @($"{tame.StartTime:hh\\:mm} - {tame.EndTime:hh\\:mm}")</span>
-                            @* <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteTime(tame.Id)">X</button> 구현 필요*@
-                            <button class="btn btn-outline-danger btn-sm">X</button>
-                            <br />
-                        </div>
-                    }
-                </td>
-
-                <td>
-                    @foreach(var t in clas.Students)
-                    {
-                        <div class="d-flex justify-content-md-between">
-                            <span>@t.Name</span>
-                            <button class="btn btn-outline-danger btn-sm" @onclick="() => RemoveStudentFromClass(clas.Id,t.Id)">X</button>
-                            <br />
-                        </div>
-                    }
+                    <td>
+                        @foreach (var tame in clas.ClassTimes)
+                        {
+                            <div class="d-flex justify-content-md-between">
+                                <span class="text-muted">@tame.Description, @tame.DayOfWeek.ToString().Substring(0, 3),
+                                    @($"{tame.StartTime:hh\\:mm} - {tame.EndTime:hh\\:mm}")</span>
+                                <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteTime(tame.Id)">X</button>
+                                <br />
+                            </div>
+                        }
                     </td>
-                <td>
-                    <button class="btn btn-primary btn-sm" @onclick="() => ManageClassTimeModal(clas.Id)">시간 추가</button>
-                    <button class="btn btn-primary btn-sm" @onclick="() => ManageClassStudentModal(clas.Id)">학생 추가</button>
-                    <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteClass(clas.Id)">X</button>
-                </td>
-                
-            </tr>
-        }
-    </tbody>
-</table>
 
+                    <td>
+                        @for (int i = 0; i < clas.Students.Count; i++)
+                        {
+                            var t = clas.Students[i];
+                            <span>@t.Name</span>
+                            <button class="btn btn-outline-danger btn-sm m-1"
+                                @onclick="() => RemoveStudentFromClass(clas.Id, t.Id)">X</button>
+
+                            @if ((i + 1) % 3 == 0)
+                            {
+                                <br />
+                            }
+                        }
+                    </td>
+                    <td>
+                        <button class="btn btn-primary btn-sm mb-1" @onclick="() => ManageClassTimeModal(clas.Id)">시간
+                            추가</button>
+                        <br />
+                        <button class="btn btn-primary btn-sm mb-1" @onclick="() => ManageClassStudentModal(clas.Id)">학생
+                            추가</button>
+                        <br />
+                        <button class="btn btn-outline-danger btn-sm mb-1" @onclick="() => DeleteClass(clas.Id)">삭제</button>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 
 @code {
-
     List<StudentClass> classes = new();
-
     protected override async Task OnInitializedAsync()
+    {
+        await InitialDatabring();
+    }
+    async Task InitialDatabring()
     {
         var result = await studentService.GetAllClassAsync();
         if (result.Success && result.Data is not null)
@@ -108,21 +112,29 @@
             toastService.ShowError(result.Message!);
         }
     }
-
     async Task DeleteClass(int id)
     {
-        var result = await studentService.DeleteClassAsync(id);
-        if (result.Success)
+        var modal = modalService.Show<ConfirmModal>();
+        var result = await modal.Result;
+        if (!result.Cancelled)
         {
-            toastService.ShowSuccess("클래스 삭제!");
-            StateHasChanged();
+            if (result.Data is bool success)
+            {
+                if ((await studentService.DeleteClassAsync(id)).Success)
+                {
+                    toastService.ShowSuccess("클래스 삭제!");
+                    await InitialDatabring();
+                    StateHasChanged();
+                }
+                else
+                {
+                    toastService.ShowError("클래스 삭제 실패");
+                }
+            }
         }
-        else
-        {
-            toastService.ShowError("클래스 삭제?");
-        }
+
     }
-    async Task RemoveStudentFromClass(int classId,int studentId)
+    async Task RemoveStudentFromClass(int classId, int studentId)
     {
         var result = await studentService.RemoveStudentFromClass(classId, studentId);
         if (result.Success)
@@ -133,7 +145,19 @@
         {
             toastService.ShowError(result.Message!);
         }
-    
+
+    }
+    async Task DeleteTime(int id)
+    {
+        var result = await studentService.DeleteTimeAsync(id);
+        if (result.Success)
+        {
+            toastService.ShowSuccess("시간 삭제 성공!");
+        }
+        else
+        {
+            toastService.ShowError("시간 삭제 실패!");
+        }
     }
     async Task ManageClassStudentModal(int id)
     {

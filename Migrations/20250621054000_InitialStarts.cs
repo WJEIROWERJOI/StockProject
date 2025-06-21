@@ -305,7 +305,7 @@ namespace StockProject.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     StudentId = table.Column<int>(type: "INTEGER", nullable: true),
                     ClassId = table.Column<int>(type: "INTEGER", nullable: true),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
                     DayOfWeek = table.Column<int>(type: "INTEGER", nullable: false),
                     StartTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     EndTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),

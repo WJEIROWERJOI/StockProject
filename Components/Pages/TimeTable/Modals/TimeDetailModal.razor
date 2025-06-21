@@ -1,0 +1,92 @@
+﻿@inject StudentService studentService
+@inject IModalService modalService
+@inject IToastService toastService
+@* public int Id { get; set; }
+        public int? StudentId { get; set; }//student와 연결된거
+        public Student? Student { get; set; }//Id 값도 nullable 이여야 합니다잉~~~~
+        public int? ClassId { get; set; }//class와 연결된거 -> 둘다 null 일 수 있찌만 그렇게 하면 안되용~
+        public StudentClass? StudentClass { get; set; }
+        public string? Description { get; set; }
+        public DayOfWeek DayOfWeek { get; set; }
+        public TimeSpan StartTime { get; set; }
+        public TimeSpan EndTime { get; set; }
+        public DateTime? SpecificDate { get; set; } *@
+
+
+
+@foreach (var time in times)
+{
+    <div class="card mb-2 shadow-sm">
+        <div class="card-body py-2 px-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <h6 class="mb-0 fw-bold text-primary">
+                    @(time.Student?.Name ?? time.StudentClass?.Name ?? "❓")
+                </h6>
+                <small class="text-muted">
+                    @time.DayOfWeek.ToString()
+                </small>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <span class="text-muted small">@time.Description</span>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-light text-dark">
+                        @($"{time.StartTime.ToString(@"hh\:mm")} - {time.EndTime.ToString(@"hh\:mm")}")
+                    </span>
+                </div>
+            </div>
+
+            @if (time.Student is not null)
+            {
+                <div class="text-end">
+                    <button class="btn btn-outline-secondary btn-sm" @onclick="() => DetailStudentModal(time.Student)">
+                        ✏️ 상세
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+
+@* @foreach (var time in times)
+{
+    <div class="d-flex align-items-center justify-content-between ">
+        <div class="fw-bold">
+            @(time.Student?.Name ?? time.StudentClass?.Name ?? "❓")
+        </div>
+        <div class="text-muted small">@time.Description</div>
+        <div class="text-muted small">@time.DayOfWeek</div>
+        <div class="text-end small">
+            @($"{time.StartTime.ToString(@"hh\:mm")} - {time.EndTime.ToString(@"hh\:mm")}")
+        </div>
+    </div>
+} *@
+
+@code {
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    [Parameter]
+    public List<StudentTime> times { get; set; } = new();
+
+    async Task DetailStudentModal(Student student)
+    {
+        var parameter = new ModalParameters();
+        parameter.Add(nameof(StudentDetailModal.student), student);
+        var options = new ModalOptions { HideCloseButton = true, DisableBackgroundCancel = true };
+        var modal = modalService.Show<StudentDetailModal>("Detail Student", parameter, options);
+        var result = await modal.Result;
+        if (!result.Cancelled)
+        {
+            if (result.Data is bool success)
+            {
+                StateHasChanged();
+                toastService.ShowSuccess("학생 관리 완료");
+            }
+        }
+    }
+    async Task Close()
+    => await BlazoredModal.CloseAsync(ModalResult.Ok(true));
+    async Task Cancel() => await BlazoredModal.CancelAsync();
+}

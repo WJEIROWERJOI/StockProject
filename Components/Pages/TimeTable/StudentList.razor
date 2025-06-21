@@ -46,7 +46,7 @@
             <InputText @bind-Value="@searchContent" class="form-control form-control-sm" />
         }
 
-        <button type="submit" @onclick="StartSearch" class="btn btn-secondary">검색</button>
+        <button type="button" @onclick="StartSearch" class="btn btn-secondary">검색</button>
         <button type="button" @onclick="CancelSearch" class="btn btn-secondary border-start-1">취소</button>
 
     </div>
@@ -57,46 +57,6 @@
     public string? searchTopic { get; set; }
     [SupplyParameterFromQuery]
     public string? searchContent { get; set; }
-    async Task InitialDatabring()
-    {
-        Result<List<Student>> result;
-        if (string.IsNullOrWhiteSpace(searchTopic) || string.IsNullOrWhiteSpace(searchContent))
-        {
-            result = await studentService.GetAllStudentsAsync();
-        }
-        else
-        {
-            result = await studentService.SearchStudentsAsync(searchTopic, searchContent);
-        }
-
-        if (result.Success && result.Data is not null)
-        {
-            students = result.Data.OrderByDescending(s => s.CreatedAt).ToList();
-        }
-        else
-        {
-            toastService.ShowError(result.Message!);
-        }
-    }
-    protected override async Task OnParametersSetAsync()
-    {
-        await InitialDatabring();
-    }
-    List<Student> students = new();
-    List<StudentClass> classes = new();
-    protected override async Task OnInitializedAsync()
-    {
-        var result = await studentService.GetAllClassAsync();
-        if (result.Success && result.Data is not null)
-        {
-            classes = result.Data;
-        }
-        else
-        {
-            toastService.ShowError(result.Message!);
-        }
-    }
-
     private void StartSearch()
     {
         nav.NavigateTo($"/TimeTable/Student?searchTopic={searchTopic}&searchContent={searchContent}", forceLoad: true);
@@ -131,7 +91,7 @@ else
             <tbody>
                 @foreach (var student in students)
                 {
-                    <tr @onclick="() => DetailStudentModal(student)">
+                    <tr @ondblclick="() => DetailStudentModal(student)">
 
                         <td>@student.Name</td>
                         <td>@student.StudentGrade.ToString()</td>
@@ -139,7 +99,7 @@ else
                         <td>@student.Description</td>
                         <td>
                             <button class="btn btn-outline-danger btn-sm" @onclick:stopPropagation
-                                    @onclick="() => DeleteStudent(student.Id)">
+                                @onclick="() => DeleteStudent(student.Id)">
                                 삭제
                             </button>
                         </td>
@@ -152,6 +112,25 @@ else
 }
 
 @code {
+    List<Student> students = new();
+    List<StudentClass> classes = new();
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await studentService.GetAllClassAsync();
+        if (result.Success && result.Data is not null)
+        {
+            classes = result.Data;
+        }
+        else
+        {
+            toastService.ShowError(result.Message!);
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await InitialDatabring();
+    }
 
     async Task StudentCreateModal()
     {
@@ -164,22 +143,20 @@ else
                 await InitialDatabring();
                 toastService.ShowSuccess("학생 생성!");
             }
-
         }
     }
     async Task DetailStudentModal(Student student)
     {
         var parameter = new ModalParameters();
         parameter.Add(nameof(StudentDetailModal.student), student);
-            var options = new ModalOptions { HideCloseButton = true, DisableBackgroundCancel = true };
-            // Modal.Show<Confirm>("Background Cancel Disabled", options);
-        var modal = modalService.Show<StudentDetailModal>("Detail Student", parameter,options);
+        var options = new ModalOptions { HideCloseButton = true, DisableBackgroundCancel = true };
+        var modal = modalService.Show<StudentDetailModal>("Detail Student", parameter, options);
         var result = await modal.Result;
         if (!result.Cancelled)
         {
             if (result.Data is bool success)
             {
-                toastService.ShowSuccess("학생 관리!");
+                toastService.ShowSuccess("학생 관리 완료");
             }
         }
     }
@@ -201,16 +178,30 @@ else
                     toastService.ShowError("삭제 실패!");
                 }
             }
-            else
-            {
-                toastService.ShowInfo("삭제 취소!");
-            }
+        }
+    }
+
+    async Task InitialDatabring()
+    {
+        Result<List<Student>> result;
+        if (string.IsNullOrWhiteSpace(searchTopic) || string.IsNullOrWhiteSpace(searchContent))
+        {
+            result = await studentService.GetAllStudentsAsync();
         }
         else
         {
-            toastService.ShowInfo("삭제 취소!");
+            result = await studentService.SearchStudentsAsync(searchTopic, searchContent);
         }
 
+        if (result.Success && result.Data is not null)
+        {
+            students = result.Data.OrderByDescending(s => s.CreatedAt).ToList();
+        }
+        else
+        {
+            toastService.ShowError(result.Message!);
+        }
     }
+
 
 }

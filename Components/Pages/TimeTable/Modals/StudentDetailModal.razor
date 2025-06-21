@@ -115,19 +115,17 @@ else
 
     protected override void OnParametersSet()
     {
-
         exstudent!.Name = student!.Name;
         exstudent.Description = student.Description;
         exstudent.StudentGrade = student.StudentGrade;
         exstudent.ClassId = student.ClassId;
         exstudent.Class = student.Class;
-
     }
 
     async Task Close()
     {
         student!.Class = classes.FirstOrDefault(c => c.Id == student.ClassId);
-        await studentService.UpdateAsync();
+        await studentService.UpdateStudentAsync(student);
         await BlazoredModal.CloseAsync(ModalResult.Ok(true));
     }
 
@@ -149,9 +147,9 @@ else
     async Task ManageStudentModal(int id)
     {
         var parameter = new ModalParameters();
-        parameter.Add(nameof(StudentManageModal.StudentId), id);
+        parameter.Add(nameof(StudentTimeManageModal.StudentId), id);
 
-        var modal = modalService.Show<StudentManageModal>("Manage Student", parameter);
+        var modal = modalService.Show<StudentTimeManageModal>("Manage Student", parameter);
         var result = await modal.Result;
         if (!result.Cancelled)
         {

@@ -19,5 +19,5 @@ namespace StockProject.Data.Entities
         public TimeSpan EndTime { get; set; }
         public DateTime? SpecificDate { get; set; }
 
-        }
+    }
 }

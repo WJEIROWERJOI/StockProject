@@ -3,7 +3,7 @@
 <div class="form-group">
     <EditForm Model="input" OnValidSubmit="Close">
         <select class="form-control" @bind=@input>
-            @foreach (var student in students)
+            @foreach (var student in students.OrderBy(s=>s.Name))
             {
                 <option value=@student.Id>@($"{student.Name}({student.Id})")</option>
             }

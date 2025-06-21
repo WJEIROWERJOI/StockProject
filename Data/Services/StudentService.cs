@@ -110,30 +110,54 @@ namespace StockProject.Data.Services
                 return Result<List<Student>>.Fail(ex.Message);
             }
         }
-        public async Task<List<StudentTime>> GetTimesByStudentNameAsync(string str)
-        {
-            return await _studentRepository.GetTimesByStudentNameAsync(str);
-        }
-        public async Task<List<StudentTime>> GetTimesByStudentClassAsync(string id)
-        {
-            //int.TryParse(Id, out int classId); 둘다 TryParse 값은 무시한다는 건데 _= 쓰면 명시적으로 무시한다는 뜻
-            _ = int.TryParse(id, out int classId);
-            return await _studentRepository.GetTimesByStudentClassAsync(classId);
-        }
-        public async Task<List<StudentTime>> GetOnlyTimesWithClassAsync()
-        {
-            return await _studentRepository.GetOnlyTimesWithClassAsync();
-        }
-        public async Task<List<StudentTime>> GetOnlyTimesWithStudentAsync()
-        {
-            return await _studentRepository.GetOnlyTimesWithStudentAsync();
-        }
 
-        //update
-        public async Task<Result> UpdateAsync()
+        public async Task<Result<List<StudentTime>>> SearchTimesAsync(string searchTopic, string searchContent)
         {
             try
             {
+                var times = await _studentRepository.SearchTimesAsync(searchTopic, searchContent);
+                return Result<List<StudentTime>>.Ok(times);
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogErrorAsync(ex.Message);
+                return Result<List<StudentTime>>.Fail(ex.Message);
+            }
+        }
+
+        // public async Task<List<StudentTime>> GetTimesByStudentNameAsync(string str)
+        // {
+        //     return await _studentRepository.GetTimesByStudentNameAsync(str);
+        // }
+        // public async Task<List<StudentTime>> GetTimesByStudentClassAsync(string id)
+        // {
+        //     //int.TryParse(Id, out int classId); 둘다 TryParse 값은 무시한다는 건데 _= 쓰면 명시적으로 무시한다는 뜻
+        //     _ = int.TryParse(id, out int classId);
+        //     return await _studentRepository.GetTimesByStudentClassAsync(classId);
+        // }
+        // public async Task<List<StudentTime>> GetOnlyTimesWithClassAsync()
+        // {
+        //     return await _studentRepository.GetOnlyTimesWithClassAsync();
+        // }
+        // public async Task<List<StudentTime>> GetOnlyTimesWithStudentAsync()
+        // {
+        //     return await _studentRepository.GetOnlyTimesWithStudentAsync();
+        // }
+
+
+
+
+
+
+
+
+
+        //update
+        public async Task<Result> UpdateStudentAsync(Student student)
+        {
+            try
+            {
+                student.LastUpdatedAt = DateTime.UtcNow;
                 await _studentRepository.SaveAsync();
                 return Result.Ok();
             }
@@ -143,7 +167,20 @@ namespace StockProject.Data.Services
                 return Result.Fail(ex.Message);
             }
         }
-
+        public async Task<Result> UpdateAsync()
+        {
+            try
+            {
+                // student.LastUpdatedAt = DateTime.UtcNow;
+                await _studentRepository.SaveAsync();
+                return Result.Ok();
+            }
+            catch (Exception ex)
+            {
+                await _logService.LogErrorAsync(ex.Message);
+                return Result.Fail(ex.Message);
+            }
+        }
 
         //C
         public async Task<Result> CreateStudent(string _name, string _description, StudentGrade _StudentGrade, int? _ClassId)
@@ -221,7 +258,7 @@ namespace StockProject.Data.Services
                     EndTime = _EndTime,
                     Description = _Description
                 };
-
+                student.LastUpdatedAt = DateTime.UtcNow;
                 await _studentRepository.CreateAsync(studentTime);
                 return Result.Ok();
             }
@@ -278,7 +315,7 @@ namespace StockProject.Data.Services
                 klass.Students.Add(student);
                 student.ClassId = klass.Id;//필요 없는게 있긴할텐데... 명시적으로 확실하게!
                 student.Class = klass;
-
+                student.LastUpdatedAt = DateTime.UtcNow;
                 await _studentRepository.SaveAsync();
                 return Result.Ok();
             }
@@ -359,6 +396,7 @@ namespace StockProject.Data.Services
                     student.ClassId = null;
                     student.Class = null;
                 }
+                student.LastUpdatedAt = DateTime.UtcNow;
                 await _studentRepository.SaveAsync();
                 return Result.Ok();
             }
